@@ -392,7 +392,7 @@
   <div id="home" class="screen active">
     <header>
       <div class="logo">⚓ Морський Бій</div>
-      <div class="subtitle">Онлайн • 2 гравці • HTML5 • v1.5</div>
+      <div class="subtitle">Онлайн • 2 гравці • HTML5 • v1.6</div>
     </header>
     <div class="card">
       <h2>Нова гра</h2>
@@ -1433,131 +1433,182 @@
     let scanCameras = [];
     let scanCamIndex = 0;
 
-    async function startQRScanner() {
-      if (typeof Html5Qrcode === 'undefined') {
-        toast('Сканер недоступний. Вставте код вручну.');
-        return;
-      }
-      const modal = document.getElementById('scanner-modal');
-      modal.classList.add('show');
-      const readerEl = document.getElementById('qr-reader');
-      readerEl.innerHTML = '';
-
-      const onSuccess = (decoded) => {
-        const code = (decoded || '').trim();
-        if (!code) return;
-        stopQRScanner();
-        document.getElementById('join-code').value = code;
-        toast('QR розпізнано!');
-        setTimeout(() => document.getElementById('btn-connect').click(), 300);
-      };
-
-      // Larger box = easier scan; aspect ratio helps focus framing
-      const config = {
-        fps: 12,
+    function getScanConfig() {
+      return {
+        fps: 10,
         qrbox: (viewW, viewH) => {
-          const s = Math.floor(Math.min(viewW, viewH) * 0.72);
+          const s = Math.max(180, Math.floor(Math.min(viewW, viewH) * 0.7));
           return { width: s, height: s };
         },
-        aspectRatio: 1,
-        disableFlip: false,
-        experimentalFeatures: { useBarCodeDetectorIfSupported: true }
+        aspectRatio: 1.0,
+        disableFlip: false
       };
+    }
+
+    function onScanSuccess(decoded) {
+      const code = (decoded || '').trim();
+      if (!code) return;
+      stopQRScanner();
+      document.getElementById('join-code').value = code;
+      toast('QR розпізнано!');
+      setTimeout(() => document.getElementById('btn-connect').click(), 300);
+    }
+
+    async function ensureCameraPermission() {
+      // Explicit permission request — unlocks getCameras() on many browsers
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        throw new Error('Браузер не підтримує камеру');
+      }
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: false,
+        video: { facingMode: { ideal: 'environment' } }
+      });
+      // Immediately stop — Html5Qrcode will open its own stream
+      stream.getTracks().forEach(t => t.stop());
+      await new Promise(r => setTimeout(r, 200));
+    }
+
+    async function createScanner() {
+      // Always fresh instance — after failed start the old one is often broken
+      if (html5Qr) {
+        try { await html5Qr.stop(); } catch (e) {}
+        try { html5Qr.clear(); } catch (e) {}
+        html5Qr = null;
+      }
+      document.getElementById('qr-reader').innerHTML = '';
+      html5Qr = new Html5Qrcode('qr-reader', { verbose: false });
+      return html5Qr;
+    }
+
+    async function startQRScanner() {
+      if (typeof Html5Qrcode === 'undefined') {
+        toast('Сканер не завантажився. Оновіть сторінку або вставте код.');
+        return;
+      }
+      if (!window.isSecureContext) {
+        toast('Камера працює лише через HTTPS (GitHub Pages).');
+        return;
+      }
+
+      const modal = document.getElementById('scanner-modal');
+      modal.classList.add('show');
+      document.getElementById('btn-switch-cam').style.display = 'none';
 
       try {
-        html5Qr = new Html5Qrcode('qr-reader', { verbose: false });
-
-        // Prefer back camera with continuous focus + higher res
-        const advancedConstraints = {
-          facingMode: { ideal: 'environment' },
-          width: { ideal: 1920 },
-          height: { ideal: 1080 },
-          focusMode: { ideal: 'continuous' },
-          advanced: [{ focusMode: 'continuous' }]
-        };
-
+        // 1) Ask permission first (fixes “permission granted but camera dead”)
         try {
-          await html5Qr.start(advancedConstraints, config, onSuccess, () => {});
-        } catch (e1) {
-          // Fallback: simple environment camera
-          try {
-            await html5Qr.start(
-              { facingMode: 'environment' },
-              config,
-              onSuccess,
-              () => {}
-            );
-          } catch (e2) {
-            // Last resort: any camera by id
-            const cams = await Html5Qrcode.getCameras();
-            scanCameras = cams || [];
-            if (!scanCameras.length) throw e2;
-            // Prefer back/environment in label
-            scanCamIndex = scanCameras.findIndex(c =>
-              /back|rear|environment|задн/i.test(c.label || '')
-            );
-            if (scanCamIndex < 0) scanCamIndex = 0;
-            await html5Qr.start(scanCameras[scanCamIndex].id, config, onSuccess, () => {});
-            if (scanCameras.length > 1) {
-              document.getElementById('btn-switch-cam').style.display = 'inline-flex';
+          await ensureCameraPermission();
+        } catch (permErr) {
+          console.error(permErr);
+          const name = permErr && permErr.name;
+          if (name === 'NotAllowedError' || name === 'PermissionDeniedError') {
+            toast('Доступ до камери заборонено. Увімкніть у налаштуваннях сайту.');
+          } else if (name === 'NotFoundError') {
+            toast('Камеру не знайдено на пристрої.');
+          } else {
+            toast('Немає доступу до камери: ' + (permErr.message || name || 'помилка'));
+          }
+          stopQRScanner();
+          return;
+        }
+
+        // 2) List cameras
+        try {
+          scanCameras = await Html5Qrcode.getCameras() || [];
+        } catch (e) {
+          scanCameras = [];
+        }
+
+        const config = getScanConfig();
+        let started = false;
+        let lastError = null;
+
+        // 3a) Try by camera id (most reliable after permission)
+        if (scanCameras.length) {
+          scanCamIndex = scanCameras.findIndex(c =>
+            /back|rear|environment|задн|후면|trasera/i.test(c.label || '')
+          );
+          if (scanCamIndex < 0) scanCamIndex = Math.max(0, scanCameras.length - 1);
+
+          // Try preferred, then others
+          const order = [scanCamIndex, ...scanCameras.map((_, i) => i).filter(i => i !== scanCamIndex)];
+          for (const idx of order) {
+            try {
+              await createScanner();
+              await html5Qr.start(scanCameras[idx].id, config, onScanSuccess, () => {});
+              scanCamIndex = idx;
+              started = true;
+              break;
+            } catch (e) {
+              lastError = e;
+              console.warn('Camera id failed', scanCameras[idx], e);
             }
           }
         }
 
-        // Tap video to re-focus (helps on many Android phones)
+        // 3b) facingMode fallbacks
+        if (!started) {
+          const modes = [
+            { facingMode: 'environment' },
+            { facingMode: { exact: 'environment' } },
+            { facingMode: 'user' },
+            true
+          ];
+          for (const video of modes) {
+            try {
+              await createScanner();
+              await html5Qr.start({ audio: false, video }, config, onScanSuccess, () => {});
+              started = true;
+              break;
+            } catch (e) {
+              lastError = e;
+              console.warn('facingMode failed', video, e);
+            }
+          }
+        }
+
+        if (!started) {
+          throw lastError || new Error('Не вдалося відкрити жоден пристрій камери');
+        }
+
+        if (scanCameras.length > 1) {
+          document.getElementById('btn-switch-cam').style.display = 'inline-flex';
+        }
+
+        // Tap to focus
         setTimeout(() => {
           const video = document.querySelector('#qr-reader video');
           if (!video) return;
           video.setAttribute('playsinline', 'true');
+          video.setAttribute('muted', 'true');
           video.style.touchAction = 'manipulation';
           const tryFocus = async () => {
             try {
               const stream = video.srcObject;
-              if (!stream) return;
-              const track = stream.getVideoTracks()[0];
-              if (!track || typeof track.applyConstraints !== 'function') return;
-              await track.applyConstraints({
-                advanced: [{ focusMode: 'continuous' }]
-              });
+              const track = stream && stream.getVideoTracks()[0];
+              if (!track || !track.applyConstraints) return;
+              await track.applyConstraints({ advanced: [{ focusMode: 'continuous' }] });
             } catch (e) {}
           };
           video.addEventListener('click', tryFocus);
           tryFocus();
-        }, 600);
+        }, 500);
 
       } catch (e) {
-        console.error(e);
-        toast('Камера недоступна. Дозвольте доступ або вставте код.');
+        console.error('QR scanner error', e);
+        toast('Камера не відкрилась. Вставте код вручну. (' + (e && e.name ? e.name : 'err') + ')');
         stopQRScanner();
       }
     }
 
     async function switchCamera() {
-      if (!html5Qr || scanCameras.length < 2) return;
-      try { await html5Qr.stop(); } catch (e) {}
+      if (scanCameras.length < 2) return;
       scanCamIndex = (scanCamIndex + 1) % scanCameras.length;
-      const config = {
-        fps: 12,
-        qrbox: (viewW, viewH) => {
-          const s = Math.floor(Math.min(viewW, viewH) * 0.72);
-          return { width: s, height: s };
-        },
-        aspectRatio: 1
-      };
       try {
-        await html5Qr.start(
-          scanCameras[scanCamIndex].id,
-          config,
-          (decoded) => {
-            const code = (decoded || '').trim();
-            if (!code) return;
-            stopQRScanner();
-            document.getElementById('join-code').value = code;
-            toast('QR розпізнано!');
-            setTimeout(() => document.getElementById('btn-connect').click(), 300);
-          },
-          () => {}
-        );
+        await createScanner();
+        await html5Qr.start(scanCameras[scanCamIndex].id, getScanConfig(), onScanSuccess, () => {});
+        document.getElementById('btn-switch-cam').style.display = 'inline-flex';
+        toast('Камера ' + (scanCamIndex + 1) + '/' + scanCameras.length);
       } catch (e) {
         toast('Не вдалося перемкнути камеру');
       }
@@ -1571,6 +1622,8 @@
         try { html5Qr.clear(); } catch (e) {}
         html5Qr = null;
       }
+      const readerEl = document.getElementById('qr-reader');
+      if (readerEl) readerEl.innerHTML = '';
     }
 
     // ==================== PARTICLES ====================
