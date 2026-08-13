@@ -185,7 +185,7 @@
     .orient-indicator span { font-weight: 700; color: var(--accent); min-width: 70px; text-align: center; }
 
     .hud {
-      display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; width: 100%; max-width: 720px;
+      display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 10px; width: 100%; max-width: 900px;
     }
     .hud-item {
       background: var(--glass); border: 1px solid var(--glass-border); border-radius: 11px;
@@ -193,6 +193,9 @@
     }
     .hud-item.turn { border-color: var(--accent); box-shadow: 0 0 12px var(--accent-glow); }
     .hud-item.turn.enemy { border-color: var(--hit); box-shadow: 0 0 12px var(--hit-glow); }
+    .hud .btn-sm, .hud .icon-btn {
+      flex-shrink: 0;
+    }
 
     .message {
       text-align: center; padding: 9px 18px; border-radius: 10px; font-weight: 500;
@@ -225,13 +228,13 @@
 
     /* ===== CHAT ===== */
     .chat-toggle {
-      position: fixed; bottom: 20px; right: 20px; width: 56px; height: 56px; border-radius: 50%;
+      position: fixed; bottom: 24px; right: 24px; width: 60px; height: 60px; border-radius: 50%;
       background: linear-gradient(135deg, #00b4d8, #0077b6); border: none; color: white;
-      font-size: 1.4rem; cursor: pointer; box-shadow: 0 4px 20px rgba(0,180,216,0.4);
-      z-index: 150; display: flex; align-items: center; justify-content: center;
-      transition: transform 0.2s;
+      font-size: 1.5rem; cursor: pointer; box-shadow: 0 4px 24px rgba(0,180,216,0.5);
+      z-index: 150; display: none; align-items: center; justify-content: center;
+      transition: transform 0.2s, box-shadow 0.2s;
     }
-    .chat-toggle:hover { transform: scale(1.08); }
+    .chat-toggle:hover { transform: scale(1.1); box-shadow: 0 6px 28px rgba(0,180,216,0.65); }
     .chat-toggle .badge-chat {
       position: absolute; top: -2px; right: -2px; background: #ef4444; color: white;
       font-size: 0.7rem; width: 20px; height: 20px; border-radius: 50%;
@@ -391,6 +394,10 @@
       <div class="hud-item turn" id="turn-indicator">Ваш хід</div>
       <div class="hud-item" id="ships-left">Ваших: 5</div>
       <div class="hud-item" id="enemy-ships">Ворожих: 5</div>
+      <button class="btn btn-secondary btn-sm" id="btn-pause" style="width:auto;max-width:none;padding:8px 14px;">⏸ Пауза</button>
+      <button class="btn btn-danger btn-sm" id="btn-surrender" style="width:auto;max-width:none;padding:8px 14px;">🏳 Здатися</button>
+      <button class="icon-btn" id="btn-sound" title="Звук">🔊</button>
+      <button class="icon-btn" id="btn-chat-hud" title="Чат">💬</button>
     </div>
     <div class="message info" id="game-msg">Починаємо бій!</div>
 
@@ -403,12 +410,6 @@
         <div class="board-title">Ви <span class="badge" id="you-badge">5</span></div>
         <div class="grid" id="my-grid"></div>
       </div>
-    </div>
-
-    <div class="game-controls">
-      <button class="btn btn-secondary btn-sm" id="btn-pause">⏸ Пауза</button>
-      <button class="btn btn-danger btn-sm" id="btn-surrender">🏳 Здатися</button>
-      <button class="icon-btn" id="btn-sound" title="Звук">🔊</button>
     </div>
   </div>
 
@@ -432,7 +433,7 @@
   </div>
 
   <!-- CHAT -->
-  <button class="chat-toggle" id="chat-toggle" style="display:none" title="Чат">
+  <button class="chat-toggle" id="chat-toggle" title="Чат">
     💬
     <span class="badge-chat" id="chat-badge">0</span>
   </button>
@@ -493,14 +494,14 @@
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
       document.getElementById(id).classList.add('active');
       gamePhase = id;
-      // show chat only when connected
+      updateChatVisibility();
+    }
+
+    function updateChatVisibility() {
       const chatBtn = document.getElementById('chat-toggle');
-      if (['placement','game','end'].includes(id) && conn && conn.open) {
-        chatBtn.style.display = 'flex';
-      } else {
-        chatBtn.style.display = 'none';
-        closeChat();
-      }
+      const show = ['placement','game','end'].includes(gamePhase) && conn && conn.open;
+      chatBtn.style.display = show ? 'flex' : 'none';
+      if (!show) closeChat();
     }
 
     function toast(msg, duration = 2400) {
@@ -604,6 +605,7 @@
 
     function setupConnection() {
       conn.on('open', () => {
+        updateChatVisibility();
         if (isHost) {
           document.getElementById('create-status').textContent = 'Суперник підключився!';
           document.getElementById('create-status').className = 'status connected';
@@ -1261,6 +1263,9 @@
 
     // Chat
     document.getElementById('chat-toggle').addEventListener('click', () => {
+      if (chatOpen) closeChat(); else openChat();
+    });
+    document.getElementById('btn-chat-hud').addEventListener('click', () => {
       if (chatOpen) closeChat(); else openChat();
     });
     document.getElementById('chat-close').addEventListener('click', closeChat);
