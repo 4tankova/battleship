@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Морський Бій • Онлайн</title>
   <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
   <style>
     :root {
       --bg-deep: #020617;
@@ -279,6 +281,53 @@
     }
     .chat-input-row input { flex: 1; padding: 10px 12px; font-size: 0.9rem; }
     .chat-input-row button { width: auto; padding: 10px 14px; }
+    .chat-emoji-bar {
+      display: flex; flex-wrap: wrap; gap: 4px; padding: 6px 10px;
+      border-top: 1px solid var(--glass-border); max-height: 72px; overflow-y: auto;
+    }
+    .chat-emoji-bar button {
+      background: transparent; border: none; font-size: 1.25rem; cursor: pointer;
+      padding: 4px; border-radius: 6px; line-height: 1;
+    }
+    .chat-emoji-bar button:hover { background: rgba(255,255,255,0.08); }
+    .chat-msg .ticks {
+      font-size: 0.72rem; margin-left: 6px; opacity: 0.7; letter-spacing: -1px;
+    }
+    .chat-msg .ticks.delivered { color: #94a3b8; }
+    .chat-msg .ticks.read { color: #38bdf8; }
+    .chat-msg .meta { display: flex; align-items: center; justify-content: flex-end; gap: 4px; margin-top: 2px; }
+    .chat-msg.them .meta { justify-content: flex-start; }
+
+    .qr-box {
+      display: flex; flex-direction: column; align-items: center; gap: 10px; margin: 12px 0;
+    }
+    .qr-box canvas, .qr-box img {
+      border-radius: 12px; background: #fff; padding: 10px;
+      max-width: 200px; width: 100%;
+    }
+    #qr-reader {
+      width: 100%; max-width: 320px; margin: 0 auto; border-radius: 12px; overflow: hidden;
+    }
+    .scanner-modal {
+      position: fixed; inset: 0; background: rgba(2,6,23,0.92); z-index: 300;
+      display: none; flex-direction: column; align-items: center; justify-content: center;
+      gap: 16px; padding: 20px;
+    }
+    .scanner-modal.show { display: flex; }
+
+    #place-confirm {
+      position: sticky; bottom: 12px; z-index: 20;
+      background: rgba(15,23,42,0.97); backdrop-filter: blur(14px);
+      border: 2px solid var(--accent); border-radius: 14px;
+      padding: 14px !important; box-shadow: 0 8px 32px rgba(0,212,255,0.35);
+      max-width: 420px;
+    }
+    @media (max-width: 700px) {
+      #place-confirm {
+        position: fixed; left: 12px; right: 12px; bottom: 16px;
+        max-width: none; width: auto; margin: 0;
+      }
+    }
 
     /* ===== PAUSE OVERLAY ===== */
     .pause-overlay {
@@ -352,12 +401,16 @@
     <header><div class="logo">⚓ Морський Бій</div></header>
     <div class="card">
       <h2>Ваша кімната</h2>
-      <p style="text-align:center;color:var(--text-dim);margin-bottom:6px;font-size:0.9rem">Надішліть цей код другу:</p>
+      <p style="text-align:center;color:var(--text-dim);margin-bottom:6px;font-size:0.9rem">Код або QR для друга:</p>
       <div class="room-code" id="room-code" title="Натисніть, щоб скопіювати">—</div>
+      <div class="qr-box">
+        <canvas id="qr-canvas" width="180" height="180"></canvas>
+        <span style="font-size:0.8rem;color:var(--text-dim)">Відскануйте камерою</span>
+      </div>
       <div class="status waiting" id="create-status">Очікування суперника...</div>
-      <div style="margin-top:18px;text-align:center">
+      <div style="margin-top:14px;text-align:center" class="btn-group">
         <button class="btn btn-secondary btn-sm" id="btn-copy">📋 Копіювати код</button>
-        <button class="btn btn-danger btn-sm" id="btn-cancel-create" style="margin-top:10px">Скасувати</button>
+        <button class="btn btn-danger btn-sm" id="btn-cancel-create">Скасувати</button>
       </div>
     </div>
   </div>
@@ -373,10 +426,18 @@
       </div>
       <div class="btn-group">
         <button class="btn btn-primary" id="btn-connect">Підключитися</button>
+        <button class="btn btn-secondary" id="btn-scan-qr">📷 Сканувати QR</button>
         <button class="btn btn-secondary" id="btn-back-join">Назад</button>
       </div>
       <div class="status" id="join-status" style="margin-top:14px"></div>
     </div>
+  </div>
+
+  <!-- QR SCANNER MODAL -->
+  <div class="scanner-modal" id="scanner-modal">
+    <h2 style="color:var(--accent)">📷 Сканування QR</h2>
+    <div id="qr-reader"></div>
+    <button class="btn btn-danger btn-sm" id="btn-close-scanner" style="max-width:200px">Закрити</button>
   </div>
 
   <!-- PLACEMENT -->
@@ -473,6 +534,24 @@
       <button class="icon-btn" id="chat-close" style="width:32px;height:32px;font-size:0.9rem">✕</button>
     </div>
     <div class="chat-messages" id="chat-messages"></div>
+    <div class="chat-emoji-bar" id="emoji-bar">
+      <button type="button" data-e="😀">😀</button>
+      <button type="button" data-e="😂">😂</button>
+      <button type="button" data-e="😎">😎</button>
+      <button type="button" data-e="🔥">🔥</button>
+      <button type="button" data-e="💥">💥</button>
+      <button type="button" data-e="⚓">⚓</button>
+      <button type="button" data-e="🚢">🚢</button>
+      <button type="button" data-e="🌊">🌊</button>
+      <button type="button" data-e="👍">👍</button>
+      <button type="button" data-e="👎">👎</button>
+      <button type="button" data-e="❤️">❤️</button>
+      <button type="button" data-e="😭">😭</button>
+      <button type="button" data-e="🫡">🫡</button>
+      <button type="button" data-e="🎯">🎯</button>
+      <button type="button" data-e="🏆">🏆</button>
+      <button type="button" data-e="💀">💀</button>
+    </div>
     <div class="chat-input-row">
       <input type="text" id="chat-input" placeholder="Написати..." maxlength="200" autocomplete="off">
       <button class="btn btn-primary btn-sm" id="chat-send">➤</button>
@@ -729,11 +808,22 @@
           break;
         case 'chat':
           addChatMessage(data.text, false);
-          if (!chatOpen) {
+          // ACK delivered
+          if (data.id != null) send({ type: 'chatDelivered', id: data.id });
+          if (chatOpen) {
+            send({ type: 'chatRead' });
+          } else {
             unreadChat++;
             updateChatBadge();
             playSound('chat');
           }
+          break;
+        case 'chatDelivered':
+          if (data.id != null) setChatStatus(data.id, 'delivered');
+          break;
+        case 'chatRead':
+          // mark all my pending as read
+          pendingChatIds.forEach((el, id) => setChatStatus(id, 'read'));
           break;
         case 'rematch':
           toast('Суперник хоче зіграти ще раз');
@@ -810,8 +900,8 @@
       });
       document.getElementById('place-confirm').style.display = 'flex';
       document.getElementById('place-actions').style.display = 'none';
+      document.getElementById('placement').style.paddingBottom = '90px';
       setMsg('place-msg', '✓ Поставити  або  ✕ Скасувати', 'warning');
-      // subtle haptic if available
       if (navigator.vibrate) navigator.vibrate(12);
     }
 
@@ -822,6 +912,7 @@
       pendingPlace = null;
       document.getElementById('place-confirm').style.display = 'none';
       document.getElementById('place-actions').style.display = 'flex';
+      document.getElementById('placement').style.paddingBottom = '';
       clearPreview();
     }
 
@@ -830,6 +921,7 @@
       clearPreview();
       document.getElementById('place-confirm').style.display = 'none';
       document.getElementById('place-actions').style.display = 'flex';
+      document.getElementById('placement').style.paddingBottom = '';
       setMsg('place-msg', 'Оберіть корабель і натисніть на поле, потім підтвердіть.');
     }
 
@@ -1184,18 +1276,39 @@
     }
 
     // ==================== CHAT ====================
-    function addChatMessage(text, isMe) {
+    let chatMsgId = 0;
+    const pendingChatIds = new Map(); // id -> element ticks
+
+    function addChatMessage(text, isMe, msgId = null, status = 'sent') {
       const box = document.getElementById('chat-messages');
       const div = document.createElement('div');
       div.className = 'chat-msg ' + (isMe ? 'me' : 'them');
+      if (msgId) div.dataset.msgid = msgId;
       const time = new Date().toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' });
-      div.innerHTML = `${escapeHtml(text)}<div class="time">${time}</div>`;
+      let ticksHtml = '';
+      if (isMe) {
+        const tickClass = status === 'read' ? 'ticks read' : status === 'delivered' ? 'ticks delivered' : 'ticks';
+        const tickSym = status === 'read' || status === 'delivered' ? '✓✓' : '✓';
+        ticksHtml = `<span class="${tickClass}" data-ticks>${tickSym}</span>`;
+      }
+      div.innerHTML = `${escapeHtml(text)}<div class="meta"><span class="time">${time}</span>${ticksHtml}</div>`;
       box.appendChild(div);
       box.scrollTop = box.scrollHeight;
+      if (isMe && msgId) {
+        pendingChatIds.set(msgId, div.querySelector('[data-ticks]'));
+      }
+      return div;
+    }
+
+    function setChatStatus(msgId, status) {
+      const el = pendingChatIds.get(msgId);
+      if (!el) return;
+      el.textContent = '✓✓';
+      el.className = status === 'read' ? 'ticks read' : 'ticks delivered';
     }
 
     function escapeHtml(str) {
-      return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
     }
 
     function updateChatBadge() {
@@ -1214,6 +1327,8 @@
       unreadChat = 0;
       updateChatBadge();
       document.getElementById('chat-input').focus();
+      // mark all incoming as read
+      send({ type: 'chatRead' });
     }
 
     function closeChat() {
@@ -1225,9 +1340,52 @@
       const input = document.getElementById('chat-input');
       const text = input.value.trim();
       if (!text) return;
-      send({ type: 'chat', text });
-      addChatMessage(text, true);
+      const id = ++chatMsgId;
+      send({ type: 'chat', text, id });
+      addChatMessage(text, true, id, 'sent');
       input.value = '';
+    }
+
+    function renderQR(text) {
+      const canvas = document.getElementById('qr-canvas');
+      if (!canvas || typeof QRCode === 'undefined') return;
+      QRCode.toCanvas(canvas, text, {
+        width: 180,
+        margin: 1,
+        color: { dark: '#0c1a2e', light: '#ffffff' }
+      }, err => { if (err) console.error(err); });
+    }
+
+    let html5Qr = null;
+    async function startQRScanner() {
+      const modal = document.getElementById('scanner-modal');
+      modal.classList.add('show');
+      try {
+        html5Qr = new Html5Qrcode('qr-reader');
+        await html5Qr.start(
+          { facingMode: 'environment' },
+          { fps: 10, qrbox: { width: 220, height: 220 } },
+          (decoded) => {
+            stopQRScanner();
+            const code = decoded.trim();
+            document.getElementById('join-code').value = code;
+            toast('QR розпізнано!');
+            document.getElementById('btn-connect').click();
+          },
+          () => {}
+        );
+      } catch (e) {
+        toast('Немає доступу до камери');
+        stopQRScanner();
+      }
+    }
+
+    async function stopQRScanner() {
+      document.getElementById('scanner-modal').classList.remove('show');
+      if (html5Qr) {
+        try { await html5Qr.stop(); html5Qr.clear(); } catch (e) {}
+        html5Qr = null;
+      }
     }
 
     // ==================== PARTICLES ====================
@@ -1293,6 +1451,7 @@
         document.getElementById('create-status').className = 'status waiting';
         const id = await initPeer();
         document.getElementById('room-code').textContent = id;
+        renderQR(id);
         document.getElementById('create-status').textContent = 'Очікування суперника...';
       } catch (e) {
         toast('Не вдалося створити кімнату');
@@ -1310,6 +1469,19 @@
     document.getElementById('btn-cancel-create').addEventListener('click', () => {
       if (peer) peer.destroy();
       showScreen('home');
+    });
+    document.getElementById('btn-scan-qr').addEventListener('click', () => {
+      unlockAudio();
+      startQRScanner();
+    });
+    document.getElementById('btn-close-scanner').addEventListener('click', () => stopQRScanner());
+
+    document.getElementById('emoji-bar').addEventListener('click', e => {
+      const btn = e.target.closest('button[data-e]');
+      if (!btn) return;
+      const input = document.getElementById('chat-input');
+      input.value += btn.dataset.e;
+      input.focus();
     });
 
     document.getElementById('btn-copy').addEventListener('click', () => {
