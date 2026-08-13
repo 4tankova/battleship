@@ -306,14 +306,24 @@
       max-width: 200px; width: 100%;
     }
     #qr-reader {
-      width: 100%; max-width: 320px; margin: 0 auto; border-radius: 12px; overflow: hidden;
+      width: min(100%, 360px); margin: 0 auto; border-radius: 12px; overflow: hidden;
+      background: #000;
+    }
+    #qr-reader video {
+      width: 100% !important;
+      height: auto !important;
+      object-fit: cover;
+      border-radius: 12px;
     }
     .scanner-modal {
-      position: fixed; inset: 0; background: rgba(2,6,23,0.92); z-index: 300;
+      position: fixed; inset: 0; background: rgba(2,6,23,0.95); z-index: 300;
       display: none; flex-direction: column; align-items: center; justify-content: center;
-      gap: 16px; padding: 20px;
+      gap: 14px; padding: 16px;
     }
     .scanner-modal.show { display: flex; }
+    .scanner-hint {
+      color: var(--text-dim); font-size: 0.88rem; text-align: center; max-width: 320px; line-height: 1.4;
+    }
 
     #place-confirm {
       position: sticky; bottom: 12px; z-index: 20;
@@ -382,7 +392,7 @@
   <div id="home" class="screen active">
     <header>
       <div class="logo">⚓ Морський Бій</div>
-      <div class="subtitle">Онлайн • 2 гравці • HTML5 • v1.4</div>
+      <div class="subtitle">Онлайн • 2 гравці • HTML5 • v1.5</div>
     </header>
     <div class="card">
       <h2>Нова гра</h2>
@@ -437,7 +447,9 @@
   <!-- QR SCANNER MODAL -->
   <div class="scanner-modal" id="scanner-modal">
     <h2 style="color:var(--accent)">📷 Сканування QR</h2>
+    <p class="scanner-hint">Піднесіть камеру на 15–30 см до QR. Торкніться екрана, щоб сфокусувати.</p>
     <div id="qr-reader"></div>
+    <button class="btn btn-secondary btn-sm" id="btn-switch-cam" style="max-width:220px;display:none">🔄 Інша камера</button>
     <button class="btn btn-danger btn-sm" id="btn-close-scanner" style="max-width:200px">Закрити</button>
   </div>
 
@@ -1418,6 +1430,9 @@
     }
 
     let html5Qr = null;
+    let scanCameras = [];
+    let scanCamIndex = 0;
+
     async function startQRScanner() {
       if (typeof Html5Qrcode === 'undefined') {
         toast('Сканер недоступний. Вставте код вручну.');
@@ -1427,11 +1442,112 @@
       modal.classList.add('show');
       const readerEl = document.getElementById('qr-reader');
       readerEl.innerHTML = '';
+
+      const onSuccess = (decoded) => {
+        const code = (decoded || '').trim();
+        if (!code) return;
+        stopQRScanner();
+        document.getElementById('join-code').value = code;
+        toast('QR розпізнано!');
+        setTimeout(() => document.getElementById('btn-connect').click(), 300);
+      };
+
+      // Larger box = easier scan; aspect ratio helps focus framing
+      const config = {
+        fps: 12,
+        qrbox: (viewW, viewH) => {
+          const s = Math.floor(Math.min(viewW, viewH) * 0.72);
+          return { width: s, height: s };
+        },
+        aspectRatio: 1,
+        disableFlip: false,
+        experimentalFeatures: { useBarCodeDetectorIfSupported: true }
+      };
+
       try {
-        html5Qr = new Html5Qrcode('qr-reader');
+        html5Qr = new Html5Qrcode('qr-reader', { verbose: false });
+
+        // Prefer back camera with continuous focus + higher res
+        const advancedConstraints = {
+          facingMode: { ideal: 'environment' },
+          width: { ideal: 1920 },
+          height: { ideal: 1080 },
+          focusMode: { ideal: 'continuous' },
+          advanced: [{ focusMode: 'continuous' }]
+        };
+
+        try {
+          await html5Qr.start(advancedConstraints, config, onSuccess, () => {});
+        } catch (e1) {
+          // Fallback: simple environment camera
+          try {
+            await html5Qr.start(
+              { facingMode: 'environment' },
+              config,
+              onSuccess,
+              () => {}
+            );
+          } catch (e2) {
+            // Last resort: any camera by id
+            const cams = await Html5Qrcode.getCameras();
+            scanCameras = cams || [];
+            if (!scanCameras.length) throw e2;
+            // Prefer back/environment in label
+            scanCamIndex = scanCameras.findIndex(c =>
+              /back|rear|environment|задн/i.test(c.label || '')
+            );
+            if (scanCamIndex < 0) scanCamIndex = 0;
+            await html5Qr.start(scanCameras[scanCamIndex].id, config, onSuccess, () => {});
+            if (scanCameras.length > 1) {
+              document.getElementById('btn-switch-cam').style.display = 'inline-flex';
+            }
+          }
+        }
+
+        // Tap video to re-focus (helps on many Android phones)
+        setTimeout(() => {
+          const video = document.querySelector('#qr-reader video');
+          if (!video) return;
+          video.setAttribute('playsinline', 'true');
+          video.style.touchAction = 'manipulation';
+          const tryFocus = async () => {
+            try {
+              const stream = video.srcObject;
+              if (!stream) return;
+              const track = stream.getVideoTracks()[0];
+              if (!track || typeof track.applyConstraints !== 'function') return;
+              await track.applyConstraints({
+                advanced: [{ focusMode: 'continuous' }]
+              });
+            } catch (e) {}
+          };
+          video.addEventListener('click', tryFocus);
+          tryFocus();
+        }, 600);
+
+      } catch (e) {
+        console.error(e);
+        toast('Камера недоступна. Дозвольте доступ або вставте код.');
+        stopQRScanner();
+      }
+    }
+
+    async function switchCamera() {
+      if (!html5Qr || scanCameras.length < 2) return;
+      try { await html5Qr.stop(); } catch (e) {}
+      scanCamIndex = (scanCamIndex + 1) % scanCameras.length;
+      const config = {
+        fps: 12,
+        qrbox: (viewW, viewH) => {
+          const s = Math.floor(Math.min(viewW, viewH) * 0.72);
+          return { width: s, height: s };
+        },
+        aspectRatio: 1
+      };
+      try {
         await html5Qr.start(
-          { facingMode: 'environment' },
-          { fps: 8, qrbox: { width: 220, height: 220 } },
+          scanCameras[scanCamIndex].id,
+          config,
           (decoded) => {
             const code = (decoded || '').trim();
             if (!code) return;
@@ -1443,14 +1559,13 @@
           () => {}
         );
       } catch (e) {
-        console.error(e);
-        toast('Камера недоступна. Дозвольте доступ або вставте код.');
-        stopQRScanner();
+        toast('Не вдалося перемкнути камеру');
       }
     }
 
     async function stopQRScanner() {
       document.getElementById('scanner-modal').classList.remove('show');
+      document.getElementById('btn-switch-cam').style.display = 'none';
       if (html5Qr) {
         try { await html5Qr.stop(); } catch (e) {}
         try { html5Qr.clear(); } catch (e) {}
@@ -1545,6 +1660,7 @@
       startQRScanner();
     });
     document.getElementById('btn-close-scanner').addEventListener('click', () => stopQRScanner());
+    document.getElementById('btn-switch-cam').addEventListener('click', () => switchCamera());
 
     document.getElementById('emoji-bar').addEventListener('click', e => {
       const btn = e.target.closest('button[data-e]');
