@@ -139,12 +139,22 @@
     }
     .cell {
       width: var(--cell-size); height: var(--cell-size); background: rgba(15,40,70,0.6);
-      border-radius: 4px; cursor: pointer; transition: all 0.18s ease; position: relative;
+      border-radius: 4px; cursor: pointer; transition: background 0.15s ease, box-shadow 0.15s ease;
+      position: relative;
       display: flex; align-items: center; justify-content: center;
       font-size: calc(var(--cell-size) * 0.42); user-select: none;
+      touch-action: manipulation;
+      -webkit-user-select: none;
     }
-    .cell:hover:not(.disabled):not(.hit):not(.miss):not(.ship) {
-      background: rgba(0,212,255,0.25); box-shadow: 0 0 10px var(--accent-glow); transform: scale(1.06);
+    @media (hover: hover) and (pointer: fine) {
+      .cell:hover:not(.disabled):not(.hit):not(.miss):not(.ship) {
+        background: rgba(0,212,255,0.25); box-shadow: 0 0 10px var(--accent-glow); transform: scale(1.06);
+      }
+    }
+    .cell.selected-preview {
+      background: rgba(34,211,238,0.55) !important;
+      border: 2px solid var(--accent) !important;
+      box-shadow: 0 0 14px var(--accent-glow);
     }
     .cell.ship {
       background: linear-gradient(135deg, #0e7490, #0891b2);
@@ -294,14 +304,21 @@
     .icon-btn.off { opacity: 0.5; }
 
     @media (max-width: 700px) {
-      :root { --cell-size: min(8.2vw, 36px); }
+      :root { --cell-size: min(9vw, 40px); }
       .boards-container { flex-direction: column; align-items: center; }
       .card { padding: 16px; }
       .logo { font-size: 1.6rem; }
       .chat-panel { bottom: 80px; right: 12px; height: 320px; }
-      .chat-toggle { bottom: 14px; right: 14px; width: 50px; height: 50px; }
+      .chat-toggle { bottom: 14px; right: 14px; width: 52px; height: 52px; }
+      .hud { gap: 8px; }
+      .hud .btn-sm { padding: 9px 11px; font-size: 0.8rem; }
+      .grid { gap: 4px; padding: 6px; }
+      .ship-btn { min-width: 76px; padding: 11px 10px; }
+      #place-confirm { width: 100%; max-width: 360px; }
+      #place-confirm .btn { flex: 1; padding: 14px 12px; font-size: 1rem; max-width: none !important; }
+      .orient-indicator { flex-wrap: wrap; justify-content: center; gap: 8px; }
     }
-    @media (max-width: 400px) { :root { --cell-size: 7.6vw; } }
+    @media (max-width: 400px) { :root { --cell-size: min(8.8vw, 38px); } }
   </style>
 </head>
 <body>
@@ -380,7 +397,13 @@
 
     <div class="placement-panel" id="ship-list"></div>
 
-    <div class="controls">
+    <!-- Confirmation for placement (especially for mobile) -->
+    <div class="controls" id="place-confirm" style="display:none; gap:12px;">
+      <button class="btn btn-success" id="btn-confirm-place" style="max-width:160px;">✓ Поставити</button>
+      <button class="btn btn-secondary" id="btn-cancel-place" style="max-width:140px;">✕ Скасувати</button>
+    </div>
+
+    <div class="controls" id="place-actions">
       <button class="btn btn-secondary" id="btn-random">🎲 Випадково</button>
       <button class="btn btn-secondary" id="btn-clear">🗑 Очистити</button>
       <button class="btn btn-success" id="btn-ready" disabled>Готовий ✓</button>
@@ -430,6 +453,13 @@
     <h2>⏸ Пауза</h2>
     <p id="pause-text">Гра призупинена</p>
     <button class="btn btn-primary" id="btn-resume" style="max-width:200px">▶ Продовжити</button>
+  </div>
+
+  <!-- DISCONNECT OVERLAY -->
+  <div class="pause-overlay" id="disconnect-overlay">
+    <h2 style="color:#f87171;">🔌 Суперник офлайн</h2>
+    <p id="disconnect-text">Другий гравець вийшов з гри або втратив з'єднання.</p>
+    <button class="btn btn-primary" id="btn-disconnect-home" style="max-width:220px">🏠 На головну</button>
   </div>
 
   <!-- CHAT -->
@@ -484,6 +514,8 @@
     let soundOn = true;
     let unreadChat = 0;
     let chatOpen = false;
+    let pendingPlace = null; // {r, c} when waiting for confirm on mobile/desktop
+    let audioUnlocked = false;
 
     // ==================== UTILS ====================
     function createEmptyBoard() {
@@ -524,41 +556,65 @@
     }
 
     // ==================== SOUND ====================
-    const audioCtx = window.AudioContext ? new (window.AudioContext || window.webkitAudioContext)() : null;
+    let audioCtx = null;
+    try {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    } catch (e) { audioCtx = null; }
+
+    function unlockAudio() {
+      if (!audioCtx || audioUnlocked) return;
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume().then(() => { audioUnlocked = true; }).catch(() => {});
+      } else {
+        audioUnlocked = true;
+      }
+      // tiny silent buffer to unlock on iOS
+      try {
+        const buf = audioCtx.createBuffer(1, 1, 22050);
+        const src = audioCtx.createBufferSource();
+        src.buffer = buf;
+        src.connect(audioCtx.destination);
+        src.start(0);
+      } catch (e) {}
+    }
 
     function playSound(type) {
       if (!soundOn || !audioCtx) return;
+      unlockAudio();
+      if (audioCtx.state === 'suspended') return;
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
       osc.connect(gain);
       gain.connect(audioCtx.destination);
       const now = audioCtx.currentTime;
+      // slightly louder for mobile speakers
+      const vol = 0.22;
 
       if (type === 'shot') {
         osc.type = 'sawtooth';
         osc.frequency.setValueAtTime(180, now);
         osc.frequency.exponentialRampToValueAtTime(40, now + 0.25);
-        gain.gain.setValueAtTime(0.12, now);
+        gain.gain.setValueAtTime(vol, now);
         gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
         osc.start(now); osc.stop(now + 0.25);
       } else if (type === 'hit') {
         osc.type = 'square';
         osc.frequency.setValueAtTime(220, now);
         osc.frequency.exponentialRampToValueAtTime(80, now + 0.15);
-        gain.gain.setValueAtTime(0.15, now);
+        gain.gain.setValueAtTime(vol, now);
         gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
         osc.start(now); osc.stop(now + 0.3);
       } else if (type === 'miss') {
         osc.type = 'sine';
         osc.frequency.setValueAtTime(120, now);
-        gain.gain.setValueAtTime(0.08, now);
+        gain.gain.setValueAtTime(vol * 0.6, now);
         gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
         osc.start(now); osc.stop(now + 0.2);
       } else if (type === 'sink') {
         osc.type = 'sawtooth';
         osc.frequency.setValueAtTime(150, now);
         osc.frequency.exponentialRampToValueAtTime(30, now + 0.5);
-        gain.gain.setValueAtTime(0.18, now);
+        gain.gain.setValueAtTime(vol * 1.1, now);
         gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
         osc.start(now); osc.stop(now + 0.5);
       } else if (type === 'win') {
@@ -567,14 +623,14 @@
           const g = audioCtx.createGain();
           o.connect(g); g.connect(audioCtx.destination);
           o.frequency.value = f;
-          g.gain.setValueAtTime(0.1, now + i * 0.12);
+          g.gain.setValueAtTime(vol * 0.7, now + i * 0.12);
           g.gain.exponentialRampToValueAtTime(0.01, now + i * 0.12 + 0.3);
           o.start(now + i * 0.12); o.stop(now + i * 0.12 + 0.3);
         });
       } else if (type === 'chat') {
         osc.type = 'sine';
         osc.frequency.value = 880;
-        gain.gain.setValueAtTime(0.06, now);
+        gain.gain.setValueAtTime(vol * 0.4, now);
         gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
         osc.start(now); osc.stop(now + 0.1);
       }
@@ -618,10 +674,20 @@
       });
       conn.on('data', data => handleData(data));
       conn.on('close', () => {
-        toast('Суперник відключився');
-        setTimeout(() => location.reload(), 1800);
+        handleOpponentDisconnect();
       });
       conn.on('error', err => { console.error(err); toast('Помилка з\'єднання'); });
+    }
+
+    function handleOpponentDisconnect() {
+      isPaused = true;
+      gameStarted = false;
+      shotPending = false;
+      document.getElementById('pause-overlay').classList.remove('show');
+      document.getElementById('disconnect-overlay').classList.add('show');
+      document.getElementById('disconnect-text').textContent = 'Другий гравець вийшов з гри або втратив з\'єднання. Гра завершена.';
+      // disable further actions
+      document.querySelectorAll('#enemy-grid .cell').forEach(c => c.classList.add('disabled'));
     }
 
     function send(data) {
@@ -689,9 +755,12 @@
       myShips = [];
       isReady = false;
       opponentReady = false;
+      pendingPlace = null;
       document.getElementById('btn-ready').disabled = true;
       document.getElementById('place-status').textContent = '';
-      setMsg('place-msg', 'Оберіть корабель і поставте на поле. Кнопка «Повернути» змінює орієнтацію.');
+      document.getElementById('place-confirm').style.display = 'none';
+      document.getElementById('place-actions').style.display = 'flex';
+      setMsg('place-msg', 'Оберіть корабель → натисніть на поле → підтвердіть. «Повернути» змінює орієнтацію.');
     }
 
     function buildPlaceGrid() {
@@ -702,14 +771,66 @@
           const cell = document.createElement('div');
           cell.className = 'cell';
           cell.dataset.r = r; cell.dataset.c = c;
-          cell.addEventListener('click', () => placeShip(r, c));
-          cell.addEventListener('mouseenter', () => previewShip(r, c));
-          cell.addEventListener('mouseleave', clearPreview);
-          // touch support
-          cell.addEventListener('touchstart', (e) => { e.preventDefault(); previewShip(r, c); }, {passive:false});
+
+          // Desktop hover preview (only when no pending)
+          cell.addEventListener('mouseenter', () => {
+            if (!pendingPlace) previewShip(r, c);
+          });
+          cell.addEventListener('mouseleave', () => {
+            if (!pendingPlace) clearPreview();
+          });
+
+          // Click / tap → select position for confirmation
+          cell.addEventListener('click', (e) => {
+            e.preventDefault();
+            unlockAudio();
+            selectPlacePosition(r, c);
+          });
+
           grid.appendChild(cell);
         }
       }
+    }
+
+    function selectPlacePosition(r, c) {
+      if (placedShips.has(SHIPS[currentShipIndex].id)) return;
+      const ship = SHIPS[currentShipIndex];
+      const cells = getShipCells(r, c, ship.size, orientation);
+      if (!canPlace(cells)) {
+        toast('Не можна поставити тут');
+        playSound('miss');
+        return;
+      }
+      pendingPlace = { r, c };
+      clearPreview();
+      // fixed bright preview for confirmation
+      cells.forEach(({ r: nr, c: nc }) => {
+        const el = document.querySelector(`#place-grid .cell[data-r="${nr}"][data-c="${nc}"]`);
+        if (el) el.classList.add('ship', 'preview', 'selected-preview');
+      });
+      document.getElementById('place-confirm').style.display = 'flex';
+      document.getElementById('place-actions').style.display = 'none';
+      setMsg('place-msg', '✓ Поставити  або  ✕ Скасувати', 'warning');
+      // subtle haptic if available
+      if (navigator.vibrate) navigator.vibrate(12);
+    }
+
+    function confirmPlace() {
+      if (!pendingPlace) return;
+      const { r, c } = pendingPlace;
+      placeShip(r, c);
+      pendingPlace = null;
+      document.getElementById('place-confirm').style.display = 'none';
+      document.getElementById('place-actions').style.display = 'flex';
+      clearPreview();
+    }
+
+    function cancelPlace() {
+      pendingPlace = null;
+      clearPreview();
+      document.getElementById('place-confirm').style.display = 'none';
+      document.getElementById('place-actions').style.display = 'flex';
+      setMsg('place-msg', 'Оберіть корабель і натисніть на поле, потім підтвердіть.');
     }
 
     function buildShipList() {
@@ -764,8 +885,8 @@
     }
 
     function clearPreview() {
-      document.querySelectorAll('#place-grid .cell.preview').forEach(el => {
-        el.classList.remove('ship', 'preview', 'invalid');
+      document.querySelectorAll('#place-grid .cell.preview, #place-grid .cell.selected-preview').forEach(el => {
+        el.classList.remove('ship', 'preview', 'invalid', 'selected-preview');
         const r = +el.dataset.r, c = +el.dataset.c;
         if (myBoard[r][c] === 1) el.classList.add('ship');
       });
@@ -779,22 +900,30 @@
       cells.forEach(({ r, c }) => {
         myBoard[r][c] = 1;
         const el = document.querySelector(`#place-grid .cell[data-r="${r}"][data-c="${c}"]`);
-        el.classList.add('ship');
-        el.classList.remove('preview', 'invalid');
+        if (el) {
+          el.classList.add('ship');
+          el.classList.remove('preview', 'invalid');
+        }
       });
       myShips.push({ id: ship.id, cells, hits: 0, sunk: false });
       placedShips.add(ship.id);
-      document.querySelector(`.ship-btn[data-index="${currentShipIndex}"]`).classList.add('placed');
-      document.querySelector(`.ship-btn[data-index="${currentShipIndex}"]`).classList.remove('active');
+      const btn = document.querySelector(`.ship-btn[data-index="${currentShipIndex}"]`);
+      if (btn) {
+        btn.classList.add('placed');
+        btn.classList.remove('active');
+      }
 
       const next = SHIPS.findIndex(s => !placedShips.has(s.id));
       if (next >= 0) {
         currentShipIndex = next;
-        document.querySelector(`.ship-btn[data-index="${next}"]`).classList.add('active');
+        const nextBtn = document.querySelector(`.ship-btn[data-index="${next}"]`);
+        if (nextBtn) nextBtn.classList.add('active');
+        setMsg('place-msg', 'Корабель поставлено. Оберіть наступний і натисніть на поле.');
       } else {
         document.getElementById('btn-ready').disabled = false;
         setMsg('place-msg', 'Усі кораблі розставлені! Натисніть «Готовий».', 'success');
       }
+      playSound('hit'); // small feedback
     }
 
     function randomPlace() {
@@ -819,7 +948,9 @@
       renderPlaceBoard();
       document.querySelectorAll('.ship-btn').forEach(b => b.classList.add('placed'));
       document.getElementById('btn-ready').disabled = false;
-      setMsg('place-msg', 'Кораблі розставлені випадково. Можна змінити або натиснути «Готовий».', 'success');
+      document.getElementById('place-confirm').style.display = 'none';
+      document.getElementById('place-actions').style.display = 'flex';
+      setMsg('place-msg', 'Кораблі розставлені випадково. Можна очистити або натиснути «Готовий».', 'success');
     }
 
     function clearBoard() {
@@ -827,11 +958,15 @@
       myShips = [];
       placedShips.clear();
       currentShipIndex = 0;
+      pendingPlace = null;
       document.querySelectorAll('.ship-btn').forEach(b => b.classList.remove('placed', 'active'));
-      document.querySelector('.ship-btn[data-index="0"]').classList.add('active');
+      const first = document.querySelector('.ship-btn[data-index="0"]');
+      if (first) first.classList.add('active');
       document.getElementById('btn-ready').disabled = true;
+      document.getElementById('place-confirm').style.display = 'none';
+      document.getElementById('place-actions').style.display = 'flex';
       renderPlaceBoard();
-      setMsg('place-msg', 'Поле очищено. Розставте кораблі.');
+      setMsg('place-msg', 'Поле очищено. Оберіть корабель і натисніть на поле.');
     }
 
     function renderPlaceBoard() {
@@ -1150,6 +1285,7 @@
 
     // ==================== EVENTS ====================
     document.getElementById('btn-create').addEventListener('click', async () => {
+      unlockAudio();
       try {
         isHost = true;
         showScreen('lobby-create');
@@ -1186,6 +1322,7 @@
     });
 
     document.getElementById('btn-connect').addEventListener('click', async () => {
+      unlockAudio();
       const code = document.getElementById('join-code').value.trim();
       if (!code) { toast('Введіть код'); return; }
       isHost = false;
@@ -1205,18 +1342,49 @@
       }
     });
 
+    document.getElementById('btn-disconnect-home').addEventListener('click', () => {
+      location.reload();
+    });
+
     // Orientation
     document.getElementById('btn-rotate').addEventListener('click', () => {
+      unlockAudio();
       orientation = orientation === 'H' ? 'V' : 'H';
       updateOrientLabel();
+      if (pendingPlace) {
+        const { r, c } = pendingPlace;
+        clearPreview();
+        const ship = SHIPS[currentShipIndex];
+        const cells = getShipCells(r, c, ship.size, orientation);
+        if (cells && canPlace(cells)) {
+          cells.forEach(({ r: nr, c: nc }) => {
+            const el = document.querySelector(`#place-grid .cell[data-r="${nr}"][data-c="${nc}"]`);
+            if (el) el.classList.add('ship', 'preview');
+          });
+        } else {
+          toast('З цією орієнтацією не поміщається — оберіть інше місце');
+          cancelPlace();
+        }
+      }
       toast(orientation === 'H' ? 'Горизонтально →' : 'Вертикально ↓');
     });
 
-    document.getElementById('btn-random').addEventListener('click', randomPlace);
-    document.getElementById('btn-clear').addEventListener('click', clearBoard);
+    document.getElementById('btn-random').addEventListener('click', () => { unlockAudio(); randomPlace(); });
+    document.getElementById('btn-clear').addEventListener('click', () => { unlockAudio(); clearBoard(); });
+
+    document.getElementById('btn-confirm-place').addEventListener('click', () => {
+      unlockAudio();
+      confirmPlace();
+    });
+    document.getElementById('btn-cancel-place').addEventListener('click', () => {
+      unlockAudio();
+      cancelPlace();
+    });
 
     document.getElementById('btn-ready').addEventListener('click', () => {
+      unlockAudio();
       if (placedShips.size < 5) return;
+      if (pendingPlace) cancelPlace();
       isReady = true;
       document.getElementById('btn-ready').disabled = true;
       document.getElementById('place-status').textContent = 'Очікуємо суперника...';
@@ -1254,11 +1422,12 @@
 
     // Sound
     document.getElementById('btn-sound').addEventListener('click', () => {
+      unlockAudio();
       soundOn = !soundOn;
       const btn = document.getElementById('btn-sound');
       btn.textContent = soundOn ? '🔊' : '🔇';
       btn.classList.toggle('off', !soundOn);
-      if (soundOn && audioCtx?.state === 'suspended') audioCtx.resume();
+      if (soundOn) playSound('chat'); // feedback
     });
 
     // Chat
@@ -1298,6 +1467,17 @@
     });
 
     document.addEventListener('gesturestart', e => e.preventDefault());
+
+    // Unlock audio on first user gesture (required on iOS/Android)
+    const unlockOnce = () => {
+      unlockAudio();
+      document.removeEventListener('pointerdown', unlockOnce);
+      document.removeEventListener('touchstart', unlockOnce);
+      document.removeEventListener('click', unlockOnce);
+    };
+    document.addEventListener('pointerdown', unlockOnce, { passive: true });
+    document.addEventListener('touchstart', unlockOnce, { passive: true });
+    document.addEventListener('click', unlockOnce);
   </script>
 </body>
 </html>
