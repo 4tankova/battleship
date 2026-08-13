@@ -255,8 +255,8 @@
     .chat-toggle .badge-chat.show { display: flex; }
 
     .chat-panel {
-      position: fixed; bottom: 88px; right: 20px; width: min(340px, calc(100vw - 40px));
-      height: 380px; background: var(--glass); backdrop-filter: blur(24px);
+      position: fixed; bottom: 88px; right: 20px; width: min(360px, calc(100vw - 40px));
+      height: min(460px, calc(100dvh - 120px)); background: var(--glass); backdrop-filter: blur(24px);
       border: 1px solid var(--glass-border); border-radius: 16px; z-index: 140;
       display: none; flex-direction: column; box-shadow: 0 12px 40px rgba(0,0,0,0.5);
       overflow: hidden;
@@ -291,7 +291,7 @@
     }
     .chat-emoji-bar button:hover { background: rgba(255,255,255,0.08); }
     .chat-msg .ticks {
-      font-size: 0.72rem; margin-left: 6px; opacity: 0.7; letter-spacing: -1px;
+      font-size: 0.85rem; margin-left: 6px; opacity: 0.95; letter-spacing: -2px; font-weight: 700;
     }
     .chat-msg .ticks.delivered { color: #94a3b8; }
     .chat-msg .ticks.read { color: #38bdf8; }
@@ -382,7 +382,7 @@
   <div id="home" class="screen active">
     <header>
       <div class="logo">⚓ Морський Бій</div>
-      <div class="subtitle">Онлайн • 2 гравці • HTML5</div>
+      <div class="subtitle">Онлайн • 2 гравці • HTML5 • v1.4</div>
     </header>
     <div class="card">
       <h2>Нова гра</h2>
@@ -404,8 +404,9 @@
       <p style="text-align:center;color:var(--text-dim);margin-bottom:6px;font-size:0.9rem">Код або QR для друга:</p>
       <div class="room-code" id="room-code" title="Натисніть, щоб скопіювати">—</div>
       <div class="qr-box">
-        <canvas id="qr-canvas" width="180" height="180"></canvas>
-        <span style="font-size:0.8rem;color:var(--text-dim)">Відскануйте камерою</span>
+        <img id="qr-img" alt="QR код кімнати" width="180" height="180" style="display:none;border-radius:12px;background:#fff;padding:8px;">
+        <canvas id="qr-canvas" width="180" height="180" style="display:none;"></canvas>
+        <span style="font-size:0.8rem;color:var(--text-dim)">Відскануйте камерою смартфона</span>
       </div>
       <div class="status waiting" id="create-status">Очікування суперника...</div>
       <div style="margin-top:14px;text-align:center" class="btn-group">
@@ -734,13 +735,19 @@
           conn = connection;
           setupConnection();
         });
-        peer.on('disconnected', () => toast('З\'єднання втрачено'));
+        peer.on('disconnected', () => {
+          toast('З\'єднання з мережею втрачено');
+          // try reconnect briefly
+          try { peer.reconnect(); } catch (e) {}
+        });
+        peer.on('close', () => handleOpponentDisconnect());
       });
     }
 
     function setupConnection() {
       conn.on('open', () => {
         updateChatVisibility();
+        startHeartbeat();
         if (isHost) {
           document.getElementById('create-status').textContent = 'Суперник підключився!';
           document.getElementById('create-status').className = 'status connected';
@@ -753,20 +760,56 @@
       });
       conn.on('data', data => handleData(data));
       conn.on('close', () => {
+        stopHeartbeat();
         handleOpponentDisconnect();
       });
       conn.on('error', err => { console.error(err); toast('Помилка з\'єднання'); });
     }
 
+    let heartbeatTimer = null;
+    let lastPong = Date.now();
+    let opponentGone = false;
+
+    function startHeartbeat() {
+      stopHeartbeat();
+      lastPong = Date.now();
+      opponentGone = false;
+      heartbeatTimer = setInterval(() => {
+        if (!conn || !conn.open) {
+          handleOpponentDisconnect();
+          return;
+        }
+        try { conn.send({ type: 'ping', t: Date.now() }); } catch (e) {}
+        // if no pong for 12s — treat as disconnect
+        if (Date.now() - lastPong > 12000) {
+          handleOpponentDisconnect();
+        }
+      }, 3000);
+    }
+
+    function stopHeartbeat() {
+      if (heartbeatTimer) { clearInterval(heartbeatTimer); heartbeatTimer = null; }
+    }
+
     function handleOpponentDisconnect() {
+      if (opponentGone) return;
+      opponentGone = true;
+      stopHeartbeat();
       isPaused = true;
       gameStarted = false;
       shotPending = false;
+      try { if (conn) conn.close(); } catch (e) {}
       document.getElementById('pause-overlay').classList.remove('show');
-      document.getElementById('disconnect-overlay').classList.add('show');
-      document.getElementById('disconnect-text').textContent = 'Другий гравець вийшов з гри або втратив з\'єднання. Гра завершена.';
-      // disable further actions
+      const ov = document.getElementById('disconnect-overlay');
+      if (ov) {
+        ov.classList.add('show');
+        const t = document.getElementById('disconnect-text');
+        if (t) t.textContent = 'Другий гравець вийшов або втратив з\'єднання. Гру завершено. Натисніть «На головну», щоб почати нову.';
+      }
+      toast('Суперник вийшов з гри');
       document.querySelectorAll('#enemy-grid .cell').forEach(c => c.classList.add('disabled'));
+      closeChat();
+      updateChatVisibility();
     }
 
     function send(data) {
@@ -828,6 +871,13 @@
         case 'rematch':
           toast('Суперник хоче зіграти ще раз');
           resetForRematch();
+          break;
+        case 'ping':
+          lastPong = Date.now();
+          try { if (conn && conn.open) conn.send({ type: 'pong', t: data.t || Date.now() }); } catch (e) {}
+          break;
+        case 'pong':
+          lastPong = Date.now();
           break;
       }
     }
@@ -1347,35 +1397,54 @@
     }
 
     function renderQR(text) {
+      // Primary: online API (works on GitHub Pages without extra libs)
+      const img = document.getElementById('qr-img');
+      if (img) {
+        img.style.display = 'block';
+        img.src = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&margin=8&data=' + encodeURIComponent(text);
+      }
+      // Optional local canvas if library loaded
       const canvas = document.getElementById('qr-canvas');
-      if (!canvas || typeof QRCode === 'undefined') return;
-      QRCode.toCanvas(canvas, text, {
-        width: 180,
-        margin: 1,
-        color: { dark: '#0c1a2e', light: '#ffffff' }
-      }, err => { if (err) console.error(err); });
+      if (canvas && typeof QRCode !== 'undefined') {
+        try {
+          QRCode.toCanvas(canvas, text, {
+            width: 180, margin: 1,
+            color: { dark: '#0c1a2e', light: '#ffffff' }
+          }, err => {
+            if (!err) { canvas.style.display = 'block'; if (img) img.style.display = 'none'; }
+          });
+        } catch (e) {}
+      }
     }
 
     let html5Qr = null;
     async function startQRScanner() {
+      if (typeof Html5Qrcode === 'undefined') {
+        toast('Сканер недоступний. Вставте код вручну.');
+        return;
+      }
       const modal = document.getElementById('scanner-modal');
       modal.classList.add('show');
+      const readerEl = document.getElementById('qr-reader');
+      readerEl.innerHTML = '';
       try {
         html5Qr = new Html5Qrcode('qr-reader');
         await html5Qr.start(
           { facingMode: 'environment' },
-          { fps: 10, qrbox: { width: 220, height: 220 } },
+          { fps: 8, qrbox: { width: 220, height: 220 } },
           (decoded) => {
+            const code = (decoded || '').trim();
+            if (!code) return;
             stopQRScanner();
-            const code = decoded.trim();
             document.getElementById('join-code').value = code;
             toast('QR розпізнано!');
-            document.getElementById('btn-connect').click();
+            setTimeout(() => document.getElementById('btn-connect').click(), 300);
           },
           () => {}
         );
       } catch (e) {
-        toast('Немає доступу до камери');
+        console.error(e);
+        toast('Камера недоступна. Дозвольте доступ або вставте код.');
         stopQRScanner();
       }
     }
@@ -1383,7 +1452,8 @@
     async function stopQRScanner() {
       document.getElementById('scanner-modal').classList.remove('show');
       if (html5Qr) {
-        try { await html5Qr.stop(); html5Qr.clear(); } catch (e) {}
+        try { await html5Qr.stop(); } catch (e) {}
+        try { html5Qr.clear(); } catch (e) {}
         html5Qr = null;
       }
     }
