@@ -1,0 +1,26 @@
+{
+  "name": "Морський Бій Онлайн",
+  "short_name": "Морський Бій",
+  "description": "Морський бій на двох з чатом і P2P-обміном файлів",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#020617",
+  "theme_color": "#00b4d8",
+  "lang": "uk",
+  "icons": [
+    {
+      "src": "./icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
