@@ -3,6 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#00b4d8">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Морський Бій">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="apple-touch-icon" href="./icon-192.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
   <title>Морський Бій • Онлайн</title>
   <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
@@ -412,13 +420,14 @@
   <div id="home" class="screen active">
     <header>
       <div class="logo">⚓ Морський Бій</div>
-      <div class="subtitle">Онлайн • 2 гравці • HTML5 • v1.8</div>
+      <div class="subtitle">Онлайн • 2 гравці • HTML5 • v1.9</div>
     </header>
     <div class="card">
       <h2>Нова гра</h2>
       <div class="btn-group">
         <button class="btn btn-primary" id="btn-create">Створити гру</button>
         <button class="btn btn-secondary" id="btn-join">Приєднатися</button>
+        <button class="btn btn-secondary" id="btn-install" style="display:none">📲 Встановити додаток</button>
       </div>
     </div>
     <p style="color:var(--text-dim);font-size:0.84rem;text-align:center;max-width:360px;margin-top:6px">
@@ -1592,32 +1601,63 @@
       return (n / 1048576).toFixed(2) + ' MB';
     }
 
+    function updateRecvProgressUI(rec, pct) {
+      setDeskProgress('Отримання: ' + pct + '%');
+      if (rec.progressEl) {
+        const bar = Math.round(pct / 5); // 20 steps
+        const filled = '█'.repeat(bar);
+        const empty = '░'.repeat(20 - bar);
+        rec.progressEl.innerHTML =
+          '📥 <strong>' + escapeHtml(rec.name) + '</strong> (' + formatBytes(rec.size) + ')<br>' +
+          '<span style="font-family:monospace;letter-spacing:1px;color:var(--accent)">' + filled + empty + '</span> ' +
+          '<strong>' + pct + '%</strong>' +
+          (pct < 100 ? '<br><span style="color:var(--text-dim);font-size:0.8rem">Отримання…</span>' : '');
+      }
+    }
+
     function handleFileMeta(data) {
       if (!data || !data.id) return;
-      incomingFiles.set(data.id, {
+      const rec = {
         name: data.name || 'file',
         size: data.size || 0,
         mime: data.mime || 'application/octet-stream',
         total: data.chunks || 0,
         parts: [],
-        received: 0
-      });
+        received: 0,
+        progressEl: null
+      };
+      incomingFiles.set(data.id, rec);
       if (!chatOpen) {
         unreadChat++;
         updateChatBadge();
+        playSound('chat');
       }
       openChat();
-      addChatMessage('📥 Отримую файл: ' + (data.name || 'file') + ' (' + formatBytes(data.size || 0) + ')', false);
+
+      const box = document.getElementById('chat-messages');
+      const div = document.createElement('div');
+      div.className = 'chat-msg them file-msg';
+      div.dataset.fileId = data.id;
+      box.appendChild(div);
+      rec.progressEl = div;
+      updateRecvProgressUI(rec, 0);
+      box.scrollTop = box.scrollHeight;
+      // also unlock desk panel on receiver so progress line is visible
+      unlockDesk(true);
       setDeskProgress('Отримання: 0%');
     }
 
     function handleFileChunk(data) {
       const rec = incomingFiles.get(data.id);
       if (!rec || data.data == null) return;
+      if (rec.parts[data.i] == null) rec.received++;
       rec.parts[data.i] = data.data;
-      rec.received++;
       const pct = rec.total ? Math.min(100, Math.round((rec.received / rec.total) * 100)) : 0;
-      setDeskProgress('Отримання: ' + pct + '%');
+      // throttle DOM updates a bit
+      if (pct !== rec._lastPct || pct === 100) {
+        rec._lastPct = pct;
+        updateRecvProgressUI(rec, pct);
+      }
     }
 
     function handleFileDone(data) {
@@ -1629,7 +1669,11 @@
           if (rec.parts[i] == null) missing.push(i);
         }
         if (missing.length) {
-          addChatMessage('⚠️ Файл пошкоджено (втрачені частини)', false);
+          if (rec.progressEl) {
+            rec.progressEl.innerHTML = '⚠️ Файл пошкоджено: ' + escapeHtml(rec.name);
+          } else {
+            addChatMessage('⚠️ Файл пошкоджено (втрачені частини)', false);
+          }
           incomingFiles.delete(data.id);
           setDeskProgress('');
           return;
@@ -1642,19 +1686,20 @@
         buffers.forEach(b => { out.set(b, off); off += b.length; });
         const blob = new Blob([out], { type: rec.mime });
         const url = URL.createObjectURL(blob);
-        const box = document.getElementById('chat-messages');
-        const div = document.createElement('div');
-        div.className = 'chat-msg them file-msg';
         const safeName = escapeHtml(rec.name);
-        div.innerHTML = '📎 <strong>' + safeName + '</strong> (' + formatBytes(blob.size) + ')<br>' +
-          '<a download="' + safeName.replace(/"/g, '') + '" href="' + url + '">⬇ Завантажити</a>' +
-          '<div class="meta"><span class="time">' +
-          new Date().toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' }) +
-          '</span></div>';
-        box.appendChild(div);
-        box.scrollTop = box.scrollHeight;
-        setDeskProgress('Отримано ✓');
+        const dlName = String(rec.name).replace(/"/g, '');
+        if (rec.progressEl) {
+          rec.progressEl.innerHTML =
+            '📎 <strong>' + safeName + '</strong> (' + formatBytes(blob.size) + ')<br>' +
+            '<span style="color:var(--success)">✅ Отримано 100%</span><br>' +
+            '<a download="' + dlName + '" href="' + url + '">⬇ Завантажити файл</a>' +
+            '<div class="meta"><span class="time">' +
+            new Date().toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' }) +
+            '</span></div>';
+        }
+        setDeskProgress('Отримано ✓ 100%');
         playSound('chat');
+        if (navigator.vibrate) navigator.vibrate([40, 40, 40]);
       } catch (e) {
         console.error(e);
         addChatMessage('⚠️ Помилка збірки файлу', false);
@@ -1663,7 +1708,13 @@
     }
 
     function handleFileAbort(data) {
-      if (data && data.id) incomingFiles.delete(data.id);
+      if (data && data.id) {
+        const rec = incomingFiles.get(data.id);
+        if (rec && rec.progressEl) {
+          rec.progressEl.innerHTML = '⚠️ Передачу скасовано: ' + escapeHtml(rec.name);
+        }
+        incomingFiles.delete(data.id);
+      }
       setDeskProgress('Передачу скасовано');
       addChatMessage('⚠️ Передачу файлу скасовано', false);
     }
@@ -2159,6 +2210,56 @@
     document.addEventListener('pointerdown', unlockOnce, { passive: true });
     document.addEventListener('touchstart', unlockOnce, { passive: true });
     document.addEventListener('click', unlockOnce);
+
+    // ==================== PWA INSTALL ====================
+    let deferredInstallPrompt = null;
+    const btnInstall = document.getElementById('btn-install');
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredInstallPrompt = e;
+      if (btnInstall) btnInstall.style.display = 'inline-flex';
+    });
+
+    if (btnInstall) {
+      btnInstall.addEventListener('click', async () => {
+        if (deferredInstallPrompt) {
+          deferredInstallPrompt.prompt();
+          try {
+            const choice = await deferredInstallPrompt.userChoice;
+            if (choice && choice.outcome === 'accepted') toast('Додаток встановлено');
+          } catch (e) {}
+          deferredInstallPrompt = null;
+          btnInstall.style.display = 'none';
+        } else {
+          // iOS / browsers without beforeinstallprompt
+          const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+          if (isIOS) {
+            toast('iOS: Поділитися → На екран «Домівка»');
+          } else {
+            toast('Меню браузера → «Встановити додаток» / «На головний екран»');
+          }
+        }
+      });
+      // Show button always as fallback tip on mobile
+      if (/android|iphone|ipad|mobile/i.test(navigator.userAgent)) {
+        btnInstall.style.display = 'inline-flex';
+      }
+    }
+
+    window.addEventListener('appinstalled', () => {
+      deferredInstallPrompt = null;
+      if (btnInstall) btnInstall.style.display = 'none';
+      toast('Морський Бій на головному екрані');
+    });
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch((err) => {
+          console.warn('SW register failed', err);
+        });
+      });
+    }
   </script>
 </body>
 </html>
