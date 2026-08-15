@@ -270,12 +270,15 @@
       overflow: hidden;
     }
     .chat-panel.open { display: flex; animation: fadeIn 0.25s ease; }
+    .chat-panel.desk-open { height: min(520px, calc(100dvh - 100px)); }
     .chat-header {
       padding: 12px 16px; border-bottom: 1px solid var(--glass-border);
       display: flex; justify-content: space-between; align-items: center; font-weight: 600;
+      flex-shrink: 0;
     }
     .chat-messages {
       flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 8px;
+      min-height: 80px; -webkit-overflow-scrolling: touch;
     }
     .chat-msg {
       max-width: 85%; padding: 8px 12px; border-radius: 12px; font-size: 0.88rem; line-height: 1.35;
@@ -286,12 +289,14 @@
     .chat-msg .time { font-size: 0.7rem; opacity: 0.6; margin-top: 2px; }
     .chat-input-row {
       display: flex; gap: 8px; padding: 10px; border-top: 1px solid var(--glass-border);
+      flex-shrink: 0; background: rgba(2,6,23,0.5);
     }
     .chat-input-row input { flex: 1; padding: 10px 12px; font-size: 0.9rem; }
     .chat-input-row button { width: auto; padding: 10px 14px; }
     .desk-panel {
-      display: none; flex-direction: column; gap: 8px; padding: 10px;
-      border-top: 1px solid rgba(0,212,255,0.25); background: rgba(0,30,50,0.55);
+      display: none; flex-direction: column; gap: 6px; padding: 8px 10px;
+      border-top: 1px solid rgba(0,212,255,0.25); background: rgba(0,30,50,0.85);
+      flex-shrink: 0; z-index: 2;
     }
     .desk-panel.open { display: flex; }
     .desk-panel .desk-row {
@@ -299,20 +304,28 @@
     }
     .desk-panel input[type="file"] {
       font-size: 0.78rem; color: var(--text-dim); max-width: 100%;
+      flex: 1; min-width: 0;
     }
     .desk-progress {
       font-size: 0.78rem; color: var(--accent); min-height: 1.1em;
     }
     .chat-msg.file-msg {
       border: 1px solid rgba(0,212,255,0.3); background: rgba(0,80,120,0.25);
+      max-width: 95%;
     }
-    .chat-msg.file-msg a {
-      color: var(--accent); text-decoration: underline; cursor: pointer;
+    .chat-msg.file-msg a.file-dl {
+      display: inline-block; margin-top: 8px; padding: 10px 14px;
+      background: rgba(0,212,255,0.18); border: 1px solid var(--accent);
+      border-radius: 10px; color: var(--accent); text-decoration: none;
+      font-weight: 600; font-size: 0.9rem;
     }
+    .chat-msg.file-msg a.file-dl:active { background: rgba(0,212,255,0.35); }
     .chat-emoji-bar {
       display: flex; flex-wrap: wrap; gap: 4px; padding: 6px 10px;
       border-top: 1px solid var(--glass-border); max-height: 72px; overflow-y: auto;
+      flex-shrink: 0;
     }
+    .chat-panel.desk-open .chat-emoji-bar { display: none; }
     .chat-emoji-bar button {
       background: transparent; border: none; font-size: 1.25rem; cursor: pointer;
       padding: 4px; border-radius: 6px; line-height: 1;
@@ -395,7 +408,12 @@
       .boards-container { flex-direction: column; align-items: center; }
       .card { padding: 16px; }
       .logo { font-size: 1.6rem; }
-      .chat-panel { bottom: 80px; right: 12px; height: 320px; }
+      .chat-panel {
+        left: 0; right: 0; bottom: 0; width: 100%; max-width: none;
+        height: min(55dvh, 420px); border-radius: 16px 16px 0 0;
+        border-left: none; border-right: none; border-bottom: none;
+      }
+      .chat-panel.desk-open { height: min(70dvh, 520px); }
       .chat-toggle { bottom: 14px; right: 14px; width: 52px; height: 52px; }
       .hud { gap: 8px; }
       .hud .btn-sm { padding: 9px 11px; font-size: 0.8rem; }
@@ -404,6 +422,9 @@
       #place-confirm { width: 100%; max-width: 360px; }
       #place-confirm .btn { flex: 1; padding: 14px 12px; font-size: 1rem; max-width: none !important; }
       .orient-indicator { flex-wrap: wrap; justify-content: center; gap: 8px; }
+      .desk-panel .desk-row { flex-direction: column; align-items: stretch; }
+      .desk-panel .desk-row .btn { width: 100%; max-width: none; }
+      .chat-msg.file-msg a.file-dl { width: 100%; text-align: center; box-sizing: border-box; }
     }
     @media (max-width: 400px) { :root { --cell-size: min(8.8vw, 38px); } }
   </style>
@@ -420,7 +441,7 @@
   <div id="home" class="screen active">
     <header>
       <div class="logo">⚓ Морський Бій</div>
-      <div class="subtitle">Онлайн • 2 гравці • </div>
+      <div class="subtitle">Онлайн • 2 гравці • HTML5 • v2.0</div>
     </header>
     <div class="card">
       <h2>Нова гра</h2>
@@ -766,34 +787,100 @@
     }
 
     // ==================== PEER ====================
+    const ICE_CONFIG = {
+      iceServers: [
+        { urls: 'stun:stun.l.google.com:19302' },
+        { urls: 'stun:stun1.l.google.com:19302' },
+        { urls: 'stun:stun.cloudflare.com:3478' },
+        // Free public TURN — critical for PC↔PC behind strict NAT/firewall
+        {
+          urls: [
+            'turn:openrelay.metered.ca:80',
+            'turn:openrelay.metered.ca:443',
+            'turn:openrelay.metered.ca:443?transport=tcp'
+          ],
+          username: 'openrelayproject',
+          credential: 'openrelayproject'
+        },
+        {
+          urls: [
+            'turn:openrelay.metered.ca:80?transport=tcp',
+            'turns:openrelay.metered.ca:443'
+          ],
+          username: 'openrelayproject',
+          credential: 'openrelayproject'
+        }
+      ],
+      iceCandidatePoolSize: 10
+    };
+
+    function destroyPeer() {
+      stopHeartbeat();
+      try { if (conn) { conn.close(); } } catch (e) {}
+      try { if (peer && !peer.destroyed) peer.destroy(); } catch (e) {}
+      conn = null;
+      peer = null;
+      myId = null;
+    }
+
+    function normalizePeerId(raw) {
+      return String(raw || '')
+        .replace(/[\u200B-\u200D\uFEFF]/g, '') // zero-width
+        .replace(/\s+/g, '')
+        .trim();
+    }
+
     function initPeer() {
       return new Promise((resolve, reject) => {
+        // Always fresh peer instance
+        try { if (peer && !peer.destroyed) peer.destroy(); } catch (e) {}
+        peer = null;
+        conn = null;
+
         peer = new Peer({
           debug: 1,
-          config: {
-            iceServers: [
-              { urls: 'stun:stun.l.google.com:19302' },
-              { urls: 'stun:stun1.l.google.com:19302' }
-            ]
+          config: ICE_CONFIG
+        });
+
+        const t = setTimeout(() => reject(new Error('Таймаут PeerJS')), 15000);
+
+        peer.on('open', id => {
+          clearTimeout(t);
+          myId = id;
+          resolve(id);
+        });
+        peer.on('error', err => {
+          clearTimeout(t);
+          console.error('Peer error:', err);
+          // peer-unavailable etc. — surface later on connect
+          if (err && err.type === 'browser-incompatible') {
+            reject(new Error('Браузер не підтримує WebRTC'));
+          } else if (err && err.type === 'network') {
+            reject(new Error('Мережева помилка PeerJS'));
+          } else {
+            // don't reject for peer-unavailable during host wait
+            if (err && err.type === 'peer-unavailable') return;
+            reject(err);
           }
         });
-        peer.on('open', id => { myId = id; resolve(id); });
-        peer.on('error', err => { console.error('Peer error:', err); reject(err); });
         peer.on('connection', connection => {
-          if (conn && conn.open) { connection.close(); return; }
+          if (conn && conn.open) { try { connection.close(); } catch (e) {} return; }
           conn = connection;
           setupConnection();
         });
         peer.on('disconnected', () => {
-          toast('З\'єднання з мережею втрачено');
-          // try reconnect briefly
+          toast('З\'єднання з сигнальним сервером втрачено');
           try { peer.reconnect(); } catch (e) {}
         });
-        peer.on('close', () => handleOpponentDisconnect());
       });
     }
 
     function setupConnection() {
+      if (!conn) return;
+      // prevent double-binding
+      if (conn.__setupDone) return;
+      conn.__setupDone = true;
+
       conn.on('open', () => {
         updateChatVisibility();
         startHeartbeat();
@@ -812,7 +899,60 @@
         stopHeartbeat();
         handleOpponentDisconnect();
       });
-      conn.on('error', err => { console.error(err); toast('Помилка з\'єднання'); });
+      conn.on('error', err => {
+        console.error(err);
+        toast('Помилка з\'єднання');
+      });
+    }
+
+    function connectToHost(hostId) {
+      return new Promise((resolve, reject) => {
+        const id = normalizePeerId(hostId);
+        if (!id) return reject(new Error('Порожній код'));
+        if (!peer || peer.destroyed) return reject(new Error('Peer не готовий'));
+
+        let settled = false;
+        const fail = (msg) => {
+          if (settled) return;
+          settled = true;
+          clearTimeout(timer);
+          reject(new Error(msg));
+        };
+        const ok = () => {
+          if (settled) return;
+          settled = true;
+          clearTimeout(timer);
+          resolve();
+        };
+
+        const timer = setTimeout(() => {
+          fail('Не вдалося підключитися. Перевірте код і мережу (PC↔PC іноді потребує TURN).');
+        }, 20000);
+
+        try {
+          conn = peer.connect(id, {
+            reliable: true,
+            serialization: 'json',
+            metadata: { from: myId }
+          });
+        } catch (e) {
+          return fail(e.message || 'connect failed');
+        }
+
+        setupConnection();
+
+        if (conn.open) ok();
+        else {
+          conn.on('open', ok);
+          conn.on('error', (err) => fail((err && err.message) || 'Помилка каналу'));
+        }
+
+        peer.on('error', (err) => {
+          if (err && err.type === 'peer-unavailable') {
+            fail('Кімнату не знайдено. Перевірте код (створювач має тримати вкладку відкритою).');
+          }
+        });
+      });
     }
 
     let heartbeatTimer = null;
@@ -1458,6 +1598,8 @@
       deskUnlocked = true;
       const panel = document.getElementById('desk-panel');
       if (panel) panel.classList.add('open');
+      const chat = document.getElementById('chat-panel');
+      if (chat) chat.classList.add('desk-open');
       if (!silent) {
         toast('🔒 Desk відкрито');
         setDeskProgress('Оберіть файл (до 100 МБ). Канал шифрується (DTLS).');
@@ -1469,6 +1611,8 @@
       deskUnlocked = false;
       const panel = document.getElementById('desk-panel');
       if (panel) panel.classList.remove('open');
+      const chat = document.getElementById('chat-panel');
+      if (chat) chat.classList.remove('desk-open');
       const fi = document.getElementById('desk-file');
       if (fi) fi.value = '';
       setDeskProgress('');
@@ -1692,7 +1836,7 @@
           rec.progressEl.innerHTML =
             '📎 <strong>' + safeName + '</strong> (' + formatBytes(blob.size) + ')<br>' +
             '<span style="color:var(--success)">✅ Отримано 100%</span><br>' +
-            '<a download="' + dlName + '" href="' + url + '">⬇ Завантажити файл</a>' +
+            '<a class="file-dl" download="' + dlName + '" href="' + url + '">⬇ Завантажити файл</a>' +
             '<div class="meta"><span class="time">' +
             new Date().toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' }) +
             '</span></div>';
@@ -2016,7 +2160,7 @@
 
     document.getElementById('btn-back-join').addEventListener('click', () => showScreen('home'));
     document.getElementById('btn-cancel-create').addEventListener('click', () => {
-      if (peer) peer.destroy();
+      destroyPeer();
       showScreen('home');
     });
     document.getElementById('btn-scan-qr').addEventListener('click', () => {
@@ -2055,22 +2199,20 @@
 
     document.getElementById('btn-connect').addEventListener('click', async () => {
       unlockAudio();
-      const code = document.getElementById('join-code').value.trim();
+      const code = normalizePeerId(document.getElementById('join-code').value);
+      document.getElementById('join-code').value = code;
       if (!code) { toast('Введіть код'); return; }
       isHost = false;
       document.getElementById('join-status').innerHTML = '<span class="spinner"></span> Підключення...';
+      document.getElementById('join-status').className = 'status waiting';
       try {
         await initPeer();
-        conn = peer.connect(code, { reliable: true });
-        setupConnection();
-        setTimeout(() => {
-          if (!conn || !conn.open) {
-            document.getElementById('join-status').textContent = 'Не вдалося підключитися. Перевірте код.';
-            document.getElementById('join-status').className = 'status';
-          }
-        }, 9000);
+        await connectToHost(code);
       } catch (e) {
-        document.getElementById('join-status').textContent = 'Помилка: ' + e.message;
+        console.error(e);
+        document.getElementById('join-status').textContent = 'Помилка: ' + (e.message || e);
+        document.getElementById('join-status').className = 'status';
+        toast(e.message || 'Не вдалося підключитися');
       }
     });
 
