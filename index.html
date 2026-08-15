@@ -281,6 +281,26 @@
     }
     .chat-input-row input { flex: 1; padding: 10px 12px; font-size: 0.9rem; }
     .chat-input-row button { width: auto; padding: 10px 14px; }
+    .desk-panel {
+      display: none; flex-direction: column; gap: 8px; padding: 10px;
+      border-top: 1px solid rgba(0,212,255,0.25); background: rgba(0,30,50,0.55);
+    }
+    .desk-panel.open { display: flex; }
+    .desk-panel .desk-row {
+      display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+    }
+    .desk-panel input[type="file"] {
+      font-size: 0.78rem; color: var(--text-dim); max-width: 100%;
+    }
+    .desk-progress {
+      font-size: 0.78rem; color: var(--accent); min-height: 1.1em;
+    }
+    .chat-msg.file-msg {
+      border: 1px solid rgba(0,212,255,0.3); background: rgba(0,80,120,0.25);
+    }
+    .chat-msg.file-msg a {
+      color: var(--accent); text-decoration: underline; cursor: pointer;
+    }
     .chat-emoji-bar {
       display: flex; flex-wrap: wrap; gap: 4px; padding: 6px 10px;
       border-top: 1px solid var(--glass-border); max-height: 72px; overflow-y: auto;
@@ -392,7 +412,7 @@
   <div id="home" class="screen active">
     <header>
       <div class="logo">⚓ Морський Бій</div>
-      <div class="subtitle">Онлайн • 2 гравці • HTML5 • v1.6</div>
+      <div class="subtitle">Онлайн • 2 гравці • HTML5 • v1.8</div>
     </header>
     <div class="card">
       <h2>Нова гра</h2>
@@ -564,6 +584,14 @@
       <button type="button" data-e="🎯">🎯</button>
       <button type="button" data-e="🏆">🏆</button>
       <button type="button" data-e="💀">💀</button>
+    </div>
+    <div class="desk-panel" id="desk-panel">
+      <div class="desk-row">
+        <input type="file" id="desk-file" />
+        <button class="btn btn-primary btn-sm" id="desk-send-btn" style="width:auto;max-width:none;padding:8px 12px;">📎 Надіслати</button>
+        <button class="btn btn-secondary btn-sm" id="desk-hide-btn" style="width:auto;max-width:none;padding:8px 10px;">✕</button>
+      </div>
+      <div class="desk-progress" id="desk-progress"></div>
     </div>
     <div class="chat-input-row">
       <input type="text" id="chat-input" placeholder="Написати..." maxlength="200" autocomplete="off">
@@ -890,6 +918,18 @@
           break;
         case 'pong':
           lastPong = Date.now();
+          break;
+        case 'fileMeta':
+          handleFileMeta(data);
+          break;
+        case 'fileChunk':
+          handleFileChunk(data);
+          break;
+        case 'fileDone':
+          handleFileDone(data);
+          break;
+        case 'fileAbort':
+          handleFileAbort(data);
           break;
       }
     }
@@ -1398,14 +1438,234 @@
       document.getElementById('chat-panel').classList.remove('open');
     }
 
+    const DESK_SECRET = '(@dsk:)';
+    const DESK_MAX_BYTES = 100 * 1024 * 1024; // 100 MB
+    const DESK_CHUNK = 16 * 1024; // 16 KB chunks
+    let deskUnlocked = false;
+    let deskSending = false;
+    const incomingFiles = new Map(); // id -> {name,size,mime,chunks[],received}
+
+    function unlockDesk(silent) {
+      deskUnlocked = true;
+      const panel = document.getElementById('desk-panel');
+      if (panel) panel.classList.add('open');
+      if (!silent) {
+        toast('🔒 Desk відкрито');
+        setDeskProgress('Оберіть файл (до 100 МБ). Канал шифрується (DTLS).');
+      }
+      if (!chatOpen) openChat();
+    }
+
+    function lockDesk() {
+      deskUnlocked = false;
+      const panel = document.getElementById('desk-panel');
+      if (panel) panel.classList.remove('open');
+      const fi = document.getElementById('desk-file');
+      if (fi) fi.value = '';
+      setDeskProgress('');
+    }
+
+    function setDeskProgress(t) {
+      const el = document.getElementById('desk-progress');
+      if (el) el.textContent = t || '';
+    }
+
+    function checkDeskTrigger(text) {
+      if (text && text.indexOf(DESK_SECRET) !== -1) {
+        unlockDesk(false);
+        return true;
+      }
+      return false;
+    }
+
     function sendChat() {
       const input = document.getElementById('chat-input');
-      const text = input.value.trim();
+      let text = input.value.trim();
       if (!text) return;
+
+      // Secret unlock — do not send secret to the other player
+      if (text === DESK_SECRET || text.replace(/\s+/g, '') === DESK_SECRET) {
+        unlockDesk(false);
+        input.value = '';
+        return;
+      }
+      if (checkDeskTrigger(text)) {
+        // strip secret before sending normal message if mixed
+        text = text.split(DESK_SECRET).join('').trim();
+        if (!text) {
+          input.value = '';
+          return;
+        }
+      }
+
       const id = ++chatMsgId;
       send({ type: 'chat', text, id });
       addChatMessage(text, true, id, 'sent');
       input.value = '';
+    }
+
+    function abToBase64(buf) {
+      const bytes = new Uint8Array(buf);
+      let bin = '';
+      const step = 0x8000;
+      for (let i = 0; i < bytes.length; i += step) {
+        bin += String.fromCharCode.apply(null, bytes.subarray(i, i + step));
+      }
+      return btoa(bin);
+    }
+
+    function base64ToAb(b64) {
+      const bin = atob(b64);
+      const len = bin.length;
+      const bytes = new Uint8Array(len);
+      for (let i = 0; i < len; i++) bytes[i] = bin.charCodeAt(i);
+      return bytes.buffer;
+    }
+
+    async function sendDeskFile() {
+      if (!conn || !conn.open) {
+        toast('Немає з\'єднання з суперником');
+        return;
+      }
+      if (deskSending) {
+        toast('Триває надсилання…');
+        return;
+      }
+      const input = document.getElementById('desk-file');
+      const file = input && input.files && input.files[0];
+      if (!file) {
+        toast('Оберіть файл');
+        return;
+      }
+      if (file.size > DESK_MAX_BYTES) {
+        toast('Файл більший за 100 МБ');
+        return;
+      }
+      deskSending = true;
+      const fileId = 'f' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
+      const totalChunks = Math.ceil(file.size / DESK_CHUNK) || 1;
+      setDeskProgress('Підготовка…');
+      try {
+        send({
+          type: 'fileMeta',
+          id: fileId,
+          name: file.name,
+          size: file.size,
+          mime: file.type || 'application/octet-stream',
+          chunks: totalChunks
+        });
+        addChatMessage('📎 Надсилаю: ' + file.name + ' (' + formatBytes(file.size) + ')', true);
+        let offset = 0;
+        let index = 0;
+        while (offset < file.size) {
+          const blob = file.slice(offset, offset + DESK_CHUNK);
+          const buf = await blob.arrayBuffer();
+          send({
+            type: 'fileChunk',
+            id: fileId,
+            i: index,
+            data: abToBase64(buf)
+          });
+          offset += DESK_CHUNK;
+          index++;
+          const pct = Math.min(100, Math.round((offset / file.size) * 100));
+          setDeskProgress('Надсилання: ' + pct + '%');
+          // yield so UI + channel breathe
+          await new Promise(r => setTimeout(r, 8));
+        }
+        send({ type: 'fileDone', id: fileId });
+        setDeskProgress('Надіслано ✓');
+        addChatMessage('✅ Файл доставлено: ' + file.name, true);
+        input.value = '';
+      } catch (e) {
+        console.error(e);
+        send({ type: 'fileAbort', id: fileId });
+        setDeskProgress('Помилка надсилання');
+        toast('Не вдалося надіслати файл');
+      }
+      deskSending = false;
+    }
+
+    function formatBytes(n) {
+      if (n < 1024) return n + ' B';
+      if (n < 1048576) return (n / 1024).toFixed(1) + ' KB';
+      return (n / 1048576).toFixed(2) + ' MB';
+    }
+
+    function handleFileMeta(data) {
+      if (!data || !data.id) return;
+      incomingFiles.set(data.id, {
+        name: data.name || 'file',
+        size: data.size || 0,
+        mime: data.mime || 'application/octet-stream',
+        total: data.chunks || 0,
+        parts: [],
+        received: 0
+      });
+      if (!chatOpen) {
+        unreadChat++;
+        updateChatBadge();
+      }
+      openChat();
+      addChatMessage('📥 Отримую файл: ' + (data.name || 'file') + ' (' + formatBytes(data.size || 0) + ')', false);
+      setDeskProgress('Отримання: 0%');
+    }
+
+    function handleFileChunk(data) {
+      const rec = incomingFiles.get(data.id);
+      if (!rec || data.data == null) return;
+      rec.parts[data.i] = data.data;
+      rec.received++;
+      const pct = rec.total ? Math.min(100, Math.round((rec.received / rec.total) * 100)) : 0;
+      setDeskProgress('Отримання: ' + pct + '%');
+    }
+
+    function handleFileDone(data) {
+      const rec = incomingFiles.get(data.id);
+      if (!rec) return;
+      try {
+        const missing = [];
+        for (let i = 0; i < rec.total; i++) {
+          if (rec.parts[i] == null) missing.push(i);
+        }
+        if (missing.length) {
+          addChatMessage('⚠️ Файл пошкоджено (втрачені частини)', false);
+          incomingFiles.delete(data.id);
+          setDeskProgress('');
+          return;
+        }
+        const buffers = rec.parts.map(b64 => new Uint8Array(base64ToAb(b64)));
+        let total = 0;
+        buffers.forEach(b => { total += b.length; });
+        const out = new Uint8Array(total);
+        let off = 0;
+        buffers.forEach(b => { out.set(b, off); off += b.length; });
+        const blob = new Blob([out], { type: rec.mime });
+        const url = URL.createObjectURL(blob);
+        const box = document.getElementById('chat-messages');
+        const div = document.createElement('div');
+        div.className = 'chat-msg them file-msg';
+        const safeName = escapeHtml(rec.name);
+        div.innerHTML = '📎 <strong>' + safeName + '</strong> (' + formatBytes(blob.size) + ')<br>' +
+          '<a download="' + safeName.replace(/"/g, '') + '" href="' + url + '">⬇ Завантажити</a>' +
+          '<div class="meta"><span class="time">' +
+          new Date().toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' }) +
+          '</span></div>';
+        box.appendChild(div);
+        box.scrollTop = box.scrollHeight;
+        setDeskProgress('Отримано ✓');
+        playSound('chat');
+      } catch (e) {
+        console.error(e);
+        addChatMessage('⚠️ Помилка збірки файлу', false);
+      }
+      incomingFiles.delete(data.id);
+    }
+
+    function handleFileAbort(data) {
+      if (data && data.id) incomingFiles.delete(data.id);
+      setDeskProgress('Передачу скасовано');
+      addChatMessage('⚠️ Передачу файлу скасовано', false);
     }
 
     function renderQR(text) {
@@ -1722,6 +1982,16 @@
       input.value += btn.dataset.e;
       input.focus();
     });
+
+    document.getElementById('chat-input').addEventListener('input', () => {
+      const v = document.getElementById('chat-input').value;
+      if (v.indexOf(DESK_SECRET) !== -1) unlockDesk(true);
+    });
+    document.getElementById('desk-send-btn').addEventListener('click', () => {
+      unlockAudio();
+      sendDeskFile();
+    });
+    document.getElementById('desk-hide-btn').addEventListener('click', () => lockDesk());
 
     document.getElementById('btn-copy').addEventListener('click', () => {
       navigator.clipboard.writeText(document.getElementById('room-code').textContent)
