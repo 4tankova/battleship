@@ -441,7 +441,7 @@
   <div id="home" class="screen active">
     <header>
       <div class="logo">⚓ Морський Бій</div>
-      <div class="subtitle">Онлайн • 2 гравці • HTML5 • v2.1</div>
+      <div class="subtitle">Онлайн • 2 гравці • HTML5 • v2.2</div>
     </header>
     <div class="card">
       <h2>Нова гра</h2>
@@ -787,31 +787,44 @@
     }
 
     // ==================== PEER ====================
-    const ICE_CONFIG = {
-      iceServers: [
-        { urls: 'stun:stun.l.google.com:19302' },
-        { urls: 'stun:stun1.l.google.com:19302' },
-        { urls: 'stun:stun.cloudflare.com:3478' },
-        // Free public TURN — critical for PC↔PC behind strict NAT/firewall
-        {
-          urls: [
-            'turn:openrelay.metered.ca:80',
-            'turn:openrelay.metered.ca:443',
-            'turn:openrelay.metered.ca:443?transport=tcp'
-          ],
-          username: 'openrelayproject',
-          credential: 'openrelayproject'
-        },
-        {
-          urls: [
-            'turn:openrelay.metered.ca:80?transport=tcp',
-            'turns:openrelay.metered.ca:443'
-          ],
-          username: 'openrelayproject',
-          credential: 'openrelayproject'
-        }
-      ],
-      iceCandidatePoolSize: 10
+    const ICE_SERVERS = [
+      { urls: 'stun:stun.l.google.com:19302' },
+      { urls: 'stun:stun1.l.google.com:19302' },
+      { urls: 'stun:stun2.l.google.com:19302' },
+      { urls: 'stun:stun.cloudflare.com:3478' },
+      { urls: 'stun:stun.relay.metered.ca:80' },
+      {
+        urls: [
+          'turn:openrelay.metered.ca:80',
+          'turn:openrelay.metered.ca:80?transport=tcp',
+          'turn:openrelay.metered.ca:443',
+          'turn:openrelay.metered.ca:443?transport=tcp',
+          'turns:openrelay.metered.ca:443'
+        ],
+        username: 'openrelayproject',
+        credential: 'openrelayproject'
+      },
+      {
+        urls: [
+          'turn:standard.relay.metered.ca:80',
+          'turn:standard.relay.metered.ca:80?transport=tcp',
+          'turn:standard.relay.metered.ca:443',
+          'turns:standard.relay.metered.ca:443'
+        ],
+        username: 'openrelayproject',
+        credential: 'openrelayproject'
+      },
+      {
+        urls: 'turn:relay1.expressturn.com:3478',
+        username: 'efJBVQ443P09PUE9SP',
+        credential: '1bVqNqYqZz'
+      }
+    ];
+    const ICE_CONFIG = { iceServers: ICE_SERVERS, iceCandidatePoolSize: 16 };
+    const ICE_RELAY_ONLY = {
+      iceServers: ICE_SERVERS,
+      iceTransportPolicy: 'relay',
+      iceCandidatePoolSize: 16
     };
 
     function destroyPeer() {
@@ -830,21 +843,19 @@
         .trim();
     }
 
-    function initPeer() {
+    function initPeer(iceConfig) {
       return new Promise((resolve, reject) => {
         try { if (peer && !peer.destroyed) peer.destroy(); } catch (e) {}
         peer = null;
         conn = null;
 
-        // Explicit cloud broker — more reliable than implicit default in some builds
         peer = new Peer({
           host: '0.peerjs.com',
           port: 443,
           path: '/',
           secure: true,
           debug: 1,
-          config: ICE_CONFIG,
-          // slightly longer ping to keep host discoverable
+          config: iceConfig || ICE_CONFIG,
           pingInterval: 5000
         });
 
@@ -985,9 +996,9 @@
       if (!id) throw new Error('Порожній код');
       if (!peer || peer.destroyed || !myId) throw new Error('Peer не готовий');
 
-      // Small delay: host must be registered on broker before connect
-      await new Promise(r => setTimeout(r, 400));
+      await new Promise(r => setTimeout(r, 500));
 
+      // Attempt 1 — normal ICE (direct + STUN + TURN)
       try {
         await tryPeerConnect(id);
         return;
@@ -995,13 +1006,31 @@
         console.warn('connect attempt 1 failed', e1);
       }
 
-      // Retry once after short wait (helps Chrome↔Chrome race)
-      await new Promise(r => setTimeout(r, 1200));
+      // Attempt 2 — same peer, short wait
+      await new Promise(r => setTimeout(r, 1000));
       try {
         if (conn) { try { conn.close(); } catch (e) {} conn = null; }
         await tryPeerConnect(id);
+        return;
       } catch (e2) {
-        throw e2;
+        console.warn('connect attempt 2 failed', e2);
+      }
+
+      // Attempt 3 — force TURN relay only (typical fix for PC↔PC)
+      const joinStatus = document.getElementById('join-status');
+      if (joinStatus) {
+        joinStatus.innerHTML = '<span class="spinner"></span> Повтор через TURN (PC↔PC)…';
+      }
+      await initPeer(ICE_RELAY_ONLY);
+      await new Promise(r => setTimeout(r, 400));
+      try {
+        await tryPeerConnect(id);
+        return;
+      } catch (e3) {
+        throw new Error(
+          'PC↔PC не з\'єдналось. Перевірте: 1) код 2) Windows Firewall 3) вимкніть VPN. ' +
+          'Або створіть кімнату з телефону. (' + (e3.message || 'err') + ')'
+        );
       }
     }
 
