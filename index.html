@@ -441,7 +441,7 @@
   <div id="home" class="screen active">
     <header>
       <div class="logo">⚓ Морський Бій</div>
-      <div class="subtitle">Онлайн • 2 гравці • </div>
+      <div class="subtitle">Онлайн • 2 гравці • HTML5 • v2.1</div>
     </header>
     <div class="card">
       <h2>Нова гра</h2>
@@ -832,68 +832,97 @@
 
     function initPeer() {
       return new Promise((resolve, reject) => {
-        // Always fresh peer instance
         try { if (peer && !peer.destroyed) peer.destroy(); } catch (e) {}
         peer = null;
         conn = null;
 
+        // Explicit cloud broker — more reliable than implicit default in some builds
         peer = new Peer({
+          host: '0.peerjs.com',
+          port: 443,
+          path: '/',
+          secure: true,
           debug: 1,
-          config: ICE_CONFIG
+          config: ICE_CONFIG,
+          // slightly longer ping to keep host discoverable
+          pingInterval: 5000
         });
 
-        const t = setTimeout(() => reject(new Error('Таймаут PeerJS')), 15000);
+        let done = false;
+        const t = setTimeout(() => {
+          if (!done) reject(new Error('Таймаут PeerJS (перевірте інтернет)'));
+        }, 18000);
 
         peer.on('open', id => {
+          if (done) return;
+          done = true;
           clearTimeout(t);
           myId = id;
           resolve(id);
         });
+
         peer.on('error', err => {
-          clearTimeout(t);
           console.error('Peer error:', err);
-          // peer-unavailable etc. — surface later on connect
-          if (err && err.type === 'browser-incompatible') {
+          const type = err && err.type;
+          // peer-unavailable is for connect attempts, not for host open
+          if (type === 'peer-unavailable') return;
+          if (done) return;
+          done = true;
+          clearTimeout(t);
+          if (type === 'browser-incompatible') {
             reject(new Error('Браузер не підтримує WebRTC'));
-          } else if (err && err.type === 'network') {
-            reject(new Error('Мережева помилка PeerJS'));
+          } else if (type === 'network' || type === 'server-error' || type === 'socket-error') {
+            reject(new Error('Немає зв\'язку з PeerJS. Спробуйте ще раз.'));
           } else {
-            // don't reject for peer-unavailable during host wait
-            if (err && err.type === 'peer-unavailable') return;
-            reject(err);
+            reject(err instanceof Error ? err : new Error(String(type || err)));
           }
         });
+
         peer.on('connection', connection => {
-          if (conn && conn.open) { try { connection.close(); } catch (e) {} return; }
+          // Host accepts first guest only
+          if (conn && conn.open) {
+            try { connection.close(); } catch (e) {}
+            return;
+          }
           conn = connection;
           setupConnection();
         });
+
         peer.on('disconnected', () => {
-          toast('З\'єднання з сигнальним сервером втрачено');
-          try { peer.reconnect(); } catch (e) {}
+          toast('Сигнальний сервер відключився — перепідключення…');
+          try { if (peer && !peer.destroyed) peer.reconnect(); } catch (e) {}
         });
       });
     }
 
     function setupConnection() {
       if (!conn) return;
-      // prevent double-binding
       if (conn.__setupDone) return;
       conn.__setupDone = true;
 
-      conn.on('open', () => {
+      const onOpen = () => {
         updateChatVisibility();
         startHeartbeat();
         if (isHost) {
-          document.getElementById('create-status').textContent = 'Суперник підключився!';
-          document.getElementById('create-status').className = 'status connected';
+          const el = document.getElementById('create-status');
+          if (el) {
+            el.textContent = 'Суперник підключився!';
+            el.className = 'status connected';
+          }
           setTimeout(() => startPlacement(), 700);
         } else {
-          document.getElementById('join-status').textContent = 'Підключено!';
-          document.getElementById('join-status').className = 'status connected';
+          const el = document.getElementById('join-status');
+          if (el) {
+            el.textContent = 'Підключено!';
+            el.className = 'status connected';
+          }
           setTimeout(() => startPlacement(), 700);
         }
-      });
+      };
+
+      if (conn.open) onOpen();
+      else conn.on('open', onOpen);
+
       conn.on('data', data => handleData(data));
       conn.on('close', () => {
         stopHeartbeat();
@@ -905,54 +934,75 @@
       });
     }
 
-    function connectToHost(hostId) {
+    function tryPeerConnect(id) {
       return new Promise((resolve, reject) => {
-        const id = normalizePeerId(hostId);
-        if (!id) return reject(new Error('Порожній код'));
-        if (!peer || peer.destroyed) return reject(new Error('Peer не готовий'));
-
         let settled = false;
-        const fail = (msg) => {
-          if (settled) return;
-          settled = true;
-          clearTimeout(timer);
-          reject(new Error(msg));
-        };
-        const ok = () => {
+        const finishOk = () => {
           if (settled) return;
           settled = true;
           clearTimeout(timer);
           resolve();
         };
+        const finishFail = (msg) => {
+          if (settled) return;
+          settled = true;
+          clearTimeout(timer);
+          reject(new Error(msg));
+        };
 
         const timer = setTimeout(() => {
-          fail('Не вдалося підключитися. Перевірте код і мережу (PC↔PC іноді потребує TURN).');
-        }, 20000);
+          finishFail('Таймаут каналу. Спробуйте ще раз — створювач має тримати гру відкритою.');
+        }, 25000);
 
+        let c;
         try {
-          conn = peer.connect(id, {
-            reliable: true,
-            serialization: 'json',
-            metadata: { from: myId }
-          });
+          // Default binary serialization is fine (we send plain objects)
+          c = peer.connect(id, { reliable: true });
         } catch (e) {
-          return fail(e.message || 'connect failed');
+          return finishFail(e.message || 'connect failed');
         }
 
+        conn = c;
         setupConnection();
 
-        if (conn.open) ok();
+        if (c.open) finishOk();
         else {
-          conn.on('open', ok);
-          conn.on('error', (err) => fail((err && err.message) || 'Помилка каналу'));
+          c.on('open', finishOk);
+          c.on('error', (err) => finishFail((err && err.message) || 'Помилка каналу'));
         }
 
-        peer.on('error', (err) => {
+        const onPeerErr = (err) => {
           if (err && err.type === 'peer-unavailable') {
-            fail('Кімнату не знайдено. Перевірте код (створювач має тримати вкладку відкритою).');
+            finishFail('Код не знайдено. Перевірте, що створювач онлайн і код скопійовано повністю.');
           }
-        });
+        };
+        peer.on('error', onPeerErr);
       });
+    }
+
+    async function connectToHost(hostId) {
+      const id = normalizePeerId(hostId);
+      if (!id) throw new Error('Порожній код');
+      if (!peer || peer.destroyed || !myId) throw new Error('Peer не готовий');
+
+      // Small delay: host must be registered on broker before connect
+      await new Promise(r => setTimeout(r, 400));
+
+      try {
+        await tryPeerConnect(id);
+        return;
+      } catch (e1) {
+        console.warn('connect attempt 1 failed', e1);
+      }
+
+      // Retry once after short wait (helps Chrome↔Chrome race)
+      await new Promise(r => setTimeout(r, 1200));
+      try {
+        if (conn) { try { conn.close(); } catch (e) {} conn = null; }
+        await tryPeerConnect(id);
+      } catch (e2) {
+        throw e2;
+      }
     }
 
     let heartbeatTimer = null;
@@ -2397,7 +2447,20 @@
 
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js').catch((err) => {
+        navigator.serviceWorker.register('./sw.js').then((reg) => {
+          // Force check for updates so installed apps get peer fixes
+          try { reg.update(); } catch (e) {}
+          if (reg.waiting) reg.waiting.postMessage('SKIP_WAITING');
+          reg.addEventListener('updatefound', () => {
+            const nw = reg.installing;
+            if (!nw) return;
+            nw.addEventListener('statechange', () => {
+              if (nw.state === 'installed' && navigator.serviceWorker.controller) {
+                toast('Оновлення готове — перезавантажте додаток');
+              }
+            });
+          });
+        }).catch((err) => {
           console.warn('SW register failed', err);
         });
       });
