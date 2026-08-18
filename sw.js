@@ -1,5 +1,5 @@
 /* PWA service worker — network-first for HTML so updates reach installed apps */
-const CACHE = 'morskoy-biy-v2.1';
+const CACHE = 'morskoy-biy-v2.3';
 const PRECACHE = [
   './manifest.webmanifest',
   './icon-192.png',
