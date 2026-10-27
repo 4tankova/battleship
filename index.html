@@ -1,0 +1,3729 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-VXwYJHG57IoQePvZnJW/VzwMg51FCLRZTsxTC4XDDRI='; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; media-src 'self' blob: mediastream:; connect-src 'self' wss://0.peerjs.com https://battleship-ua.metered.live https://fonts.googleapis.com https://fonts.gstatic.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; require-trusted-types-for 'script'; trusted-types mb">
+  <meta name="referrer" content="no-referrer">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#061018">
+  <meta name="description" content="Морський бій: тактичний ШІ, гра з другом онлайн за кодом або QR, чат. Працює на телефоні й комп’ютері, навіть офлайн.">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Морський Бій">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
+  <link rel="apple-touch-icon" href="./apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400..800&family=Unbounded:wght@500..800&display=swap">
+  <link rel="stylesheet" href="./css/app.css">
+  <title>Морський Бій</title>
+</head>
+<body>
+  <svg class="sprite" aria-hidden="true" focusable="false">
+    <symbol id="i-sound" viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></symbol>
+    <symbol id="i-mute" viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="m17 9 5 6m0-6-5 6"/></symbol>
+    <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 10h8M8 13h5"/></symbol>
+    <symbol id="i-pause" viewBox="0 0 24 24"><path d="M8 5v14M16 5v14"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 5v14l12-7z"/></symbol>
+    <symbol id="i-flag" viewBox="0 0 24 24"><path d="M5 21V4m0 0h11l-2 4 2 4H5"/></symbol>
+    <symbol id="i-rotate" viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.3-5.7L20 8.6"/><path d="M20 3v5.6h-5.6"/></symbol>
+    <symbol id="i-dice" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/><circle cx="9" cy="9" r=".6"/><circle cx="15" cy="15" r=".6"/><circle cx="15" cy="9" r=".6"/><circle cx="9" cy="15" r=".6"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3m-9 0 1 13h10l1-13"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/></symbol>
+    <symbol id="i-share" viewBox="0 0 24 24"><path d="M12 15V3m0 0L7.5 7.5M12 3l4.5 4.5"/><path d="M6 11H5v10h14V11h-1"/></symbol>
+    <symbol id="i-camera" viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></symbol>
+    <symbol id="i-back" viewBox="0 0 24 24"><path d="M19 12H5m0 0 6-6m-6 6 6 6"/></symbol>
+    <symbol id="i-bot" viewBox="0 0 24 24"><rect x="4" y="8" width="16" height="11" rx="3"/><path d="M12 4v4M9 13h.01M15 13h.01M2 13v2M22 13v2"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14a6.5 6.5 0 0 1 3.5 6"/></symbol>
+    <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></symbol>
+    <symbol id="i-send" viewBox="0 0 24 24"><path d="M4 12 20 4l-5 16-3-7z"/><path d="m12 13 8-9"/></symbol>
+    <symbol id="i-clip" viewBox="0 0 24 24"><path d="m20 11-8.5 8.5a5 5 0 0 1-7-7L13 4a3.3 3.3 0 0 1 4.7 4.7L9.2 17.2a1.7 1.7 0 0 1-2.4-2.4L14 7.6"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 20h14"/></symbol>
+    <symbol id="i-install" viewBox="0 0 24 24"><rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M12 7v7m0 0-3-3m3 3 3-3"/></symbol>
+    <symbol id="i-trophy" viewBox="0 0 24 24"><path d="M8 4h8v5a4 4 0 0 1-8 0zM8 6H4.5a3 3 0 0 0 3.5 4M16 6h3.5a3 3 0 0 1-3.5 4M12 13v4m-4 3h8l-1-3H9z"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M4 12a8 8 0 0 1 13.7-5.7L20 8.6M20 12a8 8 0 0 1-13.7 5.7L4 15.4"/><path d="M20 3.5v5.1h-5.1M4 20.5v-5.1h5.1"/></symbol>
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="m3.5 11 8.5-7 8.5 7M6 9.5V20h12V9.5"/></symbol>
+    <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 4.5 6v6c0 4.5 3.2 7.7 7.5 9 4.3-1.3 7.5-4.5 7.5-9V6z"/><path d="m8.5 12 2.5 2.5 4.5-5"/></symbol>
+    <symbol id="i-torch" viewBox="0 0 24 24"><path d="M8 3h8v4l-2 4v10h-4V11L8 7z"/><path d="M12 14v2"/></symbol>
+    <symbol id="i-switch" viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><path d="M9 13a3 3 0 0 1 5.2-2M15 13a3 3 0 0 1-5.2 2"/><path d="M14.5 9.5v1.7h-1.7M9.5 16.5v-1.7h1.7"/></symbol>
+    <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><path d="M12 1.5v4m0 13v4M1.5 12h4m13 0h4"/></symbol>
+    <symbol id="i-anchor" viewBox="0 0 24 24"><circle cx="12" cy="5" r="2.2"/><path d="M12 7.2V21m-5-10h10M4 13a8 8 0 0 0 16 0"/></symbol>
+  </svg>
+
+  <div class="ocean" aria-hidden="true"><div class="ocean-sweep"></div><div class="ocean-grid"></div></div>
+
+  <div id="app">
+    <header class="topbar">
+      <button class="brand" id="brand" type="button" aria-label="На головну">
+        <span class="brand-mark"><svg><use href="#i-anchor"/></svg></span>
+        <span class="brand-name">Морський бій</span>
+      </button>
+      <div class="topbar-actions">
+        <button class="icon-btn" id="btn-install" type="button" hidden aria-label="Встановити додаток" title="Встановити додаток"><svg><use href="#i-install"/></svg></button>
+        <button class="icon-btn" id="btn-sound" type="button" aria-pressed="true" aria-label="Звук і вібрація" title="Звук і вібрація"><svg><use href="#i-sound"/></svg></button>
+      </div>
+    </header>
+
+    <main>
+      <!-- ГОЛОВНА -->
+      <section class="screen is-active" id="screen-home" aria-labelledby="home-title">
+        <div class="home">
+          <div class="hero">
+            <p class="eyebrow">Тактична гра на двох</p>
+            <h1 id="home-title" class="hero-title">Морський<br><span>бій</span></h1>
+            <p class="hero-lead">Розстав флот, знайди ворога на радарі й потопи його першим. Грай із ШІ або з другом за кодом чи QR.</p>
+            <div class="sonar" aria-hidden="true">
+              <div class="sonar-sweep"></div>
+              <i class="blip b1"></i><i class="blip b2"></i><i class="blip b3"></i>
+            </div>
+          </div>
+
+          <div class="home-panel">
+            <fieldset class="field">
+              <legend>Правила</legend>
+              <div class="seg" role="radiogroup" id="rules-seg">
+                <label><input type="radio" name="rules" value="classic" checked><span><b>Класичні</b><small>10 кораблів · без дотику</small></span></label>
+                <label><input type="radio" name="rules" value="modern"><span><b>Сучасні</b><small>5 кораблів · дотик можна</small></span></label>
+              </div>
+            </fieldset>
+
+            <article class="mode-card">
+              <div class="mode-head"><span class="mode-icon"><svg><use href="#i-bot"/></svg></span><div><h2>Проти ШІ</h2><p>Офлайн, у будь-який момент</p></div></div>
+              <div class="seg seg-sm" role="radiogroup" aria-label="Складність ШІ" id="level-seg">
+                <label><input type="radio" name="level" value="easy"><span><b>Кадет</b></span></label>
+                <label><input type="radio" name="level" value="normal" checked><span><b>Капітан</b></span></label>
+                <label><input type="radio" name="level" value="hard"><span><b>Адмірал</b></span></label>
+              </div>
+              <button class="btn btn-primary btn-lg" id="btn-bot" type="button"><svg><use href="#i-target"/></svg>Почати бій</button>
+            </article>
+
+            <article class="mode-card">
+              <div class="mode-head"><span class="mode-icon"><svg><use href="#i-users"/></svg></span><div><h2>З другом онлайн</h2><p>Пряме з’єднання, чат, перевірка чесності</p></div></div>
+              <div class="btn-row">
+                <button class="btn btn-secondary" id="btn-create" type="button"><svg><use href="#i-link"/></svg>Створити кімнату</button>
+                <button class="btn btn-secondary" id="btn-join" type="button"><svg><use href="#i-camera"/></svg>Приєднатися</button>
+              </div>
+            </article>
+
+            <dl class="stats" id="stats" aria-label="Ваша статистика">
+              <div><dt>Перемоги</dt><dd id="st-wins">0</dd></div>
+              <div><dt>Поразки</dt><dd id="st-losses">0</dd></div>
+              <div><dt>Точність</dt><dd id="st-acc">—</dd></div>
+              <div><dt>Серія</dt><dd id="st-streak">0</dd></div>
+            </dl>
+          </div>
+        </div>
+      </section>
+
+      <!-- СТВОРЕННЯ КІМНАТИ -->
+      <section class="screen" id="screen-lobby" aria-labelledby="lobby-title">
+        <div class="panel lobby">
+          <p class="eyebrow">Онлайн-гра</p>
+          <h2 id="lobby-title">Кімната готова</h2>
+          <p class="muted">Покажіть другу QR-код або надішліть код. Сканування звичайною камерою телефону одразу відкриє гру.</p>
+          <div class="qr-box"><canvas id="qr" width="232" height="232" aria-label="QR-код для приєднання"></canvas><div class="qr-loading" id="qr-loading"><span class="spinner"></span></div></div>
+          <button class="room-code" id="room-code" type="button" aria-label="Скопіювати код кімнати">———</button>
+          <p class="rules-chip" id="lobby-rules"></p>
+          <div class="btn-row">
+            <button class="btn btn-secondary" id="btn-copy" type="button"><svg><use href="#i-copy"/></svg>Копіювати</button>
+            <button class="btn btn-secondary" id="btn-share" type="button"><svg><use href="#i-share"/></svg>Поділитися</button>
+          </div>
+          <p class="status" id="lobby-status" role="status"><span class="spinner"></span>Створення кімнати…</p>
+          <button class="btn btn-ghost" id="btn-lobby-cancel" type="button"><svg><use href="#i-back"/></svg>Скасувати</button>
+        </div>
+      </section>
+
+      <!-- ПРИЄДНАННЯ -->
+      <section class="screen" id="screen-join" aria-labelledby="join-title">
+        <div class="panel lobby">
+          <p class="eyebrow">Онлайн-гра</p>
+          <h2 id="join-title">Приєднатися</h2>
+          <p class="muted">Введіть 6-символьний код кімнати друга або відскануйте його QR-код.</p>
+          <form id="join-form" class="join-form" autocomplete="off" novalidate>
+            <label class="sr-only" for="join-code">Код кімнати</label>
+            <input id="join-code" class="code-input" type="text" inputmode="text" autocapitalize="characters" spellcheck="false" maxlength="40" placeholder="ABC-123" enterkeyhint="go">
+            <button class="btn btn-primary btn-lg" id="btn-connect" type="submit"><svg><use href="#i-link"/></svg>Під’єднатися</button>
+          </form>
+          <button class="btn btn-secondary" id="btn-scan" type="button"><svg><use href="#i-camera"/></svg>Сканувати QR</button>
+          <p class="status" id="join-status" role="status"></p>
+          <button class="btn btn-ghost" id="btn-join-back" type="button"><svg><use href="#i-back"/></svg>Назад</button>
+        </div>
+      </section>
+
+      <!-- РОЗСТАНОВКА -->
+      <section class="screen" id="screen-place" aria-labelledby="place-title">
+        <div class="place">
+          <div class="board-zone">
+            <div class="board" id="place-board" role="group" aria-label="Ваше поле для розстановки"></div>
+          </div>
+          <div class="place-side">
+            <div class="place-head">
+              <p class="eyebrow" id="place-mode">Розстановка</p>
+              <h2 id="place-title">Розстав свій флот</h2>
+              <p class="hint" id="place-hint" aria-live="polite">Обери корабель і торкнися поля.</p>
+            </div>
+            <div class="dock" id="dock" role="radiogroup" aria-label="Кораблі"></div>
+            <div class="tool-row">
+              <button class="btn btn-secondary" id="btn-rotate" type="button" title="Повернути (R)"><svg><use href="#i-rotate"/></svg><span id="orient-label">Горизонтально</span></button>
+              <button class="btn btn-secondary btn-icon" id="btn-random" type="button" title="Випадково" aria-label="Розставити випадково"><svg><use href="#i-dice"/></svg></button>
+              <button class="btn btn-secondary btn-icon" id="btn-clear" type="button" title="Очистити" aria-label="Очистити поле"><svg><use href="#i-trash"/></svg></button>
+            </div>
+            <div class="confirm-bar" id="confirm-bar" hidden>
+              <button class="btn btn-primary" id="btn-place-ok" type="button"><svg><use href="#i-check"/></svg>Поставити</button>
+              <button class="btn btn-secondary" id="btn-place-cancel" type="button"><svg><use href="#i-close"/></svg>Скасувати</button>
+            </div>
+            <button class="btn btn-primary btn-lg" id="btn-ready" type="button" disabled><svg><use href="#i-check"/></svg>До бою</button>
+            <p class="status" id="place-status" role="status"></p>
+            <button class="btn btn-ghost" id="btn-place-back" type="button"><svg><use href="#i-back"/></svg>Меню</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- БІЙ -->
+      <section class="screen" id="screen-game" aria-label="Бій">
+        <div class="hud">
+          <div class="hud-side me"><span class="hud-label">Ви <b class="hud-n" id="hud-me-n"></b></span><div class="fleet-pips" id="pips-me"></div></div>
+          <div class="turn" id="turn" role="status" aria-live="polite"><span class="turn-dot"></span><span id="turn-text">Ваш хід</span></div>
+          <div class="hud-side enemy"><span class="hud-label"><span id="enemy-label">Суперник</span> <b class="hud-n" id="hud-enemy-n"></b></span><div class="fleet-pips" id="pips-enemy"></div></div>
+        </div>
+        <div class="battle">
+          <div class="board-card enemy-card" id="enemy-card">
+            <div class="board-cap"><span>Поле суперника</span><span class="cap-count" id="enemy-count"></span></div>
+            <div class="board" id="enemy-board" role="group" aria-label="Поле суперника: оберіть клітинку для пострілу"></div>
+          </div>
+          <div class="board-card me-card" id="me-card">
+            <div class="board-cap"><span>Ваш флот</span><span class="cap-count" id="me-count"></span></div>
+            <div class="board" id="my-board" role="group" aria-label="Ваше поле"></div>
+          </div>
+        </div>
+        <div class="game-bar">
+          <p class="game-msg" id="game-msg" aria-live="polite"></p>
+          <div class="game-actions">
+            <button class="icon-btn" id="btn-chat-hud" type="button" hidden aria-label="Чат" title="Чат"><svg><use href="#i-chat"/></svg><span class="badge" id="badge-hud" hidden></span></button>
+            <button class="icon-btn" id="btn-pause" type="button" aria-label="Пауза" title="Пауза (P)"><svg><use href="#i-pause"/></svg></button>
+            <button class="icon-btn danger" id="btn-surrender" type="button" aria-label="Здатися" title="Здатися"><svg><use href="#i-flag"/></svg></button>
+          </div>
+        </div>
+        <div class="after-bar" id="after-bar" hidden>
+          <span id="after-text">Бій завершено</span>
+          <button class="btn btn-primary" id="btn-after-again" type="button"><svg><use href="#i-refresh"/></svg>Ще раз</button>
+          <button class="btn btn-secondary" id="btn-after-home" type="button"><svg><use href="#i-home"/></svg>Меню</button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ЧАТ -->
+  <button class="chat-fab" id="chat-fab" type="button" hidden aria-label="Відкрити чат"><svg><use href="#i-chat"/></svg><span class="badge" id="badge-fab" hidden></span></button>
+  <aside class="chat" id="chat" aria-label="Чат" hidden>
+    <header class="chat-head">
+      <div><b>Чат</b><small id="chat-peer">Суперник онлайн</small></div>
+      <button class="icon-btn sm" id="chat-close" type="button" aria-label="Закрити чат"><svg><use href="#i-close"/></svg></button>
+    </header>
+    <div class="chat-log" id="chat-log" role="log" aria-live="polite"></div>
+    <div class="desk" id="desk" hidden>
+      <div class="desk-top"><span>Вкладення · до 500 МБ</span><button class="link-btn" id="desk-hide" type="button">Сховати</button></div>
+      <div class="desk-row">
+        <label class="btn btn-secondary file-pick"><svg><use href="#i-clip"/></svg><span id="desk-name">Обрати файл</span><input type="file" id="desk-file" class="sr-only"></label>
+        <button class="btn btn-primary" id="desk-send" type="button">Надіслати</button>
+        <button class="btn btn-danger" id="desk-stop" type="button" hidden>Стоп</button>
+      </div>
+      <div class="pass-field desk-pass-row">
+        <span class="field-lock"><svg><use href="#i-shield"/></svg></span>
+        <input type="password" id="desk-pass" placeholder="Пароль шифрування (необов’язково)" autocomplete="new-password" maxlength="128">
+        <button type="button" class="icon-btn sm" id="desk-pass-eye" aria-label="Показати пароль"><svg><use href="#i-eye"/></svg></button>
+      </div>
+      <p class="desk-note" id="desk-pass-warn" hidden>Шифрування паролем доступне лише на сайті з HTTPS.</p>
+      <div class="progress" id="desk-progress" hidden><div class="progress-bar" id="desk-bar"></div></div>
+      <p class="desk-stat" id="desk-stat"></p>
+    </div>
+    <div class="emoji-row" id="emoji-row">
+      <button type="button">👍</button><button type="button">🔥</button><button type="button">💥</button><button type="button">🎯</button><button type="button">😎</button><button type="button">😅</button><button type="button">🌊</button><button type="button">⚓</button><button type="button">🫡</button><button type="button">🏆</button>
+    </div>
+    <form class="chat-form" id="chat-form" autocomplete="off">
+      <label class="sr-only" for="chat-input">Повідомлення</label>
+      <input id="chat-input" type="text" maxlength="300" placeholder="Повідомлення…" enterkeyhint="send">
+      <button class="icon-btn accent" type="submit" aria-label="Надіслати"><svg><use href="#i-send"/></svg></button>
+    </form>
+  </aside>
+
+  <!-- ДІАЛОГИ -->
+  <dialog class="dialog" id="dlg-confirm" aria-labelledby="confirm-title">
+    <form method="dialog">
+      <h3 id="confirm-title">Ви впевнені?</h3>
+      <p id="confirm-text" class="muted"></p>
+      <div class="dialog-actions">
+        <button class="btn btn-secondary" value="cancel" type="submit">Ні</button>
+        <button class="btn btn-danger" value="ok" type="submit" id="confirm-ok">Так</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog class="dialog" id="dlg-pause" aria-labelledby="pause-title">
+    <h3 id="pause-title"><svg><use href="#i-pause"/></svg>Пауза</h3>
+    <p id="pause-text" class="muted">Гру призупинено</p>
+    <div class="dialog-actions">
+      <button class="btn btn-ghost" id="btn-pause-home" type="button"><svg><use href="#i-home"/></svg>Меню</button>
+      <button class="btn btn-primary" id="btn-resume" type="button"><svg><use href="#i-play"/></svg>Продовжити</button>
+    </div>
+  </dialog>
+
+  <dialog class="dialog" id="dlg-lost" aria-labelledby="lost-title">
+    <h3 id="lost-title">З’єднання втрачено</h3>
+    <p id="lost-text" class="muted">Суперник відключився.</p>
+    <div class="dialog-actions">
+      <button class="btn btn-primary" id="btn-lost-home" type="button"><svg><use href="#i-home"/></svg>У меню</button>
+    </div>
+  </dialog>
+
+  <dialog class="dialog end" id="dlg-end" aria-labelledby="end-title">
+    <div class="end-burst" aria-hidden="true"></div>
+    <p class="eyebrow" id="end-eyebrow">Бій завершено</p>
+    <h3 id="end-title" class="end-title">Перемога!</h3>
+    <p id="end-text" class="muted"></p>
+    <dl class="end-stats">
+      <div><dt>Постріли</dt><dd id="es-shots">0</dd></div>
+      <div><dt>Влучання</dt><dd id="es-hits">0</dd></div>
+      <div><dt>Точність</dt><dd id="es-acc">0%</dd></div>
+      <div><dt>Час</dt><dd id="es-time">0:00</dd></div>
+    </dl>
+    <p class="fair" id="end-fair" hidden></p>
+    <div class="dialog-actions">
+      <button class="btn btn-ghost" id="btn-end-view" type="button"><svg><use href="#i-eye"/></svg>Поле</button>
+      <button class="btn btn-secondary" id="btn-end-home" type="button"><svg><use href="#i-home"/></svg>Меню</button>
+      <button class="btn btn-primary" id="btn-end-again" type="button"><svg><use href="#i-refresh"/></svg><span id="again-label">Ще раз</span></button>
+    </div>
+  </dialog>
+
+  <dialog class="dialog" id="dlg-file" aria-labelledby="file-title">
+    <h3 id="file-title"><svg><use href="#i-download"/></svg>Вхідний файл</h3>
+    <p class="muted">Суперник хоче надіслати файл:</p>
+    <p class="file-card"><b id="file-name"></b><span id="file-size"></span></p>
+    <p class="file-lock" id="file-lock" hidden><svg><use href="#i-shield"/></svg>Зашифрований файл — знадобиться пароль від відправника</p>
+    <p class="muted small">Приймайте файли лише від людей, яким довіряєте. Не відкривайте невідомі програми.</p>
+    <div class="dialog-actions">
+      <button class="btn btn-secondary" id="btn-file-no" type="button">Відхилити</button>
+      <button class="btn btn-primary" id="btn-file-yes" type="button">Прийняти</button>
+    </div>
+  </dialog>
+
+  <dialog class="dialog" id="dlg-pass" aria-labelledby="pass-title">
+    <h3 id="pass-title"><svg><use href="#i-shield"/></svg>Пароль до файлу</h3>
+    <p class="muted">Файл зашифровано наскрізно. Введіть пароль, який відправник повідомив вам окремо — не через цей чат.</p>
+    <form id="pass-form" autocomplete="off">
+      <div class="pass-field">
+        <input id="pass-input" type="password" placeholder="Пароль" autocomplete="off" maxlength="128" enterkeyhint="go">
+        <button type="button" class="icon-btn sm" id="pass-eye" aria-label="Показати пароль"><svg><use href="#i-eye"/></svg></button>
+      </div>
+      <p class="pass-err" id="pass-err" hidden></p>
+      <div class="dialog-actions">
+        <button class="btn btn-secondary" id="pass-cancel" type="button">Скасувати</button>
+        <button class="btn btn-primary" id="pass-ok" type="submit"><svg><use href="#i-shield"/></svg>Розшифрувати</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog class="dialog scan" id="dlg-scan" aria-labelledby="scan-title">
+    <div class="scan-head">
+      <h3 id="scan-title">Сканування QR</h3>
+      <button class="icon-btn sm" id="btn-scan-close" type="button" aria-label="Закрити"><svg><use href="#i-close"/></svg></button>
+    </div>
+    <div class="viewfinder">
+      <video id="scan-video" playsinline muted></video>
+      <div class="vf-frame" aria-hidden="true"><i></i><i></i><i></i><i></i><span class="vf-line"></span></div>
+    </div>
+    <p class="muted small" id="scan-status" role="status">Запуск камери…</p>
+    <div class="dialog-actions">
+      <button class="btn btn-secondary" id="btn-scan-switch" type="button" hidden><svg><use href="#i-switch"/></svg>Камера</button>
+      <button class="btn btn-secondary" id="btn-scan-torch" type="button" hidden><svg><use href="#i-torch"/></svg>Ліхтарик</button>
+    </div>
+  </dialog>
+
+  <div class="toasts" id="toasts" role="status" aria-live="polite"></div>
+  <script>(() => {
+  // js/rules.js
+  var N = 10;
+  var LETTERS = "ABCDEFGHIJ".split("");
+  var RULESETS = {
+    classic: {
+      id: "classic",
+      title: "\u041A\u043B\u0430\u0441\u0438\u0447\u043D\u0456",
+      note: "10 \u043A\u043E\u0440\u0430\u0431\u043B\u0456\u0432 \xB7 \u043D\u0435 \u0442\u043E\u0440\u043A\u0430\u044E\u0442\u044C\u0441\u044F",
+      touch: false,
+      fleet: [
+        { type: "battleship", name: "\u041B\u0456\u043D\u043A\u043E\u0440", size: 4, count: 1 },
+        { type: "cruiser", name: "\u041A\u0440\u0435\u0439\u0441\u0435\u0440", size: 3, count: 2 },
+        { type: "destroyer", name: "\u0415\u0441\u043C\u0456\u043D\u0435\u0446\u044C", size: 2, count: 3 },
+        { type: "boat", name: "\u041A\u0430\u0442\u0435\u0440", size: 1, count: 4 }
+      ]
+    },
+    modern: {
+      id: "modern",
+      title: "\u0421\u0443\u0447\u0430\u0441\u043D\u0456",
+      note: "5 \u043A\u043E\u0440\u0430\u0431\u043B\u0456\u0432 \xB7 \u043C\u043E\u0436\u0443\u0442\u044C \u0442\u043E\u0440\u043A\u0430\u0442\u0438\u0441\u044F",
+      touch: true,
+      fleet: [
+        { type: "carrier", name: "\u0410\u0432\u0456\u0430\u043D\u043E\u0441\u0435\u0446\u044C", size: 5, count: 1 },
+        { type: "battleship", name: "\u041B\u0456\u043D\u043A\u043E\u0440", size: 4, count: 1 },
+        { type: "cruiser", name: "\u041A\u0440\u0435\u0439\u0441\u0435\u0440", size: 3, count: 1 },
+        { type: "submarine", name: "\u041F\u0456\u0434\u0432\u043E\u0434\u043D\u0438\u0439 \u0447\u043E\u0432\u0435\u043D", size: 3, count: 1 },
+        { type: "destroyer", name: "\u0415\u0441\u043C\u0456\u043D\u0435\u0446\u044C", size: 2, count: 1 }
+      ]
+    }
+  };
+  var getRules = (id) => RULESETS[id] || RULESETS.classic;
+  var inBounds = (r, c) => Number.isInteger(r) && Number.isInteger(c) && r >= 0 && r < N && c >= 0 && c < N;
+  var key = (r, c) => r * N + c;
+  var coordName = (r, c) => LETTERS[c] + (r + 1);
+  function fleetList(rules) {
+    const out = [];
+    for (const t of rules.fleet) for (let i = 0; i < t.count; i++) out.push({ id: `${t.type}-${i}`, type: t.type, name: t.name, size: t.size });
+    return out.sort((a, b2) => b2.size - a.size);
+  }
+  var fleetCount = (rules) => rules.fleet.reduce((s, t) => s + t.count, 0);
+  function shipCells(r, c, size, orient) {
+    const cells = [];
+    for (let i = 0; i < size; i++) {
+      const rr = orient === "V" ? r + i : r;
+      const cc = orient === "V" ? c : c + i;
+      if (!inBounds(rr, cc)) return null;
+      cells.push({ r: rr, c: cc });
+    }
+    return cells;
+  }
+  function around(r, c, diagonal = true) {
+    const out = [];
+    for (let dr = -1; dr <= 1; dr++) for (let dc = -1; dc <= 1; dc++) {
+      if (!dr && !dc) continue;
+      if (!diagonal && dr && dc) continue;
+      if (inBounds(r + dr, c + dc)) out.push({ r: r + dr, c: c + dc });
+    }
+    return out;
+  }
+  function occupancy(ships, exceptId = null) {
+    const occ = /* @__PURE__ */ new Map();
+    for (const s of ships) if (s.id !== exceptId) for (const p of s.cells) occ.set(key(p.r, p.c), s.id);
+    return occ;
+  }
+  function canPlace(ships, cells, rules, exceptId = null) {
+    if (!cells || !cells.length) return false;
+    const occ = occupancy(ships, exceptId);
+    for (const p of cells) {
+      if (!inBounds(p.r, p.c) || occ.has(key(p.r, p.c))) return false;
+      if (!rules.touch) {
+        for (const n of around(p.r, p.c)) if (occ.has(key(n.r, n.c))) return false;
+      }
+    }
+    return true;
+  }
+  function orientOf(cells) {
+    return cells.length > 1 && cells[0].r !== cells[1].r ? "V" : "H";
+  }
+  function randomFleet(rules, rnd = Math.random) {
+    const list = fleetList(rules);
+    for (let restart = 0; restart < 500; restart++) {
+      const ships = [];
+      let ok = true;
+      for (const s of list) {
+        let placed = false;
+        for (let a = 0; a < 400 && !placed; a++) {
+          const orient = rnd() < 0.5 ? "H" : "V";
+          const cells = shipCells(Math.floor(rnd() * N), Math.floor(rnd() * N), s.size, orient);
+          if (canPlace(ships, cells, rules)) {
+            ships.push({ ...s, cells });
+            placed = true;
+          }
+        }
+        if (!placed) {
+          ok = false;
+          break;
+        }
+      }
+      if (ok) return ships;
+    }
+    throw new Error("\u041D\u0435 \u0432\u0434\u0430\u043B\u043E\u0441\u044F \u0440\u043E\u0437\u0441\u0442\u0430\u0432\u0438\u0442\u0438 \u0444\u043B\u043E\u0442");
+  }
+  function validateFleet(rules, ships) {
+    if (!Array.isArray(ships)) return false;
+    const expected = fleetList(rules);
+    if (ships.length !== expected.length) return false;
+    const byId = new Map(expected.map((s) => [s.id, s]));
+    const seen = /* @__PURE__ */ new Set();
+    const placed = [];
+    for (const s of ships) {
+      const ref = s && byId.get(s.id);
+      if (!ref || seen.has(s.id) || !Array.isArray(s.cells) || s.cells.length !== ref.size) return false;
+      seen.add(s.id);
+      const first = s.cells[0];
+      if (!first || !inBounds(first.r, first.c)) return false;
+      const orient = orientOf(s.cells);
+      const line = shipCells(first.r, first.c, ref.size, orient);
+      if (!line || line.some((p, i) => p.r !== s.cells[i].r || p.c !== s.cells[i].c)) return false;
+      if (!canPlace(placed, line, rules)) return false;
+      placed.push({ ...ref, cells: line });
+    }
+    return true;
+  }
+  var Fleet = class {
+    constructor(rules, ships) {
+      this.rules = rules;
+      this.ships = ships.map((s) => ({ ...s, cells: s.cells.map((p) => ({ ...p })), hits: 0, sunk: false }));
+      this.shots = new Int8Array(N * N);
+      this.occ = occupancy(this.ships);
+    }
+    get alive() {
+      return this.ships.filter((s) => !s.sunk).length;
+    }
+    shipAt(r, c) {
+      const id = this.occ.get(key(r, c));
+      return id ? this.ships.find((s) => s.id === id) : null;
+    }
+    /** Повертає результат пострілу або null, якщо постріл некоректний/повторний. */
+    receive(r, c) {
+      if (!inBounds(r, c) || this.shots[key(r, c)]) return null;
+      const ship = this.shipAt(r, c);
+      this.shots[key(r, c)] = ship ? 2 : 1;
+      if (!ship) return { r, c, hit: false, sunk: false };
+      ship.hits++;
+      if (ship.hits < ship.size) return { r, c, hit: true, sunk: false };
+      ship.sunk = true;
+      return { r, c, hit: true, sunk: true, id: ship.id, type: ship.type, cells: ship.cells.map((p) => [p.r, p.c]), over: this.alive === 0 };
+    }
+  };
+  function fleetPayload(ships) {
+    return [...ships].sort((a, b2) => a.id < b2.id ? -1 : 1).map((s) => ({ id: s.id, cells: s.cells.map((p) => [p.r, p.c]) }));
+  }
+  function fleetFromPayload(rules, payload) {
+    if (!Array.isArray(payload) || payload.length > 20) return null;
+    const ref = new Map(fleetList(rules).map((s) => [s.id, s]));
+    const ships = [];
+    for (const s of payload) {
+      if (!s || typeof s.id !== "string" || !ref.has(s.id) || !Array.isArray(s.cells) || s.cells.length > 6) return null;
+      const cells = [];
+      for (const p of s.cells) {
+        if (!Array.isArray(p) || !inBounds(p[0], p[1])) return null;
+        cells.push({ r: p[0], c: p[1] });
+      }
+      ships.push({ ...ref.get(s.id), cells });
+    }
+    return ships;
+  }
+  function commitString(salt, ships) {
+    return JSON.stringify({ v: 2, salt, fleet: fleetPayload(ships) });
+  }
+  function auditLog(rules, ships, log) {
+    if (!validateFleet(rules, ships)) return { ok: false, reason: "\u0420\u043E\u0437\u0441\u0442\u0430\u043D\u043E\u0432\u043A\u0430 \u043F\u043E\u0440\u0443\u0448\u0443\u0454 \u043F\u0440\u0430\u0432\u0438\u043B\u0430" };
+    const fleet = new Fleet(rules, ships);
+    for (const entry of log) {
+      const real = fleet.receive(entry.r, entry.c);
+      if (!real) return { ok: false, reason: "\u041D\u0435\u043A\u043E\u0440\u0435\u043A\u0442\u043D\u0430 \u0456\u0441\u0442\u043E\u0440\u0456\u044F \u043F\u043E\u0441\u0442\u0440\u0456\u043B\u0456\u0432" };
+      if (real.hit !== !!entry.hit) return { ok: false, reason: `\u041D\u0435\u043F\u0440\u0430\u0432\u0434\u0438\u0432\u0430 \u0432\u0456\u0434\u043F\u043E\u0432\u0456\u0434\u044C \u0443 ${coordName(entry.r, entry.c)}` };
+      if (real.sunk !== !!entry.sunk) return { ok: false, reason: `\u041F\u0440\u0438\u0445\u043E\u0432\u0430\u043D\u043E \u043F\u043E\u0442\u043E\u043F\u043B\u0435\u043D\u043D\u044F \u0432 ${coordName(entry.r, entry.c)}` };
+    }
+    return { ok: true };
+  }
+  function plausibleSunk(rules, cells, r, c, hitSet) {
+    if (!Array.isArray(cells) || !cells.length || cells.length > Math.max(...rules.fleet.map((t) => t.size))) return false;
+    const pts = [];
+    for (const p of cells) {
+      if (!Array.isArray(p) || !inBounds(p[0], p[1])) return false;
+      pts.push({ r: p[0], c: p[1] });
+    }
+    const line = shipCells(pts[0].r, pts[0].c, pts.length, orientOf(pts));
+    if (!line || line.some((p, i) => p.r !== pts[i].r || p.c !== pts[i].c)) return false;
+    if (!pts.some((p) => p.r === r && p.c === c)) return false;
+    if (!rules.fleet.some((t) => t.size === pts.length)) return false;
+    return pts.every((p) => p.r === r && p.c === c || hitSet.has(key(p.r, p.c)));
+  }
+
+  // js/ai.js
+  var UNKNOWN = 0;
+  var MISS = 1;
+  var HIT = 2;
+  var SUNK = 3;
+  var pick = (arr, rnd) => arr[Math.floor(rnd() * arr.length)];
+  function cellsWhere(view, state) {
+    const out = [];
+    for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) if (view[key(r, c)] === state) out.push({ r, c });
+    return out;
+  }
+  function hitGroups(view) {
+    const seen = /* @__PURE__ */ new Set(), groups = [];
+    for (const h2 of cellsWhere(view, HIT)) {
+      const k0 = key(h2.r, h2.c);
+      if (seen.has(k0)) continue;
+      const g = [], stack = [h2];
+      seen.add(k0);
+      while (stack.length) {
+        const p = stack.pop();
+        g.push(p);
+        for (const n of around(p.r, p.c, false)) {
+          const k = key(n.r, n.c);
+          if (view[k] === HIT && !seen.has(k)) {
+            seen.add(k);
+            stack.push(n);
+          }
+        }
+      }
+      groups.push(g);
+    }
+    return groups;
+  }
+  function targetCells(view, touch) {
+    const groups = hitGroups(view);
+    if (!groups.length) return [];
+    for (const g of groups.sort((a, b2) => b2.length - a.length)) {
+      let cand = [];
+      if (g.length > 1) {
+        const sameRow = g.every((p) => p.r === g[0].r), sameCol = g.every((p) => p.c === g[0].c);
+        if (sameRow || sameCol) {
+          const along = g.map((p) => sameRow ? p.c : p.r);
+          const lo = Math.min(...along) - 1, hi = Math.max(...along) + 1;
+          const ends = sameRow ? [{ r: g[0].r, c: lo }, { r: g[0].r, c: hi }] : [{ r: lo, c: g[0].c }, { r: hi, c: g[0].c }];
+          cand = ends.filter((p) => inBounds(p.r, p.c) && view[key(p.r, p.c)] === UNKNOWN);
+        }
+      }
+      if (!cand.length) {
+        const set = /* @__PURE__ */ new Map();
+        for (const p of g) for (const n of around(p.r, p.c, false)) if (view[key(n.r, n.c)] === UNKNOWN) set.set(key(n.r, n.c), n);
+        cand = [...set.values()];
+      }
+      if (!touch) {
+        cand = cand.filter((p) => !g.some((h2) => Math.abs(h2.r - p.r) === 1 && Math.abs(h2.c - p.c) === 1));
+      }
+      if (cand.length) return cand;
+    }
+    return [];
+  }
+  function densityMap(view, sizes, touch) {
+    const score = new Float64Array(N * N);
+    const anyHits = view.some((v) => v === HIT);
+    for (const size of sizes) for (const orient of size === 1 ? ["H"] : ["H", "V"]) for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) {
+      const cells = shipCells(r, c, size, orient);
+      if (!cells) continue;
+      let hits = 0, bad = false;
+      const own = /* @__PURE__ */ new Set();
+      for (const p of cells) {
+        const v = view[key(p.r, p.c)];
+        if (v === MISS || v === SUNK) {
+          bad = true;
+          break;
+        }
+        if (v === HIT) hits++;
+        own.add(key(p.r, p.c));
+      }
+      if (bad) continue;
+      if (!touch) {
+        for (const p of cells) {
+          for (const n of around(p.r, p.c)) {
+            const k = key(n.r, n.c);
+            if (own.has(k)) continue;
+            if (view[k] === SUNK || view[k] === HIT) {
+              bad = true;
+              break;
+            }
+          }
+          if (bad) break;
+        }
+        if (bad) continue;
+      }
+      if (anyHits && !hits) {
+        for (const p of cells) score[key(p.r, p.c)] += 0.02;
+        continue;
+      }
+      const w = hits ? Math.pow(40, hits) : 1;
+      for (const p of cells) if (view[key(p.r, p.c)] === UNKNOWN) score[key(p.r, p.c)] += w;
+    }
+    return score;
+  }
+  function chooseShot(view, sizes, { level = "normal", touch = true, rnd = Math.random } = {}) {
+    const unknown = cellsWhere(view, UNKNOWN);
+    if (!unknown.length) return null;
+    if (level === "easy") {
+      const t = targetCells(view, touch);
+      if (t.length && rnd() < 0.3) return pick(t, rnd);
+      return pick(unknown, rnd);
+    }
+    if (level === "normal") {
+      const t = targetCells(view, touch);
+      if (t.length) return pick(t, rnd);
+      const minSize2 = Math.max(1, Math.min(...sizes));
+      const parity = unknown.filter((p) => (p.r + p.c) % minSize2 === 0);
+      return pick(parity.length ? parity : unknown, rnd);
+    }
+    const score = densityMap(view, sizes, touch);
+    let best = -1, pool = [];
+    const minSize = Math.max(1, Math.min(...sizes));
+    const anyHits = view.some((v) => v === HIT);
+    for (const p of unknown) {
+      let s = score[key(p.r, p.c)];
+      if (!anyHits && minSize > 1 && (p.r + p.c) % 2 === 0) s *= 1.08;
+      if (s > best + 1e-9) {
+        best = s;
+        pool = [p];
+      } else if (Math.abs(s - best) <= 1e-9) pool.push(p);
+    }
+    return pick(pool.length ? pool : unknown, rnd);
+  }
+  function applyResult(view, res, touch) {
+    view[key(res.r, res.c)] = res.hit ? HIT : MISS;
+    const auto = [];
+    if (res.sunk && Array.isArray(res.cells)) {
+      const pts = res.cells.map(([r, c]) => ({ r, c }));
+      for (const p of pts) view[key(p.r, p.c)] = SUNK;
+      if (!touch) for (const p of pts) for (const n of around(p.r, p.c)) {
+        const k = key(n.r, n.c);
+        if (view[k] === UNKNOWN) {
+          view[k] = MISS;
+          auto.push(n);
+        }
+      }
+    }
+    return auto;
+  }
+
+  // js/net.js
+  var SIGNAL_URL = "wss://0.peerjs.com/peerjs";
+  var SIGNAL_KEY = "peerjs";
+  var PREFIX = "mbua2-";
+  var APP = "morskyi-biy";
+  var PROTO = 3;
+  var TURN_URL = "https://battleship-ua.metered.live/api/v1/turn/credentials?apiKey=3e47d2e924270530b05f29d1aea8854f3bd8";
+  var FALLBACK_ICE = [
+    { urls: "stun:stun.l.google.com:19302" },
+    { urls: "stun:stun.cloudflare.com:3478" }
+  ];
+  var ROOM_ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+  var ROOM_RE = new RegExp(`^[${ROOM_ALPHABET}]{6}$`);
+  function randomString(len, alphabet) {
+    const out = [];
+    const max = 256 - 256 % alphabet.length;
+    while (out.length < len) {
+      const buf = crypto.getRandomValues(new Uint8Array(len * 2));
+      for (const b2 of buf) if (b2 < max && out.length < len) out.push(alphabet[b2 % alphabet.length]);
+    }
+    return out.join("");
+  }
+  var newRoomCode = () => randomString(6, ROOM_ALPHABET);
+  var formatRoomCode = (code) => code.slice(0, 3) + "-" + code.slice(3);
+  function parseRoomCode(input) {
+    let s = String(input || "").trim();
+    const m = s.match(/[#?&]join=([A-Za-z0-9-]{6,8})/);
+    if (m) s = m[1];
+    s = s.toUpperCase().replace(/[\s\-_.​-‍﻿]/g, "");
+    return ROOM_RE.test(s) ? s : null;
+  }
+  var Emitter = class {
+    constructor() {
+      this._h = /* @__PURE__ */ new Map();
+    }
+    on(ev, fn) {
+      if (!this._h.has(ev)) this._h.set(ev, /* @__PURE__ */ new Set());
+      this._h.get(ev).add(fn);
+      return () => this._h.get(ev)?.delete(fn);
+    }
+    emit(ev, ...a) {
+      for (const fn of [...this._h.get(ev) || []]) {
+        try {
+          fn(...a);
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    }
+  };
+  var iceCache = null;
+  async function getIceServers() {
+    if (iceCache && Date.now() - iceCache.t < 10 * 6e4) return iceCache.v;
+    try {
+      const ctrl = new AbortController();
+      const timer = setTimeout(() => ctrl.abort(), 5e3);
+      const res = await fetch(TURN_URL, { signal: ctrl.signal, credentials: "omit", referrerPolicy: "no-referrer", cache: "no-store" });
+      clearTimeout(timer);
+      if (!res.ok) throw new Error("turn");
+      const data = await res.json();
+      const list = (Array.isArray(data) ? data : data?.iceServers || []).filter((s) => s && (typeof s.urls === "string" || Array.isArray(s.urls))).map((s) => ({ urls: s.urls, username: typeof s.username === "string" ? s.username : void 0, credential: typeof s.credential === "string" ? s.credential : void 0 }));
+      if (!list.length) throw new Error("turn");
+      iceCache = { t: Date.now(), v: [...list, ...FALLBACK_ICE] };
+    } catch {
+      iceCache = { t: Date.now() - 9 * 6e4, v: FALLBACK_ICE };
+    }
+    return iceCache.v;
+  }
+  var Signal = class extends Emitter {
+    constructor(id) {
+      super();
+      this.id = id;
+      this.ws = null;
+      this.hb = null;
+      this.closed = false;
+    }
+    open(timeout = 12e3) {
+      return new Promise((resolve, reject) => {
+        const token = randomString(16, "abcdefghijklmnopqrstuvwxyz0123456789");
+        const url = `${SIGNAL_URL}?key=${SIGNAL_KEY}&id=${encodeURIComponent(this.id)}&token=${token}&version=1.5.4`;
+        let settled = false;
+        const done = (err) => {
+          if (settled) return;
+          settled = true;
+          clearTimeout(t);
+          err ? reject(err) : resolve();
+        };
+        const t = setTimeout(() => {
+          done(new NetError("signal-timeout"));
+          this.close();
+        }, timeout);
+        let ws;
+        try {
+          ws = new WebSocket(url);
+        } catch {
+          done(new NetError("signal-failed"));
+          return;
+        }
+        this.ws = ws;
+        ws.onmessage = (ev) => {
+          if (typeof ev.data !== "string" || ev.data.length > 1e5) return;
+          let msg;
+          try {
+            msg = JSON.parse(ev.data);
+          } catch {
+            return;
+          }
+          if (!msg || typeof msg.type !== "string") return;
+          switch (msg.type) {
+            case "OPEN":
+              done();
+              break;
+            case "ID-TAKEN":
+              done(new NetError("id-taken"));
+              this.close();
+              break;
+            case "ERROR":
+              done(new NetError("signal-failed"));
+              this.emit("error", msg.payload?.msg);
+              break;
+            default:
+              this.emit("message", msg);
+          }
+        };
+        ws.onerror = () => done(new NetError("signal-failed"));
+        ws.onclose = () => {
+          this.stopHb();
+          done(new NetError("signal-failed"));
+          if (!this.closed) this.emit("lost");
+        };
+        ws.onopen = () => {
+          this.hb = setInterval(() => {
+            if (ws.readyState === 1) ws.send('{"type":"HEARTBEAT"}');
+          }, 5e3);
+        };
+      });
+    }
+    send(type, dst, payload) {
+      if (this.ws?.readyState === 1) this.ws.send(JSON.stringify({ type, dst, payload }));
+    }
+    stopHb() {
+      clearInterval(this.hb);
+      this.hb = null;
+    }
+    close() {
+      this.closed = true;
+      this.stopHb();
+      try {
+        this.ws?.close();
+      } catch {
+      }
+      this.ws = null;
+    }
+  };
+  var NetError = class extends Error {
+    constructor(code) {
+      super(code);
+      this.code = code;
+    }
+  };
+  var Link = class extends Emitter {
+    constructor(pc, dc) {
+      super();
+      this.pc = pc;
+      this.dc = dc;
+      this.closed = false;
+      this.lastRx = Date.now();
+      this.bucket = { tokens: 120, t: Date.now() };
+      dc.binaryType = "arraybuffer";
+      dc.bufferedAmountLowThreshold = 256 * 1024;
+      dc.onmessage = (ev) => {
+        this.lastRx = Date.now();
+        if (typeof ev.data === "string") {
+          if (ev.data.length > 32768 || !this.allow()) return;
+          let msg;
+          try {
+            msg = JSON.parse(ev.data);
+          } catch {
+            return;
+          }
+          if (!msg || typeof msg !== "object" || Array.isArray(msg) || typeof msg.t !== "string") return;
+          if (msg.t === "ping") return;
+          this.emit("message", msg);
+        } else if (ev.data instanceof ArrayBuffer) {
+          if (ev.data.byteLength > 7e4) return;
+          this.emit("binary", ev.data);
+        }
+      };
+      dc.onclose = () => this.close("closed");
+      dc.onerror = () => {
+      };
+      pc.onconnectionstatechange = () => {
+        const s = pc.connectionState;
+        if (s === "failed" || s === "closed") this.close("failed");
+        else if (s === "disconnected") {
+          clearTimeout(this.dcTimer);
+          this.dcTimer = setTimeout(() => {
+            if (pc.connectionState === "disconnected") this.close("failed");
+          }, 1e4);
+        }
+      };
+      this.onVis = () => {
+        if (!document.hidden) this.lastRx = Date.now();
+      };
+      document.addEventListener("visibilitychange", this.onVis);
+      this.hb = setInterval(() => {
+        if (this.closed) return;
+        if (dc.readyState === "open") dc.send('{"t":"ping"}');
+        if (!document.hidden && Date.now() - this.lastRx > 3e4) this.close("timeout");
+      }, 3e3);
+    }
+    allow() {
+      const now = Date.now(), b2 = this.bucket;
+      b2.tokens = Math.min(120, b2.tokens + (now - b2.t) * 0.06);
+      b2.t = now;
+      if (b2.tokens < 1) return false;
+      b2.tokens--;
+      return true;
+    }
+    get open() {
+      return !this.closed && this.dc.readyState === "open";
+    }
+    send(obj) {
+      if (this.open) this.dc.send(JSON.stringify(obj));
+    }
+    sendBinary(buf) {
+      if (this.open) this.dc.send(buf);
+    }
+    get buffered() {
+      return this.dc.bufferedAmount;
+    }
+    drain() {
+      if (this.dc.bufferedAmount <= this.dc.bufferedAmountLowThreshold) return Promise.resolve();
+      return new Promise((res) => {
+        const done = () => {
+          this.dc.removeEventListener("bufferedamountlow", done);
+          clearInterval(poll);
+          res();
+        };
+        const poll = setInterval(() => {
+          if (this.closed || this.dc.bufferedAmount <= this.dc.bufferedAmountLowThreshold) done();
+        }, 200);
+        this.dc.addEventListener("bufferedamountlow", done);
+      });
+    }
+    close(reason = "local") {
+      if (this.closed) return;
+      this.closed = true;
+      clearInterval(this.hb);
+      clearTimeout(this.dcTimer);
+      document.removeEventListener("visibilitychange", this.onVis);
+      try {
+        this.dc.close();
+      } catch {
+      }
+      try {
+        this.pc.close();
+      } catch {
+      }
+      this.emit("close", reason);
+    }
+  };
+  function validSdp(s) {
+    return typeof s === "string" && s.length > 10 && s.length < 3e4 && s.startsWith("v=0");
+  }
+  function validCandidate(c) {
+    return c && typeof c === "object" && typeof c.candidate === "string" && c.candidate.length < 2e3 && (c.sdpMid == null || typeof c.sdpMid === "string") && (c.sdpMLineIndex == null || Number.isInteger(c.sdpMLineIndex));
+  }
+  function wirePc(pc, signal, peerId, sid) {
+    const queue = [];
+    let remoteSet = false;
+    pc.onicecandidate = (e) => {
+      if (e.candidate) signal.send("CANDIDATE", peerId, { app: APP, sid, c: e.candidate.toJSON() });
+    };
+    return {
+      async setRemote(desc) {
+        await pc.setRemoteDescription(desc);
+        remoteSet = true;
+        for (const c of queue.splice(0)) pc.addIceCandidate(c).catch(() => {
+        });
+      },
+      addCandidate(c) {
+        if (!validCandidate(c)) return;
+        if (remoteSet) pc.addIceCandidate(c).catch(() => {
+        });
+        else if (queue.length < 50) queue.push(c);
+      }
+    };
+  }
+  function hostRoom({ onCode, onStatus } = {}) {
+    let signal = null, cancelled = false, pc = null, timer = null;
+    const cancel = () => {
+      cancelled = true;
+      clearTimeout(timer);
+      signal?.close();
+      try {
+        pc?.close();
+      } catch {
+      }
+    };
+    const promise = (async () => {
+      const ice = await getIceServers();
+      let code;
+      for (let attempt = 0; attempt < 4; attempt++) {
+        if (cancelled) throw new NetError("cancelled");
+        code = newRoomCode();
+        signal = new Signal(PREFIX + code);
+        try {
+          await signal.open();
+          break;
+        } catch (e) {
+          signal.close();
+          signal = null;
+          if (e.code !== "id-taken" || attempt === 3) throw e;
+        }
+      }
+      if (cancelled) {
+        signal.close();
+        throw new NetError("cancelled");
+      }
+      onCode?.(code);
+      return await new Promise((resolve, reject) => {
+        let busy = false;
+        signal.on("lost", () => {
+          if (!cancelled && !busy) reject(new NetError("signal-lost"));
+        });
+        let wired = null, sid = null, peer = null;
+        const reset = () => {
+          busy = false;
+          wired = null;
+          sid = null;
+          peer = null;
+          try {
+            pc?.close();
+          } catch {
+          }
+          pc = null;
+          onStatus?.("waiting");
+        };
+        signal.on("message", async (msg) => {
+          if (cancelled) return;
+          const p = msg.payload, src = msg.src;
+          if (!p || p.app !== APP || typeof src !== "string" || src.length > 64 || typeof p.sid !== "string" || p.sid.length > 40) return;
+          if (msg.type === "OFFER") {
+            if (busy) {
+              signal.send("ANSWER", src, { app: APP, sid: p.sid, error: "busy" });
+              return;
+            }
+            if (p.v !== PROTO) {
+              signal.send("ANSWER", src, { app: APP, sid: p.sid, error: "version" });
+              return;
+            }
+            if (!validSdp(p.sdp)) return;
+            busy = true;
+            sid = p.sid;
+            peer = src;
+            onStatus?.("connecting");
+            pc = new RTCPeerConnection({ iceServers: ice });
+            const myPc = pc;
+            wired = wirePc(pc, signal, src, sid);
+            pc.ondatachannel = (e) => {
+              const dc = e.channel;
+              if (dc.label !== "mb") {
+                dc.close();
+                return;
+              }
+              const opened = () => {
+                if (myPc !== pc || cancelled) return;
+                clearTimeout(timer);
+                const link = new Link(myPc, dc);
+                setTimeout(() => signal.close(), 1500);
+                resolve(link);
+              };
+              if (dc.readyState === "open") opened();
+              else dc.onopen = opened;
+            };
+            timer = setTimeout(() => {
+              if (myPc === pc) reset();
+            }, 3e4);
+            try {
+              await wired.setRemote({ type: "offer", sdp: p.sdp });
+              const ans = await pc.createAnswer();
+              await pc.setLocalDescription(ans);
+              signal.send("ANSWER", src, { app: APP, sid, sdp: pc.localDescription.sdp });
+            } catch {
+              if (myPc === pc) reset();
+            }
+          } else if (msg.type === "CANDIDATE" && src === peer && p.sid === sid) {
+            wired?.addCandidate(p.c);
+          } else if ((msg.type === "LEAVE" || msg.type === "EXPIRE") && src === peer) {
+            reset();
+          }
+        });
+      });
+    })();
+    return { promise, cancel };
+  }
+  function joinRoom(code, { onStatus } = {}) {
+    let signal = null, cancelled = false, pc = null, timer = null;
+    const cancel = () => {
+      cancelled = true;
+      clearTimeout(timer);
+      signal?.close();
+      try {
+        pc?.close();
+      } catch {
+      }
+    };
+    const promise = (async () => {
+      const ice = await getIceServers();
+      if (cancelled) throw new NetError("cancelled");
+      signal = new Signal(PREFIX + "g-" + randomString(12, "abcdefghijklmnopqrstuvwxyz0123456789"));
+      await signal.open();
+      if (cancelled) {
+        signal.close();
+        throw new NetError("cancelled");
+      }
+      onStatus?.("connecting");
+      const hostId = PREFIX + code;
+      const sid = randomString(16, "abcdefghijklmnopqrstuvwxyz0123456789");
+      pc = new RTCPeerConnection({ iceServers: ice });
+      const dc = pc.createDataChannel("mb", { ordered: true });
+      const wired = wirePc(pc, signal, hostId, sid);
+      return await new Promise(async (resolve, reject) => {
+        const fail = (c) => {
+          clearTimeout(timer);
+          signal.close();
+          try {
+            pc.close();
+          } catch {
+          }
+          reject(new NetError(c));
+        };
+        timer = setTimeout(() => fail("join-timeout"), 3e4);
+        signal.on("lost", () => {
+          if (dc.readyState !== "open") fail("signal-lost");
+        });
+        signal.on("message", async (msg) => {
+          const p = msg.payload;
+          if (msg.src !== hostId) return;
+          if (msg.type === "EXPIRE") {
+            fail("no-room");
+            return;
+          }
+          if (!p || p.app !== APP || p.sid !== sid) return;
+          if (msg.type === "ANSWER") {
+            if (p.error) {
+              fail(p.error === "busy" ? "room-busy" : p.error === "version" ? "version" : "join-failed");
+              return;
+            }
+            if (!validSdp(p.sdp)) return;
+            try {
+              await wired.setRemote({ type: "answer", sdp: p.sdp });
+            } catch {
+              fail("join-failed");
+            }
+          } else if (msg.type === "CANDIDATE") {
+            wired.addCandidate(p.c);
+          }
+        });
+        dc.onopen = () => {
+          if (cancelled) return;
+          clearTimeout(timer);
+          const link = new Link(pc, dc);
+          setTimeout(() => signal.close(), 1500);
+          resolve(link);
+        };
+        try {
+          const offer = await pc.createOffer();
+          await pc.setLocalDescription(offer);
+          signal.send("OFFER", hostId, { app: APP, v: PROTO, sid, sdp: pc.localDescription.sdp });
+        } catch {
+          fail("join-failed");
+        }
+      });
+    })();
+    return { promise, cancel };
+  }
+  function netErrorText(e) {
+    const code = e?.code || "";
+    return {
+      "signal-timeout": "\u0421\u0435\u0440\u0432\u0435\u0440 \u0437\u2019\u0454\u0434\u043D\u0430\u043D\u043D\u044F \u043D\u0435 \u0432\u0456\u0434\u043F\u043E\u0432\u0456\u0434\u0430\u0454. \u041F\u0435\u0440\u0435\u0432\u0456\u0440\u0442\u0435 \u0456\u043D\u0442\u0435\u0440\u043D\u0435\u0442 \u0456 \u0441\u043F\u0440\u043E\u0431\u0443\u0439\u0442\u0435 \u0449\u0435 \u0440\u0430\u0437.",
+      "signal-failed": "\u041D\u0435 \u0432\u0434\u0430\u043B\u043E\u0441\u044F \u043F\u0456\u0434\u2019\u0454\u0434\u043D\u0430\u0442\u0438\u0441\u044F \u0434\u043E \u0441\u0435\u0440\u0432\u0435\u0440\u0430 \u0433\u0440\u0438. \u041F\u0435\u0440\u0435\u0432\u0456\u0440\u0442\u0435 \u0456\u043D\u0442\u0435\u0440\u043D\u0435\u0442.",
+      "signal-lost": "\u0417\u2019\u0454\u0434\u043D\u0430\u043D\u043D\u044F \u0437 \u0441\u0435\u0440\u0432\u0435\u0440\u043E\u043C \u043F\u0435\u0440\u0435\u0440\u0432\u0430\u043B\u043E\u0441\u044F. \u0421\u043F\u0440\u043E\u0431\u0443\u0439\u0442\u0435 \u0449\u0435 \u0440\u0430\u0437.",
+      "id-taken": "\u041D\u0435 \u0432\u0434\u0430\u043B\u043E\u0441\u044F \u0441\u0442\u0432\u043E\u0440\u0438\u0442\u0438 \u043A\u0456\u043C\u043D\u0430\u0442\u0443. \u0421\u043F\u0440\u043E\u0431\u0443\u0439\u0442\u0435 \u0449\u0435 \u0440\u0430\u0437.",
+      "no-room": "\u041A\u0456\u043C\u043D\u0430\u0442\u0443 \u043D\u0435 \u0437\u043D\u0430\u0439\u0434\u0435\u043D\u043E. \u041F\u0435\u0440\u0435\u0432\u0456\u0440\u0442\u0435 \u043A\u043E\u0434 \u2014 \u043C\u043E\u0436\u043B\u0438\u0432\u043E, \u0457\u0457 \u0432\u0436\u0435 \u0437\u0430\u043A\u0440\u0438\u043B\u0438.",
+      "room-busy": "\u0423 \u0446\u0456\u0439 \u043A\u0456\u043C\u043D\u0430\u0442\u0456 \u0432\u0436\u0435 \u0433\u0440\u0430\u044E\u0442\u044C.",
+      "version": "\u0423 \u0441\u0443\u043F\u0435\u0440\u043D\u0438\u043A\u0430 \u0456\u043D\u0448\u0430 \u0432\u0435\u0440\u0441\u0456\u044F \u0433\u0440\u0438. \u041E\u043D\u043E\u0432\u0456\u0442\u044C \u0441\u0442\u043E\u0440\u0456\u043D\u043A\u0443 \u043D\u0430 \u043E\u0431\u043E\u0445 \u043F\u0440\u0438\u0441\u0442\u0440\u043E\u044F\u0445.",
+      "join-timeout": "\u041D\u0435 \u0432\u0434\u0430\u043B\u043E\u0441\u044F \u0432\u0441\u0442\u0430\u043D\u043E\u0432\u0438\u0442\u0438 \u043F\u0440\u044F\u043C\u0435 \u0437\u2019\u0454\u0434\u043D\u0430\u043D\u043D\u044F. \u0421\u043F\u0440\u043E\u0431\u0443\u0439\u0442\u0435 \u0456\u043D\u0448\u0443 \u043C\u0435\u0440\u0435\u0436\u0443 (\u043D\u0430\u043F\u0440\u0438\u043A\u043B\u0430\u0434, \u043C\u043E\u0431\u0456\u043B\u044C\u043D\u0438\u0439 \u0456\u043D\u0442\u0435\u0440\u043D\u0435\u0442).",
+      "join-failed": "\u041D\u0435 \u0432\u0434\u0430\u043B\u043E\u0441\u044F \u043F\u0456\u0434\u2019\u0454\u0434\u043D\u0430\u0442\u0438\u0441\u044F \u0434\u043E \u043A\u0456\u043C\u043D\u0430\u0442\u0438.",
+      "cancelled": ""
+    }[code] ?? "\u041F\u043E\u043C\u0438\u043B\u043A\u0430 \u043C\u0435\u0440\u0435\u0436\u0456. \u0421\u043F\u0440\u043E\u0431\u0443\u0439\u0442\u0435 \u0449\u0435 \u0440\u0430\u0437.";
+  }
+
+  // js/sound.js
+  var ctx = null;
+  var master = null;
+  var noiseBuf = null;
+  var fx = { on: true };
+  function ensure() {
+    if (!fx.on) return null;
+    if (!ctx) {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return null;
+      try {
+        ctx = new AC();
+      } catch {
+        return null;
+      }
+      master = ctx.createGain();
+      master.gain.value = 0.55;
+      master.connect(ctx.destination);
+      noiseBuf = ctx.createBuffer(1, ctx.sampleRate * 1.2, ctx.sampleRate);
+      const d = noiseBuf.getChannelData(0);
+      for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    }
+    if (ctx.state === "suspended") ctx.resume().catch(() => {
+    });
+    return ctx;
+  }
+  var unlockAudio = () => {
+    ensure();
+  };
+  function tone(freq, to, dur, type = "sine", vol = 0.2, at = 0) {
+    const t = ctx.currentTime + at;
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = type;
+    o.frequency.setValueAtTime(freq, t);
+    if (to) o.frequency.exponentialRampToValueAtTime(to, t + dur);
+    g.gain.setValueAtTime(1e-4, t);
+    g.gain.exponentialRampToValueAtTime(vol, t + 0.012);
+    g.gain.exponentialRampToValueAtTime(1e-4, t + dur);
+    o.connect(g);
+    g.connect(master);
+    o.start(t);
+    o.stop(t + dur + 0.02);
+  }
+  function noise(dur, freq, vol = 0.4, at = 0, q2 = 0.8, type = "lowpass") {
+    const t = ctx.currentTime + at;
+    const s = ctx.createBufferSource(), f = ctx.createBiquadFilter(), g = ctx.createGain();
+    s.buffer = noiseBuf;
+    f.type = type;
+    f.frequency.setValueAtTime(freq, t);
+    f.frequency.exponentialRampToValueAtTime(Math.max(60, freq / 6), t + dur);
+    f.Q.value = q2;
+    g.gain.setValueAtTime(1e-4, t);
+    g.gain.exponentialRampToValueAtTime(vol, t + 0.01);
+    g.gain.exponentialRampToValueAtTime(1e-4, t + dur);
+    s.connect(f);
+    f.connect(g);
+    g.connect(master);
+    s.start(t);
+    s.stop(t + dur + 0.05);
+  }
+  var buzz = (p) => {
+    if (fx.on && navigator.vibrate) try {
+      navigator.vibrate(p);
+    } catch {
+    }
+  };
+  function play(kind) {
+    if (!ensure() || ctx.state !== "running") {
+      if (fx.on) haptic(kind);
+      return;
+    }
+    switch (kind) {
+      case "tap":
+        tone(700, 900, 0.05, "triangle", 0.08);
+        break;
+      case "place":
+        tone(260, 180, 0.12, "triangle", 0.18);
+        noise(0.12, 900, 0.08);
+        break;
+      case "rotate":
+        tone(500, 700, 0.08, "sine", 0.1);
+        break;
+      case "error":
+        tone(220, 160, 0.16, "square", 0.06);
+        break;
+      case "shot":
+        noise(0.35, 2400, 0.12, 0, 1, "bandpass");
+        tone(900, 140, 0.3, "sine", 0.06);
+        break;
+      case "miss":
+        noise(0.5, 1400, 0.16, 0.05, 0.6);
+        tone(420, 220, 0.25, "sine", 0.05, 0.05);
+        break;
+      case "hit":
+        noise(0.55, 1800, 0.5);
+        tone(120, 40, 0.45, "sawtooth", 0.18);
+        break;
+      case "sink":
+        noise(1.1, 1200, 0.55);
+        tone(160, 30, 1, "sawtooth", 0.2);
+        tone(90, 30, 1, "sine", 0.25, 0.15);
+        break;
+      case "win":
+        [523, 659, 784, 1047].forEach((f, i) => tone(f, 0, 0.35, "triangle", 0.16, i * 0.12));
+        break;
+      case "lose":
+        [392, 330, 262, 196].forEach((f, i) => tone(f, 0, 0.4, "sine", 0.14, i * 0.16));
+        break;
+      case "chat":
+        tone(880, 0, 0.09, "sine", 0.1);
+        tone(1320, 0, 0.12, "sine", 0.08, 0.07);
+        break;
+      case "join":
+        [440, 660, 880].forEach((f, i) => tone(f, 0, 0.18, "triangle", 0.12, i * 0.08));
+        break;
+    }
+    haptic(kind);
+  }
+  function haptic(kind) {
+    ({
+      tap: () => buzz(8),
+      place: () => buzz(15),
+      error: () => buzz([20, 40, 20]),
+      shot: () => buzz(12),
+      miss: () => buzz(10),
+      hit: () => buzz([40, 30, 60]),
+      sink: () => buzz([60, 40, 80, 40, 140]),
+      win: () => buzz([30, 50, 30, 50, 120])
+    })[kind]?.();
+  }
+
+  // js/qr.js
+  var E = (t, e) => () => {
+    try {
+      return e || t((e = { exports: {} }).exports, e), e.exports;
+    } catch (n) {
+      throw e = 0, n;
+    }
+  };
+  var N2 = E((E1, G) => {
+    G.exports = { MODE_NUMBER: 1, MODE_ALPHA_NUM: 2, MODE_8BIT_BYTE: 4, MODE_KANJI: 8 };
+  });
+  var X = E((m1, U) => {
+    var s1 = N2();
+    function K(t) {
+      this.mode = s1.MODE_8BIT_BYTE, this.data = t;
+    }
+    K.prototype = { getLength: function() {
+      return this.data.length;
+    }, write: function(t) {
+      for (var e = 0; e < this.data.length; e++) t.put(this.data.charCodeAt(e), 8);
+    } };
+    U.exports = K;
+  });
+  var I = E((T1, Y) => {
+    var v = { glog: function(t) {
+      if (t < 1) throw new Error("glog(" + t + ")");
+      return v.LOG_TABLE[t];
+    }, gexp: function(t) {
+      for (; t < 0; ) t += 255;
+      for (; t >= 256; ) t -= 255;
+      return v.EXP_TABLE[t];
+    }, EXP_TABLE: new Array(256), LOG_TABLE: new Array(256) };
+    for (h2 = 0; h2 < 8; h2++) v.EXP_TABLE[h2] = 1 << h2;
+    var h2;
+    for (h2 = 8; h2 < 256; h2++) v.EXP_TABLE[h2] = v.EXP_TABLE[h2 - 4] ^ v.EXP_TABLE[h2 - 5] ^ v.EXP_TABLE[h2 - 6] ^ v.EXP_TABLE[h2 - 8];
+    var h2;
+    for (h2 = 0; h2 < 255; h2++) v.LOG_TABLE[v.EXP_TABLE[h2]] = h2;
+    var h2;
+    Y.exports = v;
+  });
+  var b = E((d1, x) => {
+    var A = I();
+    function R(t, e) {
+      if (t.length === void 0) throw new Error(t.length + "/" + e);
+      for (var n = 0; n < t.length && t[n] === 0; ) n++;
+      this.num = new Array(t.length - n + e);
+      for (var r = 0; r < t.length - n; r++) this.num[r] = t[r + n];
+    }
+    R.prototype = { get: function(t) {
+      return this.num[t];
+    }, getLength: function() {
+      return this.num.length;
+    }, multiply: function(t) {
+      for (var e = new Array(this.getLength() + t.getLength() - 1), n = 0; n < this.getLength(); n++) for (var r = 0; r < t.getLength(); r++) e[n + r] ^= A.gexp(A.glog(this.get(n)) + A.glog(t.get(r)));
+      return new R(e, 0);
+    }, mod: function(t) {
+      if (this.getLength() - t.getLength() < 0) return this;
+      for (var e = A.glog(this.get(0)) - A.glog(t.get(0)), n = new Array(this.getLength()), r = 0; r < this.getLength(); r++) n[r] = this.get(r);
+      for (var i = 0; i < t.getLength(); i++) n[i] ^= A.gexp(A.glog(t.get(i)) + e);
+      return new R(n, 0).mod(t);
+    } };
+    x.exports = R;
+  });
+  var F = E((B1, J) => {
+    J.exports = { PATTERN000: 0, PATTERN001: 1, PATTERN010: 2, PATTERN011: 3, PATTERN100: 4, PATTERN101: 5, PATTERN110: 6, PATTERN111: 7 };
+  });
+  var Z = E((L1, W) => {
+    var g = N2(), V = b(), u1 = I(), d = F(), f = { PATTERN_POSITION_TABLE: [[], [6, 18], [6, 22], [6, 26], [6, 30], [6, 34], [6, 22, 38], [6, 24, 42], [6, 26, 46], [6, 28, 50], [6, 30, 54], [6, 32, 58], [6, 34, 62], [6, 26, 46, 66], [6, 26, 48, 70], [6, 26, 50, 74], [6, 30, 54, 78], [6, 30, 56, 82], [6, 30, 58, 86], [6, 34, 62, 90], [6, 28, 50, 72, 94], [6, 26, 50, 74, 98], [6, 30, 54, 78, 102], [6, 28, 54, 80, 106], [6, 32, 58, 84, 110], [6, 30, 58, 86, 114], [6, 34, 62, 90, 118], [6, 26, 50, 74, 98, 122], [6, 30, 54, 78, 102, 126], [6, 26, 52, 78, 104, 130], [6, 30, 56, 82, 108, 134], [6, 34, 60, 86, 112, 138], [6, 30, 58, 86, 114, 142], [6, 34, 62, 90, 118, 146], [6, 30, 54, 78, 102, 126, 150], [6, 24, 50, 76, 102, 128, 154], [6, 28, 54, 80, 106, 132, 158], [6, 32, 58, 84, 110, 136, 162], [6, 26, 54, 82, 110, 138, 166], [6, 30, 58, 86, 114, 142, 170]], G15: 1335, G18: 7973, G15_MASK: 21522, getBCHTypeInfo: function(t) {
+      for (var e = t << 10; f.getBCHDigit(e) - f.getBCHDigit(f.G15) >= 0; ) e ^= f.G15 << f.getBCHDigit(e) - f.getBCHDigit(f.G15);
+      return (t << 10 | e) ^ f.G15_MASK;
+    }, getBCHTypeNumber: function(t) {
+      for (var e = t << 12; f.getBCHDigit(e) - f.getBCHDigit(f.G18) >= 0; ) e ^= f.G18 << f.getBCHDigit(e) - f.getBCHDigit(f.G18);
+      return t << 12 | e;
+    }, getBCHDigit: function(t) {
+      for (var e = 0; t !== 0; ) e++, t >>>= 1;
+      return e;
+    }, getPatternPosition: function(t) {
+      return f.PATTERN_POSITION_TABLE[t - 1];
+    }, getMask: function(t, e, n) {
+      switch (t) {
+        case d.PATTERN000:
+          return (e + n) % 2 === 0;
+        case d.PATTERN001:
+          return e % 2 === 0;
+        case d.PATTERN010:
+          return n % 3 === 0;
+        case d.PATTERN011:
+          return (e + n) % 3 === 0;
+        case d.PATTERN100:
+          return (Math.floor(e / 2) + Math.floor(n / 3)) % 2 === 0;
+        case d.PATTERN101:
+          return e * n % 2 + e * n % 3 === 0;
+        case d.PATTERN110:
+          return (e * n % 2 + e * n % 3) % 2 === 0;
+        case d.PATTERN111:
+          return (e * n % 3 + (e + n) % 2) % 2 === 0;
+        default:
+          throw new Error("bad maskPattern:" + t);
+      }
+    }, getErrorCorrectPolynomial: function(t) {
+      for (var e = new V([1], 0), n = 0; n < t; n++) e = e.multiply(new V([1, u1.gexp(n)], 0));
+      return e;
+    }, getLengthInBits: function(t, e) {
+      if (1 <= e && e < 10) switch (t) {
+        case g.MODE_NUMBER:
+          return 10;
+        case g.MODE_ALPHA_NUM:
+          return 9;
+        case g.MODE_8BIT_BYTE:
+          return 8;
+        case g.MODE_KANJI:
+          return 8;
+        default:
+          throw new Error("mode:" + t);
+      }
+      else if (e < 27) switch (t) {
+        case g.MODE_NUMBER:
+          return 12;
+        case g.MODE_ALPHA_NUM:
+          return 11;
+        case g.MODE_8BIT_BYTE:
+          return 16;
+        case g.MODE_KANJI:
+          return 10;
+        default:
+          throw new Error("mode:" + t);
+      }
+      else if (e < 41) switch (t) {
+        case g.MODE_NUMBER:
+          return 14;
+        case g.MODE_ALPHA_NUM:
+          return 13;
+        case g.MODE_8BIT_BYTE:
+          return 16;
+        case g.MODE_KANJI:
+          return 12;
+        default:
+          throw new Error("mode:" + t);
+      }
+      else throw new Error("type:" + e);
+    }, getLostPoint: function(t) {
+      var e = t.getModuleCount(), n = 0, r = 0, i = 0;
+      for (r = 0; r < e; r++) for (i = 0; i < e; i++) {
+        for (var a = 0, o = t.isDark(r, i), s = -1; s <= 1; s++) if (!(r + s < 0 || e <= r + s)) for (var u = -1; u <= 1; u++) i + u < 0 || e <= i + u || s === 0 && u === 0 || o === t.isDark(r + s, i + u) && a++;
+        a > 5 && (n += 3 + a - 5);
+      }
+      for (r = 0; r < e - 1; r++) for (i = 0; i < e - 1; i++) {
+        var l = 0;
+        t.isDark(r, i) && l++, t.isDark(r + 1, i) && l++, t.isDark(r, i + 1) && l++, t.isDark(r + 1, i + 1) && l++, (l === 0 || l === 4) && (n += 3);
+      }
+      for (r = 0; r < e; r++) for (i = 0; i < e - 6; i++) t.isDark(r, i) && !t.isDark(r, i + 1) && t.isDark(r, i + 2) && t.isDark(r, i + 3) && t.isDark(r, i + 4) && !t.isDark(r, i + 5) && t.isDark(r, i + 6) && (n += 40);
+      for (i = 0; i < e; i++) for (r = 0; r < e - 6; r++) t.isDark(r, i) && !t.isDark(r + 1, i) && t.isDark(r + 2, i) && t.isDark(r + 3, i) && t.isDark(r + 4, i) && !t.isDark(r + 5, i) && t.isDark(r + 6, i) && (n += 40);
+      var L = 0;
+      for (i = 0; i < e; i++) for (r = 0; r < e; r++) t.isDark(r, i) && L++;
+      var p = Math.abs(100 * L / e / e - 50) / 5;
+      return n += p * 10, n;
+    } };
+    W.exports = f;
+  });
+  var O = E((A1, $2) => {
+    $2.exports = { L: 1, M: 0, Q: 3, H: 2 };
+  });
+  var q = E((p1, z) => {
+    var w = O();
+    function m(t, e) {
+      this.totalCount = t, this.dataCount = e;
+    }
+    m.RS_BLOCK_TABLE = [[1, 26, 19], [1, 26, 16], [1, 26, 13], [1, 26, 9], [1, 44, 34], [1, 44, 28], [1, 44, 22], [1, 44, 16], [1, 70, 55], [1, 70, 44], [2, 35, 17], [2, 35, 13], [1, 100, 80], [2, 50, 32], [2, 50, 24], [4, 25, 9], [1, 134, 108], [2, 67, 43], [2, 33, 15, 2, 34, 16], [2, 33, 11, 2, 34, 12], [2, 86, 68], [4, 43, 27], [4, 43, 19], [4, 43, 15], [2, 98, 78], [4, 49, 31], [2, 32, 14, 4, 33, 15], [4, 39, 13, 1, 40, 14], [2, 121, 97], [2, 60, 38, 2, 61, 39], [4, 40, 18, 2, 41, 19], [4, 40, 14, 2, 41, 15], [2, 146, 116], [3, 58, 36, 2, 59, 37], [4, 36, 16, 4, 37, 17], [4, 36, 12, 4, 37, 13], [2, 86, 68, 2, 87, 69], [4, 69, 43, 1, 70, 44], [6, 43, 19, 2, 44, 20], [6, 43, 15, 2, 44, 16], [4, 101, 81], [1, 80, 50, 4, 81, 51], [4, 50, 22, 4, 51, 23], [3, 36, 12, 8, 37, 13], [2, 116, 92, 2, 117, 93], [6, 58, 36, 2, 59, 37], [4, 46, 20, 6, 47, 21], [7, 42, 14, 4, 43, 15], [4, 133, 107], [8, 59, 37, 1, 60, 38], [8, 44, 20, 4, 45, 21], [12, 33, 11, 4, 34, 12], [3, 145, 115, 1, 146, 116], [4, 64, 40, 5, 65, 41], [11, 36, 16, 5, 37, 17], [11, 36, 12, 5, 37, 13], [5, 109, 87, 1, 110, 88], [5, 65, 41, 5, 66, 42], [5, 54, 24, 7, 55, 25], [11, 36, 12], [5, 122, 98, 1, 123, 99], [7, 73, 45, 3, 74, 46], [15, 43, 19, 2, 44, 20], [3, 45, 15, 13, 46, 16], [1, 135, 107, 5, 136, 108], [10, 74, 46, 1, 75, 47], [1, 50, 22, 15, 51, 23], [2, 42, 14, 17, 43, 15], [5, 150, 120, 1, 151, 121], [9, 69, 43, 4, 70, 44], [17, 50, 22, 1, 51, 23], [2, 42, 14, 19, 43, 15], [3, 141, 113, 4, 142, 114], [3, 70, 44, 11, 71, 45], [17, 47, 21, 4, 48, 22], [9, 39, 13, 16, 40, 14], [3, 135, 107, 5, 136, 108], [3, 67, 41, 13, 68, 42], [15, 54, 24, 5, 55, 25], [15, 43, 15, 10, 44, 16], [4, 144, 116, 4, 145, 117], [17, 68, 42], [17, 50, 22, 6, 51, 23], [19, 46, 16, 6, 47, 17], [2, 139, 111, 7, 140, 112], [17, 74, 46], [7, 54, 24, 16, 55, 25], [34, 37, 13], [4, 151, 121, 5, 152, 122], [4, 75, 47, 14, 76, 48], [11, 54, 24, 14, 55, 25], [16, 45, 15, 14, 46, 16], [6, 147, 117, 4, 148, 118], [6, 73, 45, 14, 74, 46], [11, 54, 24, 16, 55, 25], [30, 46, 16, 2, 47, 17], [8, 132, 106, 4, 133, 107], [8, 75, 47, 13, 76, 48], [7, 54, 24, 22, 55, 25], [22, 45, 15, 13, 46, 16], [10, 142, 114, 2, 143, 115], [19, 74, 46, 4, 75, 47], [28, 50, 22, 6, 51, 23], [33, 46, 16, 4, 47, 17], [8, 152, 122, 4, 153, 123], [22, 73, 45, 3, 74, 46], [8, 53, 23, 26, 54, 24], [12, 45, 15, 28, 46, 16], [3, 147, 117, 10, 148, 118], [3, 73, 45, 23, 74, 46], [4, 54, 24, 31, 55, 25], [11, 45, 15, 31, 46, 16], [7, 146, 116, 7, 147, 117], [21, 73, 45, 7, 74, 46], [1, 53, 23, 37, 54, 24], [19, 45, 15, 26, 46, 16], [5, 145, 115, 10, 146, 116], [19, 75, 47, 10, 76, 48], [15, 54, 24, 25, 55, 25], [23, 45, 15, 25, 46, 16], [13, 145, 115, 3, 146, 116], [2, 74, 46, 29, 75, 47], [42, 54, 24, 1, 55, 25], [23, 45, 15, 28, 46, 16], [17, 145, 115], [10, 74, 46, 23, 75, 47], [10, 54, 24, 35, 55, 25], [19, 45, 15, 35, 46, 16], [17, 145, 115, 1, 146, 116], [14, 74, 46, 21, 75, 47], [29, 54, 24, 19, 55, 25], [11, 45, 15, 46, 46, 16], [13, 145, 115, 6, 146, 116], [14, 74, 46, 23, 75, 47], [44, 54, 24, 7, 55, 25], [59, 46, 16, 1, 47, 17], [12, 151, 121, 7, 152, 122], [12, 75, 47, 26, 76, 48], [39, 54, 24, 14, 55, 25], [22, 45, 15, 41, 46, 16], [6, 151, 121, 14, 152, 122], [6, 75, 47, 34, 76, 48], [46, 54, 24, 10, 55, 25], [2, 45, 15, 64, 46, 16], [17, 152, 122, 4, 153, 123], [29, 74, 46, 14, 75, 47], [49, 54, 24, 10, 55, 25], [24, 45, 15, 46, 46, 16], [4, 152, 122, 18, 153, 123], [13, 74, 46, 32, 75, 47], [48, 54, 24, 14, 55, 25], [42, 45, 15, 32, 46, 16], [20, 147, 117, 4, 148, 118], [40, 75, 47, 7, 76, 48], [43, 54, 24, 22, 55, 25], [10, 45, 15, 67, 46, 16], [19, 148, 118, 6, 149, 119], [18, 75, 47, 31, 76, 48], [34, 54, 24, 34, 55, 25], [20, 45, 15, 61, 46, 16]];
+    m.getRSBlocks = function(t, e) {
+      var n = m.getRsBlockTable(t, e);
+      if (n === void 0) throw new Error("bad rs block @ typeNumber:" + t + "/errorCorrectLevel:" + e);
+      for (var r = n.length / 3, i = [], a = 0; a < r; a++) for (var o = n[a * 3 + 0], s = n[a * 3 + 1], u = n[a * 3 + 2], l = 0; l < o; l++) i.push(new m(s, u));
+      return i;
+    };
+    m.getRsBlockTable = function(t, e) {
+      switch (e) {
+        case w.L:
+          return m.RS_BLOCK_TABLE[(t - 1) * 4 + 0];
+        case w.M:
+          return m.RS_BLOCK_TABLE[(t - 1) * 4 + 1];
+        case w.Q:
+          return m.RS_BLOCK_TABLE[(t - 1) * 4 + 2];
+        case w.H:
+          return m.RS_BLOCK_TABLE[(t - 1) * 4 + 3];
+        default:
+          return;
+      }
+    };
+    z.exports = m;
+  });
+  var e1 = E((P1, t1) => {
+    function j() {
+      this.buffer = [], this.length = 0;
+    }
+    j.prototype = { get: function(t) {
+      var e = Math.floor(t / 8);
+      return (this.buffer[e] >>> 7 - t % 8 & 1) == 1;
+    }, put: function(t, e) {
+      for (var n = 0; n < e; n++) this.putBit((t >>> e - n - 1 & 1) == 1);
+    }, getLengthInBits: function() {
+      return this.length;
+    }, putBit: function(t) {
+      var e = Math.floor(this.length / 8);
+      this.buffer.length <= e && this.buffer.push(0), t && (this.buffer[e] |= 128 >>> this.length % 8), this.length++;
+    } };
+    t1.exports = j;
+  });
+  var a1 = E((D1, i1) => {
+    var h1 = X(), B = Z(), f1 = b(), r1 = q(), n1 = e1();
+    function T(t, e) {
+      this.typeNumber = t, this.errorCorrectLevel = e, this.modules = null, this.moduleCount = 0, this.dataCache = null, this.dataList = [];
+    }
+    T.prototype = { addData: function(t) {
+      var e = new h1(t);
+      this.dataList.push(e), this.dataCache = null;
+    }, isDark: function(t, e) {
+      if (t < 0 || this.moduleCount <= t || e < 0 || this.moduleCount <= e) throw new Error(t + "," + e);
+      return this.modules[t][e];
+    }, getModuleCount: function() {
+      return this.moduleCount;
+    }, make: function() {
+      if (this.typeNumber < 1) {
+        var t = 1;
+        for (t = 1; t < 40; t++) {
+          for (var e = r1.getRSBlocks(t, this.errorCorrectLevel), n = new n1(), r = 0, i = 0; i < e.length; i++) r += e[i].dataCount;
+          for (var a = 0; a < this.dataList.length; a++) {
+            var o = this.dataList[a];
+            n.put(o.mode, 4), n.put(o.getLength(), B.getLengthInBits(o.mode, t)), o.write(n);
+          }
+          if (n.getLengthInBits() <= r * 8) break;
+        }
+        this.typeNumber = t;
+      }
+      this.makeImpl(false, this.getBestMaskPattern());
+    }, makeImpl: function(t, e) {
+      this.moduleCount = this.typeNumber * 4 + 17, this.modules = new Array(this.moduleCount);
+      for (var n = 0; n < this.moduleCount; n++) {
+        this.modules[n] = new Array(this.moduleCount);
+        for (var r = 0; r < this.moduleCount; r++) this.modules[n][r] = null;
+      }
+      this.setupPositionProbePattern(0, 0), this.setupPositionProbePattern(this.moduleCount - 7, 0), this.setupPositionProbePattern(0, this.moduleCount - 7), this.setupPositionAdjustPattern(), this.setupTimingPattern(), this.setupTypeInfo(t, e), this.typeNumber >= 7 && this.setupTypeNumber(t), this.dataCache === null && (this.dataCache = T.createData(this.typeNumber, this.errorCorrectLevel, this.dataList)), this.mapData(this.dataCache, e);
+    }, setupPositionProbePattern: function(t, e) {
+      for (var n = -1; n <= 7; n++) if (!(t + n <= -1 || this.moduleCount <= t + n)) for (var r = -1; r <= 7; r++) e + r <= -1 || this.moduleCount <= e + r || (0 <= n && n <= 6 && (r === 0 || r === 6) || 0 <= r && r <= 6 && (n === 0 || n === 6) || 2 <= n && n <= 4 && 2 <= r && r <= 4 ? this.modules[t + n][e + r] = true : this.modules[t + n][e + r] = false);
+    }, getBestMaskPattern: function() {
+      for (var t = 0, e = 0, n = 0; n < 8; n++) {
+        this.makeImpl(true, n);
+        var r = B.getLostPoint(this);
+        (n === 0 || t > r) && (t = r, e = n);
+      }
+      return e;
+    }, createMovieClip: function(t, e, n) {
+      var r = t.createEmptyMovieClip(e, n), i = 1;
+      this.make();
+      for (var a = 0; a < this.modules.length; a++) for (var o = a * i, s = 0; s < this.modules[a].length; s++) {
+        var u = s * i, l = this.modules[a][s];
+        l && (r.beginFill(0, 100), r.moveTo(u, o), r.lineTo(u + i, o), r.lineTo(u + i, o + i), r.lineTo(u, o + i), r.endFill());
+      }
+      return r;
+    }, setupTimingPattern: function() {
+      for (var t = 8; t < this.moduleCount - 8; t++) this.modules[t][6] === null && (this.modules[t][6] = t % 2 === 0);
+      for (var e = 8; e < this.moduleCount - 8; e++) this.modules[6][e] === null && (this.modules[6][e] = e % 2 === 0);
+    }, setupPositionAdjustPattern: function() {
+      for (var t = B.getPatternPosition(this.typeNumber), e = 0; e < t.length; e++) for (var n = 0; n < t.length; n++) {
+        var r = t[e], i = t[n];
+        if (this.modules[r][i] === null) for (var a = -2; a <= 2; a++) for (var o = -2; o <= 2; o++) Math.abs(a) === 2 || Math.abs(o) === 2 || a === 0 && o === 0 ? this.modules[r + a][i + o] = true : this.modules[r + a][i + o] = false;
+      }
+    }, setupTypeNumber: function(t) {
+      for (var e = B.getBCHTypeNumber(this.typeNumber), n, r = 0; r < 18; r++) n = !t && (e >> r & 1) === 1, this.modules[Math.floor(r / 3)][r % 3 + this.moduleCount - 8 - 3] = n;
+      for (var i = 0; i < 18; i++) n = !t && (e >> i & 1) === 1, this.modules[i % 3 + this.moduleCount - 8 - 3][Math.floor(i / 3)] = n;
+    }, setupTypeInfo: function(t, e) {
+      for (var n = this.errorCorrectLevel << 3 | e, r = B.getBCHTypeInfo(n), i, a = 0; a < 15; a++) i = !t && (r >> a & 1) === 1, a < 6 ? this.modules[a][8] = i : a < 8 ? this.modules[a + 1][8] = i : this.modules[this.moduleCount - 15 + a][8] = i;
+      for (var o = 0; o < 15; o++) i = !t && (r >> o & 1) === 1, o < 8 ? this.modules[8][this.moduleCount - o - 1] = i : o < 9 ? this.modules[8][15 - o - 1 + 1] = i : this.modules[8][15 - o - 1] = i;
+      this.modules[this.moduleCount - 8][8] = !t;
+    }, mapData: function(t, e) {
+      for (var n = -1, r = this.moduleCount - 1, i = 7, a = 0, o = this.moduleCount - 1; o > 0; o -= 2) for (o === 6 && o--; ; ) {
+        for (var s = 0; s < 2; s++) if (this.modules[r][o - s] === null) {
+          var u = false;
+          a < t.length && (u = (t[a] >>> i & 1) === 1);
+          var l = B.getMask(e, r, o - s);
+          l && (u = !u), this.modules[r][o - s] = u, i--, i === -1 && (a++, i = 7);
+        }
+        if (r += n, r < 0 || this.moduleCount <= r) {
+          r -= n, n = -n;
+          break;
+        }
+      }
+    } };
+    T.PAD0 = 236;
+    T.PAD1 = 17;
+    T.createData = function(t, e, n) {
+      for (var r = r1.getRSBlocks(t, e), i = new n1(), a = 0; a < n.length; a++) {
+        var o = n[a];
+        i.put(o.mode, 4), i.put(o.getLength(), B.getLengthInBits(o.mode, t)), o.write(i);
+      }
+      for (var s = 0, u = 0; u < r.length; u++) s += r[u].dataCount;
+      if (i.getLengthInBits() > s * 8) throw new Error("code length overflow. (" + i.getLengthInBits() + ">" + s * 8 + ")");
+      for (i.getLengthInBits() + 4 <= s * 8 && i.put(0, 4); i.getLengthInBits() % 8 !== 0; ) i.putBit(false);
+      for (; !(i.getLengthInBits() >= s * 8 || (i.put(T.PAD0, 8), i.getLengthInBits() >= s * 8)); ) i.put(T.PAD1, 8);
+      return T.createBytes(i, r);
+    };
+    T.createBytes = function(t, e) {
+      for (var n = 0, r = 0, i = 0, a = new Array(e.length), o = new Array(e.length), s = 0; s < e.length; s++) {
+        var u = e[s].dataCount, l = e[s].totalCount - u;
+        r = Math.max(r, u), i = Math.max(i, l), a[s] = new Array(u);
+        for (var L = 0; L < a[s].length; L++) a[s][L] = 255 & t.buffer[L + n];
+        n += u;
+        var p = B.getErrorCorrectPolynomial(l), o1 = new f1(a[s], p.getLength() - 1), y = o1.mod(p);
+        o[s] = new Array(p.getLength() - 1);
+        for (var P = 0; P < o[s].length; P++) {
+          var Q = P + y.getLength() - o[s].length;
+          o[s][P] = Q >= 0 ? y.get(Q) : 0;
+        }
+      }
+      for (var H = 0, C = 0; C < e.length; C++) H += e[C].totalCount;
+      for (var k = new Array(H), S2 = 0, D = 0; D < r; D++) for (var c = 0; c < e.length; c++) D < a[c].length && (k[S2++] = a[c][D]);
+      for (var M = 0; M < i; M++) for (var _ = 0; _ < e.length; _++) M < o[_].length && (k[S2++] = o[_][M]);
+      return k;
+    };
+    i1.exports = T;
+  });
+  var l1 = a1();
+  var g1 = O();
+  function c1(t) {
+    let e = new l1(-1, g1.M);
+    e.addData(t), e.make();
+    let n = e.getModuleCount(), r = [];
+    for (let i = 0; i < n; i++) {
+      let a = [];
+      for (let o = 0; o < n; o++) a.push(e.isDark(i, o));
+      r.push(a);
+    }
+    return r;
+  }
+
+  // js/app.js
+  var $ = (id) => document.getElementById(id);
+  var sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  var finePointer = matchMedia("(hover: hover) and (pointer: fine)");
+  var reduceMotion = matchMedia("(prefers-reduced-motion: reduce)");
+  function h(tag, props = {}, ...kids) {
+    const el = document.createElement(tag);
+    for (const [k, v] of Object.entries(props)) {
+      if (v == null || v === false) continue;
+      if (k === "class") el.className = v;
+      else if (k === "text") el.textContent = v;
+      else if (k.startsWith("on")) el.addEventListener(k.slice(2), v);
+      else el.setAttribute(k, v === true ? "" : v);
+    }
+    for (const kid of kids.flat()) if (kid != null) el.append(kid);
+    return el;
+  }
+  function icon(name) {
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    const use = document.createElementNS("http://www.w3.org/2000/svg", "use");
+    use.setAttribute("href", "#i-" + name);
+    svg.append(use);
+    return svg;
+  }
+  function setIcon(btn, name) {
+    btn.querySelector("use")?.setAttribute("href", "#i-" + name);
+  }
+  var store = {
+    get(k, d) {
+      try {
+        const v = localStorage.getItem("mb." + k);
+        return v == null ? d : JSON.parse(v);
+      } catch {
+        return d;
+      }
+    },
+    set(k, v) {
+      try {
+        localStorage.setItem("mb." + k, JSON.stringify(v));
+      } catch {
+      }
+    }
+  };
+  function toast(text, kind = "", ms = 2600) {
+    const box = $("toasts");
+    while (box.children.length > 2) box.firstChild.remove();
+    const t = h("div", { class: "toast " + kind, text });
+    box.append(t);
+    setTimeout(() => {
+      t.classList.add("out");
+      setTimeout(() => t.remove(), 260);
+    }, ms);
+  }
+  var fmtBytes = (n) => n < 1024 ? n + " \u0411" : n < 1048576 ? (n / 1024).toFixed(1) + " \u041A\u0411" : n < 1073741824 ? (n / 1048576).toFixed(1) + " \u041C\u0411" : (n / 1073741824).toFixed(2) + " \u0413\u0411";
+  var fmtTime = (ms) => {
+    const s = Math.max(0, Math.round(ms / 1e3));
+    return Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0");
+  };
+  var cleanText = (s, max) => String(s ?? "").replace(/[\u0000-\u0008\u000B-\u001F\u007F‪-‮⁦-⁩]/g, "").trim().slice(0, max);
+  function cleanFileName(s) {
+    let n = cleanText(s, 200).replace(/[\\/:*?"<>|]/g, "_").replace(/^\.+/, "").trim();
+    if (n.length > 120) {
+      const dot = n.lastIndexOf(".");
+      const ext = dot > 0 && n.length - dot <= 12 ? n.slice(dot) : "";
+      n = n.slice(0, 120 - ext.length) + ext;
+    }
+    return n || "file";
+  }
+  async function sha256hex(str) {
+    if (!globalThis.crypto?.subtle) return null;
+    const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
+    return [...new Uint8Array(buf)].map((b2) => b2.toString(16).padStart(2, "0")).join("");
+  }
+  var randomHex = (n) => [...crypto.getRandomValues(new Uint8Array(n))].map((b2) => b2.toString(16).padStart(2, "0")).join("");
+  var subtle = globalThis.crypto?.subtle || null;
+  var te = new TextEncoder();
+  var KDF_ITERS = 21e4;
+  function u8ToB64(u) {
+    let s = "";
+    for (let i = 0; i < u.length; i += 32768) s += String.fromCharCode.apply(null, u.subarray(i, i + 32768));
+    return btoa(s);
+  }
+  function b64ToU8(s) {
+    const bin = atob(s);
+    const u = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i);
+    return u;
+  }
+  async function deriveKey(pass, salt) {
+    const base = await subtle.importKey("raw", te.encode(pass), "PBKDF2", false, ["deriveKey"]);
+    return subtle.deriveKey({ name: "PBKDF2", salt, iterations: KDF_ITERS, hash: "SHA-256" }, base, { name: "AES-GCM", length: 256 }, false, ["encrypt", "decrypt"]);
+  }
+  async function aesEncrypt(key2, plain) {
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    const ct = new Uint8Array(await subtle.encrypt({ name: "AES-GCM", iv }, key2, plain));
+    const out = new Uint8Array(12 + ct.length);
+    out.set(iv);
+    out.set(ct, 12);
+    return out;
+  }
+  async function aesDecrypt(key2, frame) {
+    const iv = frame.subarray(0, 12), ct = frame.subarray(12);
+    return new Uint8Array(await subtle.decrypt({ name: "AES-GCM", iv }, key2, ct));
+  }
+  var settings = { rules: "classic", level: "normal", sound: true, ...store.get("settings", {}) };
+  if (!RULESETS[settings.rules]) settings.rules = "classic";
+  if (!["easy", "normal", "hard"].includes(settings.level)) settings.level = "normal";
+  var saveSettings = () => store.set("settings", settings);
+  var stats = { wins: 0, losses: 0, shots: 0, hits: 0, streak: 0, ...store.get("stats", {}) };
+  var LEVEL_NAME = { easy: "\u041A\u0430\u0434\u0435\u0442", normal: "\u041A\u0430\u043F\u0456\u0442\u0430\u043D", hard: "\u0410\u0434\u043C\u0456\u0440\u0430\u043B" };
+  function renderStats() {
+    $("st-wins").textContent = stats.wins;
+    $("st-losses").textContent = stats.losses;
+    $("st-acc").textContent = stats.shots ? Math.round(stats.hits / stats.shots * 100) + "%" : "\u2014";
+    $("st-streak").textContent = stats.streak;
+  }
+  var S = {
+    screen: "home",
+    mode: null,
+    // 'bot' | 'online'
+    rules: getRules(settings.rules),
+    level: settings.level,
+    role: null,
+    // 'host' | 'guest'
+    link: null,
+    op: null,
+    // поточна мережева операція (створення/приєднання)
+    // розстановка
+    ships: [],
+    lastShips: null,
+    sel: null,
+    orient: "H",
+    ghost: null,
+    pending: false,
+    cursor: { r: 0, c: 0 },
+    ready: false,
+    oppReady: false,
+    oppCommit: null,
+    salt: null,
+    myCommit: null,
+    // бій
+    phase: "idle",
+    // idle | place | battle | over
+    myFleet: null,
+    myView: null,
+    enemy: null,
+    enemyView: null,
+    enemySunk: [],
+    myTurn: false,
+    busy: false,
+    aim: null,
+    paused: false,
+    pausedByMe: false,
+    outSeq: 0,
+    inSeq: 0,
+    resultLog: [],
+    suspicious: null,
+    revealed: null,
+    pendingReveal: null,
+    shots: 0,
+    hits: 0,
+    t0: 0,
+    t1: 0,
+    outcome: null,
+    botTimer: null,
+    resultTimer: null,
+    rematchMe: false,
+    rematchThem: false,
+    peerGone: false
+  };
+  function show(screen) {
+    document.querySelectorAll(".screen").forEach((s) => s.classList.toggle("is-active", s.id === "screen-" + screen));
+    S.screen = screen;
+    updateChatAccess();
+    window.scrollTo({ top: 0, behavior: "instant" in window ? "instant" : "auto" });
+  }
+  function buildBoard(el, { interactive = false } = {}) {
+    el.replaceChildren();
+    el.append(h("div", { class: "lab", "aria-hidden": "true" }));
+    for (let c = 0; c < N; c++) el.append(h("div", { class: "lab", "aria-hidden": "true", text: String.fromCharCode(65 + c) }));
+    const cells = [];
+    for (let r = 0; r < N; r++) {
+      el.append(h("div", { class: "lab", "aria-hidden": "true", text: String(r + 1) }));
+      for (let c = 0; c < N; c++) {
+        const i = key(r, c);
+        let base = "cell";
+        if (i === 0) base += " corner-tl";
+        else if (i === 9) base += " corner-tr";
+        else if (i === 90) base += " corner-bl";
+        else if (i === 99) base += " corner-br";
+        const cell = h("div", { class: base, "data-i": i, role: interactive ? "button" : null, tabindex: interactive ? i === 0 ? "0" : "-1" : null, "aria-label": coordName(r, c) });
+        cell._base = base;
+        cells.push(cell);
+        el.append(cell);
+      }
+    }
+    el._cells = cells;
+    return cells;
+  }
+  function hullClasses(ships, extra) {
+    const m = /* @__PURE__ */ new Map();
+    for (const s of ships) {
+      const o = orientOf(s.cells) === "V" ? "o-v" : "o-h";
+      s.cells.forEach((p, i) => {
+        const seg = s.cells.length === 1 ? "s-1" : i === 0 ? "s-s" : i === s.cells.length - 1 ? "s-e" : "s-m";
+        m.set(key(p.r, p.c), `${extra} ${o} ${seg}`);
+      });
+    }
+    return m;
+  }
+  var cellIndex = (ev) => {
+    const c = ev.target.closest?.(".cell");
+    return c ? +c.dataset.i : -1;
+  };
+  var placeBoard = $("place-board");
+  buildBoard(placeBoard);
+  var lastPointer = "mouse";
+  function remainingOfType(type) {
+    return fleetList(S.rules).filter((s) => s.type === type && !S.ships.some((p) => p.id === s.id));
+  }
+  function nextShip() {
+    return S.sel ? remainingOfType(S.sel)[0] || null : null;
+  }
+  function autoSelect() {
+    if (S.sel && remainingOfType(S.sel).length) return;
+    const t = S.rules.fleet.find((t2) => remainingOfType(t2.type).length);
+    S.sel = t ? t.type : null;
+  }
+  function ghostCells() {
+    const ship = nextShip();
+    if (!ship || !S.ghost) return null;
+    let { r, c } = S.ghost;
+    if (S.orient === "H") c = Math.min(c, N - ship.size);
+    else r = Math.min(r, N - ship.size);
+    return shipCells(r, c, ship.size, S.orient);
+  }
+  function goPlacement() {
+    clearTimeout(S.botTimer);
+    clearTimeout(S.resultTimer);
+    Object.assign(S, {
+      phase: "place",
+      ready: false,
+      oppReady: false,
+      oppCommit: null,
+      salt: null,
+      myCommit: null,
+      ghost: null,
+      pending: false,
+      myTurn: false,
+      busy: false,
+      paused: false,
+      over: false,
+      outcome: null,
+      revealed: null,
+      pendingReveal: null,
+      suspicious: null,
+      rematchMe: false,
+      rematchThem: false,
+      resultLog: [],
+      outSeq: 0,
+      inSeq: 0,
+      enemySunk: []
+    });
+    S.ships = S.lastShips && S.lastShips.length === fleetCount(S.rules) ? S.lastShips.map((s) => ({ ...s, cells: s.cells.map((p) => ({ ...p })) })) : [];
+    S.sel = null;
+    autoSelect();
+    closeDialogs();
+    $("after-bar").hidden = true;
+    $("place-mode").textContent = S.mode === "bot" ? `\u041F\u0440\u043E\u0442\u0438 \u0428\u0406 \xB7 ${LEVEL_NAME[S.level]} \xB7 ${S.rules.title}` : `\u041E\u043D\u043B\u0430\u0439\u043D \xB7 ${S.rules.title} \u043F\u0440\u0430\u0432\u0438\u043B\u0430`;
+    $("btn-ready").hidden = false;
+    setPlaceStatus(S.mode === "online" ? "\u0421\u0443\u043F\u0435\u0440\u043D\u0438\u043A \u0440\u043E\u0437\u0441\u0442\u0430\u0432\u043B\u044F\u0454 \u0444\u043B\u043E\u0442\u2026" : "", S.mode === "online" ? "wait" : "");
+    show("place");
+    renderDock();
+    renderPlace();
+    placeHint();
+  }
+  function renderDock() {
+    const dock = $("dock");
+    dock.replaceChildren();
+    for (const t of S.rules.fleet) {
+      const left = remainingOfType(t.type).length;
+      const btn = h(
+        "button",
+        {
+          class: "ship-pick",
+          type: "button",
+          role: "radio",
+          "aria-checked": String(S.sel === t.type),
+          disabled: left === 0 || S.ready,
+          "aria-label": `${t.name}, ${t.size} \u043A\u043B., \u0437\u0430\u043B\u0438\u0448\u0438\u043B\u043E\u0441\u044C ${left}`,
+          "data-type": t.type
+        },
+        h("span", { class: "nm", text: t.name }),
+        h("span", { class: "hull-mini" }, Array.from({ length: t.size }, () => h("i"))),
+        t.count > 1 ? h("span", { class: "cnt", text: "\xD7" + left }) : null
+      );
+      dock.append(btn);
+    }
+  }
+  $("dock").addEventListener("click", (e) => {
+    const b2 = e.target.closest(".ship-pick");
+    if (!b2 || b2.disabled || S.ready) return;
+    S.sel = b2.dataset.type;
+    S.pending = false;
+    if (!finePointer.matches) S.ghost = null;
+    play("tap");
+    renderDock();
+    renderPlace();
+    placeHint();
+  });
+  function renderPlace() {
+    const cells = placeBoard._cells;
+    const hull = hullClasses(S.ships, "ship");
+    const g = S.ready ? null : ghostCells();
+    const ok = g && canPlace(S.ships, g, S.rules);
+    const gm = g ? hullClasses([{ cells: g }], "ghost" + (ok ? "" : " bad") + (S.pending ? " pending" : "")) : /* @__PURE__ */ new Map();
+    for (let i = 0; i < 100; i++) cells[i].className = cells[i]._base + " " + (gm.get(i) || hull.get(i) || "");
+    $("confirm-bar").hidden = !(S.pending && g);
+    $("btn-place-ok").disabled = !ok;
+    $("btn-ready").disabled = S.ready || S.ships.length !== fleetCount(S.rules);
+    $("orient-label").textContent = S.orient === "H" ? "\u0413\u043E\u0440\u0438\u0437\u043E\u043D\u0442\u0430\u043B\u044C\u043D\u043E" : "\u0412\u0435\u0440\u0442\u0438\u043A\u0430\u043B\u044C\u043D\u043E";
+    $("btn-random").disabled = $("btn-clear").disabled = $("btn-rotate").disabled = S.ready;
+  }
+  function placeHint(text, kind = "") {
+    const el = $("place-hint");
+    if (!text) {
+      const total = fleetCount(S.rules), done = S.ships.length;
+      if (S.ready) text = S.mode === "online" ? "\u0424\u043B\u043E\u0442 \u0433\u043E\u0442\u043E\u0432\u0438\u0439. \u0427\u0435\u043A\u0430\u0454\u043C\u043E \u043D\u0430 \u0441\u0443\u043F\u0435\u0440\u043D\u0438\u043A\u0430\u2026" : "\u0424\u043B\u043E\u0442 \u0433\u043E\u0442\u043E\u0432\u0438\u0439!";
+      else if (done === total) {
+        text = "\u0423\u0441\u0456 \u043A\u043E\u0440\u0430\u0431\u043B\u0456 \u043D\u0430 \u043F\u043E\u0437\u0438\u0446\u0456\u044F\u0445. \u0422\u0438\u0441\u043D\u0438 \xAB\u0414\u043E \u0431\u043E\u044E\xBB!";
+        kind = "ok";
+      } else if (S.pending) text = "\u0422\u043E\u0440\u043A\u043D\u0438\u0441\u044C \u043A\u043E\u0440\u0430\u0431\u043B\u044F \u0449\u0435 \u0440\u0430\u0437 \u0430\u0431\u043E \xAB\u041F\u043E\u0441\u0442\u0430\u0432\u0438\u0442\u0438\xBB. \u0406\u043D\u0448\u0430 \u043A\u043B\u0456\u0442\u0438\u043D\u043A\u0430 \u2014 \u043F\u0435\u0440\u0435\u043C\u0456\u0441\u0442\u0438\u0442\u0438.";
+      else {
+        const ship = nextShip();
+        text = (finePointer.matches ? "\u041A\u043B\u0456\u043A\u043D\u0438 \u043D\u0430 \u043F\u043E\u043B\u0435, \u0449\u043E\u0431 \u043F\u043E\u0441\u0442\u0430\u0432\u0438\u0442\u0438: " : "\u0422\u043E\u0440\u043A\u043D\u0438\u0441\u044C \u043F\u043E\u043B\u044F, \u0449\u043E\u0431 \u043F\u043E\u0441\u0442\u0430\u0432\u0438\u0442\u0438: ") + (ship ? `${ship.name} (${ship.size})` : "") + `. ${S.rules.touch ? "\u041A\u043E\u0440\u0430\u0431\u043B\u0456 \u043C\u043E\u0436\u0443\u0442\u044C \u0442\u043E\u0440\u043A\u0430\u0442\u0438\u0441\u044F." : "\u041A\u043E\u0440\u0430\u0431\u043B\u0456 \u043D\u0435 \u043C\u043E\u0436\u0443\u0442\u044C \u0442\u043E\u0440\u043A\u0430\u0442\u0438\u0441\u044F \u043D\u0430\u0432\u0456\u0442\u044C \u043A\u0443\u0442\u0430\u043C\u0438."} \u0413\u043E\u0442\u043E\u0432\u0438\u0439 \u043A\u043E\u0440\u0430\u0431\u0435\u043B\u044C \u043C\u043E\u0436\u043D\u0430 \u0432\u0437\u044F\u0442\u0438 \u0439 \u043F\u0435\u0440\u0435\u0441\u0442\u0430\u0432\u0438\u0442\u0438.`;
+      }
+    }
+    el.textContent = text;
+    el.className = "hint " + kind;
+  }
+  function setPlaceStatus(text, kind = "") {
+    const el = $("place-status");
+    el.textContent = text;
+    el.className = "status " + kind;
+  }
+  function placeAt(cells) {
+    const ship = nextShip();
+    if (!ship || !cells) return false;
+    if (!canPlace(S.ships, cells, S.rules)) {
+      play("error");
+      placeHint(S.rules.touch ? "\u0422\u0443\u0442 \u043D\u0435 \u043F\u043E\u043C\u0456\u0441\u0442\u0438\u0442\u044C\u0441\u044F \u2014 \u043A\u043B\u0456\u0442\u0438\u043D\u043A\u0438 \u0437\u0430\u0439\u043D\u044F\u0442\u0456." : "\u0417\u0430\u043D\u0430\u0434\u0442\u043E \u0431\u043B\u0438\u0437\u044C\u043A\u043E \u0434\u043E \u0456\u043D\u0448\u043E\u0433\u043E \u043A\u043E\u0440\u0430\u0431\u043B\u044F. \u0417\u0430\u043B\u0438\u0448 \u043F\u043E\u0440\u043E\u0436\u043D\u044E \u043A\u043B\u0456\u0442\u0438\u043D\u043A\u0443.", "warn");
+      return false;
+    }
+    S.ships.push({ ...ship, cells });
+    S.ghost = finePointer.matches && lastPointer === "mouse" ? S.ghost : null;
+    S.pending = false;
+    autoSelect();
+    play("place");
+    renderDock();
+    renderPlace();
+    placeHint();
+    return true;
+  }
+  function pickUp(i) {
+    const r = Math.floor(i / N), c = i % N;
+    const idx = S.ships.findIndex((s2) => s2.cells.some((p) => p.r === r && p.c === c));
+    if (idx < 0) return false;
+    const [s] = S.ships.splice(idx, 1);
+    S.sel = s.type;
+    S.orient = orientOf(s.cells);
+    S.ghost = { ...s.cells[0] };
+    S.pending = lastPointer !== "mouse";
+    play("rotate");
+    renderDock();
+    renderPlace();
+    placeHint(lastPointer === "mouse" ? `${s.name} \u0443 \u0440\u0443\u0446\u0456 \u2014 \u043E\u0431\u0435\u0440\u0456\u0442\u044C \u043D\u043E\u0432\u0435 \u043C\u0456\u0441\u0446\u0435.` : void 0);
+    return true;
+  }
+  placeBoard.addEventListener("pointerdown", (e) => {
+    lastPointer = e.pointerType || "mouse";
+    unlockAudio();
+  });
+  placeBoard.addEventListener("pointermove", (e) => {
+    if (e.pointerType !== "mouse" || S.ready || S.pending) return;
+    const i = cellIndex(e);
+    if (i < 0) return;
+    const g = { r: Math.floor(i / N), c: i % N };
+    if (!S.ghost || S.ghost.r !== g.r || S.ghost.c !== g.c) {
+      S.ghost = g;
+      renderPlace();
+    }
+  });
+  placeBoard.addEventListener("pointerleave", (e) => {
+    if (e.pointerType === "mouse" && !S.pending && S.ghost) {
+      S.ghost = null;
+      renderPlace();
+    }
+  });
+  placeBoard.addEventListener("click", (e) => {
+    if (S.ready || S.phase !== "place") return;
+    const i = cellIndex(e);
+    if (i < 0) return;
+    const r = Math.floor(i / N), c = i % N;
+    const g = ghostCells();
+    if (lastPointer === "mouse") {
+      if (!nextShip() || S.ships.some((s) => s.cells.some((p) => p.r === r && p.c === c)) && !(g && canPlace(S.ships, g, S.rules))) {
+        pickUp(i);
+        return;
+      }
+      S.ghost = { r, c };
+      placeAt(ghostCells());
+      return;
+    }
+    if (S.pending && g && g.some((p) => p.r === r && p.c === c)) {
+      placeAt(g);
+      return;
+    }
+    if (!S.pending && S.ships.some((s) => s.cells.some((p) => p.r === r && p.c === c))) {
+      pickUp(i);
+      return;
+    }
+    if (!nextShip()) {
+      placeHint("\u0423\u0441\u0456 \u043A\u043E\u0440\u0430\u0431\u043B\u0456 \u0432\u0436\u0435 \u043D\u0430 \u043F\u043E\u043B\u0456. \u0422\u043E\u0440\u043A\u043D\u0438\u0441\u044C \u043A\u043E\u0440\u0430\u0431\u043B\u044F, \u0449\u043E\u0431 \u043F\u0435\u0440\u0435\u0441\u0442\u0430\u0432\u0438\u0442\u0438.");
+      return;
+    }
+    S.ghost = { r, c };
+    S.pending = true;
+    play("tap");
+    renderPlace();
+    placeHint();
+  });
+  placeBoard.tabIndex = 0;
+  placeBoard.addEventListener("keydown", (e) => {
+    if (S.ready) return;
+    const moves = { ArrowUp: [-1, 0], ArrowDown: [1, 0], ArrowLeft: [0, -1], ArrowRight: [0, 1] };
+    if (moves[e.key]) {
+      e.preventDefault();
+      lastPointer = "keyboard";
+      const g = S.ghost || S.cursor;
+      S.ghost = { r: Math.max(0, Math.min(N - 1, g.r + moves[e.key][0])), c: Math.max(0, Math.min(N - 1, g.c + moves[e.key][1])) };
+      S.cursor = S.ghost;
+      S.pending = false;
+      renderPlace();
+    } else if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      if (!S.ghost) {
+        S.ghost = { ...S.cursor };
+        renderPlace();
+      } else placeAt(ghostCells());
+    }
+  });
+  function rotate() {
+    if (S.ready || S.phase !== "place") return;
+    S.orient = S.orient === "H" ? "V" : "H";
+    play("rotate");
+    renderPlace();
+  }
+  $("btn-rotate").addEventListener("click", rotate);
+  $("btn-random").addEventListener("click", () => {
+    if (S.ready) return;
+    S.ships = randomFleet(S.rules);
+    S.ghost = null;
+    S.pending = false;
+    S.sel = null;
+    play("place");
+    renderDock();
+    renderPlace();
+    placeHint("\u0424\u043B\u043E\u0442 \u0440\u043E\u0437\u0441\u0442\u0430\u0432\u043B\u0435\u043D\u043E \u0432\u0438\u043F\u0430\u0434\u043A\u043E\u0432\u043E. \u041C\u043E\u0436\u043D\u0430 \u043F\u0435\u0440\u0435\u0441\u0442\u0430\u0432\u0438\u0442\u0438 \u0431\u0443\u0434\u044C-\u044F\u043A\u0438\u0439 \u043A\u043E\u0440\u0430\u0431\u0435\u043B\u044C.", "ok");
+  });
+  $("btn-clear").addEventListener("click", () => {
+    if (S.ready) return;
+    S.ships = [];
+    S.ghost = null;
+    S.pending = false;
+    S.sel = null;
+    autoSelect();
+    play("tap");
+    renderDock();
+    renderPlace();
+    placeHint();
+  });
+  $("btn-place-ok").addEventListener("click", () => placeAt(ghostCells()));
+  $("btn-place-cancel").addEventListener("click", () => {
+    S.ghost = null;
+    S.pending = false;
+    play("tap");
+    renderPlace();
+    placeHint();
+  });
+  $("btn-ready").addEventListener("click", onReady);
+  $("btn-place-back").addEventListener("click", async () => {
+    if (S.mode === "online" && S.link?.open && !await confirmDlg("\u0412\u0438\u0439\u0442\u0438 \u0437 \u043A\u0456\u043C\u043D\u0430\u0442\u0438?", "\u0417\u2019\u0454\u0434\u043D\u0430\u043D\u043D\u044F \u0456\u0437 \u0441\u0443\u043F\u0435\u0440\u043D\u0438\u043A\u043E\u043C \u0431\u0443\u0434\u0435 \u0440\u043E\u0437\u0456\u0440\u0432\u0430\u043D\u043E.", "\u0412\u0438\u0439\u0442\u0438")) return;
+    goHome();
+  });
+  async function onReady() {
+    if (S.ready || S.ships.length !== fleetCount(S.rules)) return;
+    S.ready = true;
+    S.ghost = null;
+    S.pending = false;
+    S.lastShips = S.ships.map((s) => ({ ...s, cells: s.cells.map((p) => ({ ...p })) }));
+    play("tap");
+    renderDock();
+    renderPlace();
+    placeHint();
+    if (S.mode === "bot") {
+      startBattle(Math.random() < 0.5);
+      return;
+    }
+    S.salt = randomHex(16);
+    S.myCommit = await sha256hex(commitString(S.salt, S.ships));
+    send({ t: "ready", commit: S.myCommit });
+    setPlaceStatus(S.oppReady ? "\u041E\u0431\u0438\u0434\u0432\u0430 \u0433\u043E\u0442\u043E\u0432\u0456!" : "\u0427\u0435\u043A\u0430\u0454\u043C\u043E, \u043F\u043E\u043A\u0438 \u0441\u0443\u043F\u0435\u0440\u043D\u0438\u043A \u0440\u043E\u0437\u0441\u0442\u0430\u0432\u0438\u0442\u044C \u0444\u043B\u043E\u0442\u2026", "wait");
+    maybeStart();
+  }
+  function maybeStart() {
+    if (S.mode !== "online" || S.phase !== "place" || !S.ready || !S.oppReady || S.role !== "host") return;
+    const first = Math.random() < 0.5 ? "host" : "guest";
+    send({ t: "start", first });
+    startBattle(first === "host");
+  }
+  var enemyBoard = $("enemy-board");
+  var myBoard = $("my-board");
+  buildBoard(enemyBoard, { interactive: true });
+  buildBoard(myBoard);
+  function startBattle(meFirst) {
+    S.phase = "battle";
+    S.over = false;
+    S.myFleet = new Fleet(S.rules, S.ships);
+    S.myView = new Int8Array(100);
+    S.enemyView = new Int8Array(100);
+    S.enemySunk = [];
+    S.autoEnemy = /* @__PURE__ */ new Set();
+    S.revealed = null;
+    S.enemy = S.mode === "bot" ? new Fleet(S.rules, randomFleet(S.rules)) : null;
+    S.myTurn = meFirst;
+    S.busy = false;
+    S.paused = false;
+    S.aim = null;
+    S.shots = 0;
+    S.hits = 0;
+    S.t0 = Date.now();
+    S.t1 = 0;
+    S.outSeq = 0;
+    S.inSeq = 0;
+    S.resultLog = [];
+    $("enemy-label").textContent = S.mode === "bot" ? `\u0428\u0406 \xB7 ${LEVEL_NAME[S.level]}` : "\u0421\u0443\u043F\u0435\u0440\u043D\u0438\u043A";
+    $("btn-pause").hidden = false;
+    $("btn-surrender").hidden = false;
+    $("after-bar").hidden = true;
+    show("game");
+    renderBattle();
+    setMsg(meFirst ? "\u0412\u0438 \u0441\u0442\u0440\u0456\u043B\u044F\u0454\u0442\u0435 \u043F\u0435\u0440\u0448\u0438\u043C. \u041E\u0431\u0435\u0440\u0456\u0442\u044C \u043A\u043B\u0456\u0442\u0438\u043D\u043A\u0443 \u043D\u0430 \u043F\u043E\u043B\u0456 \u0441\u0443\u043F\u0435\u0440\u043D\u0438\u043A\u0430." : S.mode === "bot" ? "\u0428\u0406 \u0441\u0442\u0440\u0456\u043B\u044F\u0454 \u043F\u0435\u0440\u0448\u0438\u043C\u2026" : "\u0421\u0443\u043F\u0435\u0440\u043D\u0438\u043A \u0441\u0442\u0440\u0456\u043B\u044F\u0454 \u043F\u0435\u0440\u0448\u0438\u043C\u2026", meFirst ? "good" : "warn");
+    toast(meFirst ? "\u0416\u0435\u0440\u0435\u0431: \u0432\u0438 \u043F\u043E\u0447\u0438\u043D\u0430\u0454\u0442\u0435!" : "\u0416\u0435\u0440\u0435\u0431: \u043F\u0435\u0440\u0448\u0438\u043C \u0445\u043E\u0434\u0438\u0442\u044C \u0441\u0443\u043F\u0435\u0440\u043D\u0438\u043A", meFirst ? "good" : "");
+    wakeLock(true);
+    if (meFirst) focusEnemy();
+    else if (S.mode === "bot") botTurn();
+  }
+  function setMsg(text, kind = "") {
+    const m = $("game-msg");
+    m.textContent = text;
+    m.className = "game-msg " + kind;
+  }
+  function renderPips(el, list, deadIds) {
+    el.replaceChildren(...list.map((s) => h("span", { class: "pip" + (deadIds.has(s.id) ? " dead" : ""), title: s.name }, Array.from({ length: s.size }, () => h("i")))));
+  }
+  function enemyDeadIds() {
+    const dead = /* @__PURE__ */ new Set(), list = fleetList(S.rules);
+    for (const s of S.enemySunk) {
+      const m = list.find((x) => x.size === s.cells.length && (!s.type || x.type === s.type) && !dead.has(x.id)) || list.find((x) => x.size === s.cells.length && !dead.has(x.id));
+      if (m) dead.add(m.id);
+    }
+    return dead;
+  }
+  function renderBattle(fresh = {}) {
+    const list = fleetList(S.rules), total = list.length;
+    const mine = hullClasses(S.myFleet.ships, "ship");
+    const mySunk = hullClasses(S.myFleet.ships.filter((s) => s.sunk), "sunk");
+    const mc = myBoard._cells;
+    for (let i = 0; i < 100; i++) {
+      const v = S.myView[i];
+      let cls = mc[i]._base + " " + (mySunk.get(i) || mine.get(i) || "");
+      if (v === HIT) cls += " hit";
+      else if (v === MISS) cls += " miss" + (S.myFleet.shots[i] ? "" : " auto");
+      if (fresh.mine === i) cls += " fresh last";
+      mc[i].className = cls;
+    }
+    const sunkMap = hullClasses(S.enemySunk, "sunk");
+    const revealMap = S.revealed ? hullClasses(S.revealed, "reveal") : /* @__PURE__ */ new Map();
+    const ec = enemyBoard._cells;
+    for (let i = 0; i < 100; i++) {
+      const v = S.enemyView[i];
+      let cls = ec[i]._base + " " + (sunkMap.get(i) || revealMap.get(i) || "");
+      let label = coordName(Math.floor(i / N), i % N);
+      if (v === HIT) {
+        cls += " hit";
+        label += ", \u0432\u043B\u0443\u0447\u0430\u043D\u043D\u044F";
+      } else if (v === SUNK) {
+        label += ", \u043F\u043E\u0442\u043E\u043F\u043B\u0435\u043D\u043E";
+      } else if (v === MISS) {
+        cls += " miss" + (fresh.auto?.has(i) || S.autoEnemy?.has(i) ? " auto" : "");
+        label += ", \u043F\u0440\u043E\u043C\u0430\u0445";
+      }
+      if (fresh.enemy === i) cls += " fresh last";
+      if (S.aim === i) cls += " aim";
+      ec[i].className = cls;
+      ec[i].setAttribute("aria-label", label);
+    }
+    const myAlive = S.myFleet.alive, enemyAlive = total - S.enemySunk.length;
+    renderPips($("pips-me"), [...S.myFleet.ships].sort((a, b2) => b2.size - a.size), new Set(S.myFleet.ships.filter((s) => s.sunk).map((s) => s.id)));
+    renderPips($("pips-enemy"), list, enemyDeadIds());
+    $("me-count").textContent = `${myAlive}/${total}`;
+    $("enemy-count").textContent = `${enemyAlive}/${total}`;
+    $("hud-me-n").textContent = `${myAlive}/${total}`;
+    $("hud-enemy-n").textContent = `${enemyAlive}/${total}`;
+    renderTurn();
+  }
+  function renderTurn() {
+    const t = $("turn"), txt = $("turn-text");
+    const mine = S.phase === "battle" && S.myTurn && !S.paused;
+    const theirs = S.phase === "battle" && !S.myTurn && !S.paused;
+    t.className = "turn " + (mine ? "" : theirs ? "theirs" : "idle");
+    txt.textContent = S.phase === "over" ? S.outcome === "win" ? "\u041F\u0435\u0440\u0435\u043C\u043E\u0433\u0430" : "\u041F\u043E\u0440\u0430\u0437\u043A\u0430" : S.paused ? "\u041F\u0430\u0443\u0437\u0430" : mine ? "\u0412\u0430\u0448 \u0445\u0456\u0434" : S.mode === "bot" ? "\u0428\u0406 \u0446\u0456\u043B\u0438\u0442\u044C\u0441\u044F" : "\u0425\u0456\u0434 \u0441\u0443\u043F\u0435\u0440\u043D\u0438\u043A\u0430";
+    $("enemy-card").classList.toggle("active", mine);
+    $("me-card").classList.toggle("active", theirs);
+    $("enemy-card").classList.toggle("dim", theirs);
+    $("enemy-card").classList.toggle("focus", !theirs);
+    $("me-card").classList.toggle("focus", theirs);
+    enemyBoard.classList.toggle("locked", !mine || S.busy);
+  }
+  function canFire() {
+    return S.phase === "battle" && S.myTurn && !S.busy && !S.paused;
+  }
+  async function fire(i) {
+    if (!canFire()) {
+      if (S.phase === "battle" && !S.myTurn && !S.paused) toast("\u0417\u0430\u0440\u0430\u0437 \u0445\u0456\u0434 \u0441\u0443\u043F\u0435\u0440\u043D\u0438\u043A\u0430");
+      return;
+    }
+    if (S.enemyView[i] !== UNKNOWN) {
+      play("error");
+      return;
+    }
+    const r = Math.floor(i / N), c = i % N;
+    S.busy = true;
+    S.aim = i;
+    S.shots++;
+    play("shot");
+    renderBattle();
+    setMsg(`\u0417\u0430\u043B\u043F \u043F\u043E ${coordName(r, c)}\u2026`, "warn");
+    if (S.mode === "bot") {
+      await sleep(reduceMotion.matches ? 80 : 420);
+      if (S.phase !== "battle") return;
+      onResult(S.enemy.receive(r, c));
+    } else {
+      S.pendingShot = { r, c, n: ++S.outSeq };
+      send({ t: "shot", r, c, n: S.outSeq });
+      clearTimeout(S.resultTimer);
+      S.resultTimer = setTimeout(() => {
+        if (S.busy && S.phase === "battle") setMsg("\u0421\u0443\u043F\u0435\u0440\u043D\u0438\u043A \u043D\u0435 \u0432\u0456\u0434\u043F\u043E\u0432\u0456\u0434\u0430\u0454\u2026 \u041F\u0435\u0440\u0435\u0432\u0456\u0440\u044F\u0454\u043C\u043E \u0437\u2019\u0454\u0434\u043D\u0430\u043D\u043D\u044F.", "warn");
+      }, 12e3);
+    }
+  }
+  enemyBoard.addEventListener("click", (e) => {
+    unlockAudio();
+    const i = cellIndex(e);
+    if (i >= 0) fire(i);
+  });
+  enemyBoard.addEventListener("keydown", (e) => {
+    const i = cellIndex(e);
+    if (i < 0) return;
+    const moves = { ArrowUp: -N, ArrowDown: N, ArrowLeft: -1, ArrowRight: 1 };
+    if (moves[e.key] != null) {
+      e.preventDefault();
+      let j = i + moves[e.key];
+      if (e.key === "ArrowLeft" && i % N === 0 || e.key === "ArrowRight" && i % N === N - 1 || j < 0 || j >= 100) j = i;
+      focusEnemy(j);
+    } else if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      fire(i);
+    }
+  });
+  function focusEnemy(j) {
+    const cells = enemyBoard._cells;
+    const kb = enemyBoard.contains(document.activeElement);
+    if (j == null) {
+      j = cells.findIndex((c) => c.tabIndex === 0);
+      if (j < 0) j = 0;
+    }
+    cells.forEach((c, k) => {
+      c.tabIndex = k === j ? 0 : -1;
+    });
+    if (kb || finePointer.matches && S.screen === "game") cells[j].focus({ preventScroll: true });
+  }
+  function onResult(res) {
+    clearTimeout(S.resultTimer);
+    S.busy = false;
+    S.aim = null;
+    S.pendingShot = null;
+    const auto = applyResult(S.enemyView, res, S.rules.touch);
+    S.autoEnemy = S.autoEnemy || /* @__PURE__ */ new Set();
+    if (S.mode === "online") S.resultLog.push({ r: res.r, c: res.c, hit: res.hit, sunk: res.sunk });
+    const i = key(res.r, res.c);
+    if (res.hit) {
+      S.hits++;
+      if (res.sunk) {
+        S.enemySunk.push({ type: res.type, cells: res.cells.map(([r, c]) => ({ r, c })) });
+        auto.forEach((p) => S.autoEnemy.add(key(p.r, p.c)));
+        const name = S.rules.fleet.find((t) => t.type === res.type)?.name || "\u041A\u043E\u0440\u0430\u0431\u0435\u043B\u044C";
+        play("sink");
+        shake();
+        setMsg(`${name} \u0441\u0443\u043F\u0435\u0440\u043D\u0438\u043A\u0430 \u043F\u043E\u0442\u043E\u043F\u043B\u0435\u043D\u043E! \u0421\u0442\u0440\u0456\u043B\u044F\u0439\u0442\u0435 \u0449\u0435.`, "good");
+        toast(`\u041F\u043E\u0442\u043E\u043F\u043B\u0435\u043D\u043E: ${name}`, "good");
+      } else {
+        play("hit");
+        shake(true);
+        setMsg(`\u0412\u043B\u0443\u0447\u0430\u043D\u043D\u044F \u0432 ${coordName(res.r, res.c)}! \u0429\u0435 \u043E\u0434\u0438\u043D \u043F\u043E\u0441\u0442\u0440\u0456\u043B.`, "good");
+      }
+    } else {
+      play("miss");
+      S.myTurn = false;
+      setMsg(`\u041F\u0440\u043E\u043C\u0430\u0445 \u0443 ${coordName(res.r, res.c)}. ${S.mode === "bot" ? "\u0428\u0406 \u0446\u0456\u043B\u0438\u0442\u044C\u0441\u044F\u2026" : "\u0425\u0456\u0434 \u0441\u0443\u043F\u0435\u0440\u043D\u0438\u043A\u0430."}`);
+    }
+    renderBattle({ enemy: i, auto: new Set(auto.map((p) => key(p.r, p.c))) });
+    if (S.enemySunk.length === fleetCount(S.rules)) {
+      finish("win");
+      return;
+    }
+    if (S.myTurn) focusEnemy(i);
+    else if (S.mode === "bot") botTurn();
+  }
+  function receiveShot(r, c) {
+    const res = S.myFleet.receive(r, c);
+    if (!res) return null;
+    applyResult(S.myView, res, S.rules.touch);
+    if (res.hit) {
+      if (res.sunk) {
+        play("sink");
+        shake();
+        setMsg(`\u0412\u0430\u0448 ${S.rules.fleet.find((t) => t.type === res.type)?.name.toLowerCase() || "\u043A\u043E\u0440\u0430\u0431\u0435\u043B\u044C"} \u043F\u043E\u0442\u043E\u043F\u043B\u0435\u043D\u043E \u0432 ${coordName(r, c)}!`, "bad");
+      } else {
+        play("hit");
+        shake(true);
+        setMsg(`\u0412\u043B\u0443\u0447\u0430\u043D\u043D\u044F \u043F\u043E \u0432\u0430\u0448\u043E\u043C\u0443 \u043A\u043E\u0440\u0430\u0431\u043B\u044E \u0432 ${coordName(r, c)}!`, "bad");
+      }
+    } else {
+      play("miss");
+      S.myTurn = true;
+      setMsg(`\u0421\u0443\u043F\u0435\u0440\u043D\u0438\u043A \u043F\u0440\u043E\u043C\u0430\u0445\u043D\u0443\u0432\u0441\u044F (${coordName(r, c)}). \u0412\u0430\u0448 \u0445\u0456\u0434!`, "good");
+    }
+    renderBattle({ mine: key(r, c) });
+    if (res.over) finish("lose");
+    else if (S.myTurn) focusEnemy();
+    return res;
+  }
+  function botTurn() {
+    clearTimeout(S.botTimer);
+    if (S.mode !== "bot" || S.phase !== "battle" || S.myTurn || S.paused) return;
+    const delay = reduceMotion.matches ? 250 : S.level === "easy" ? 900 : 650 + Math.random() * 450;
+    S.botTimer = setTimeout(() => {
+      if (S.phase !== "battle" || S.myTurn || S.paused) return;
+      const sizes = S.myFleet.ships.filter((s) => !s.sunk).map((s) => s.size);
+      const t = chooseShot(S.myView, sizes, { level: S.level, touch: S.rules.touch });
+      if (!t) return;
+      receiveShot(t.r, t.c);
+      if (S.phase === "battle" && !S.myTurn) botTurn();
+    }, delay);
+  }
+  function shake(light) {
+    if (reduceMotion.matches) return;
+    const app = $("app");
+    app.classList.remove("shake");
+    void app.offsetWidth;
+    if (!light) app.classList.add("shake");
+  }
+  function pause(byMe = true, auto = false) {
+    if (S.phase !== "battle" || S.paused) return;
+    if (byMe && S.busy) {
+      toast("\u0414\u043E\u0447\u0435\u043A\u0430\u0439\u0442\u0435\u0441\u044F \u0440\u0435\u0437\u0443\u043B\u044C\u0442\u0430\u0442\u0443 \u043F\u043E\u0441\u0442\u0440\u0456\u043B\u0443");
+      return;
+    }
+    S.paused = true;
+    S.pausedByMe = byMe;
+    clearTimeout(S.botTimer);
+    if (byMe && S.mode === "online") send({ t: "pause" });
+    $("pause-text").textContent = byMe ? auto ? "\u0413\u0440\u0443 \u043F\u043E\u0441\u0442\u0430\u0432\u043B\u0435\u043D\u043E \u043D\u0430 \u043F\u0430\u0443\u0437\u0443, \u043F\u043E\u043A\u0438 \u0432\u043A\u043B\u0430\u0434\u043A\u0430 \u0431\u0443\u043B\u0430 \u043F\u0440\u0438\u0445\u043E\u0432\u0430\u043D\u0430." : "\u0413\u0440\u0443 \u043F\u0440\u0438\u0437\u0443\u043F\u0438\u043D\u0435\u043D\u043E." : "\u0421\u0443\u043F\u0435\u0440\u043D\u0438\u043A \u043F\u043E\u0441\u0442\u0430\u0432\u0438\u0432 \u0433\u0440\u0443 \u043D\u0430 \u043F\u0430\u0443\u0437\u0443. \u041F\u0440\u043E\u0434\u043E\u0432\u0436\u0438\u0442\u0438 \u043C\u043E\u0436\u0435 \u043B\u0438\u0448\u0435 \u0432\u0456\u043D.";
+    $("btn-resume").hidden = !byMe;
+    openDialog("dlg-pause");
+    renderTurn();
+  }
+  function resume(byMe = true) {
+    if (!S.paused || byMe && !S.pausedByMe || !byMe && S.pausedByMe) return;
+    S.paused = false;
+    if (byMe && S.mode === "online") send({ t: "resume" });
+    closeDialog("dlg-pause");
+    renderTurn();
+    if (!byMe) toast("\u0413\u0440\u0443 \u043F\u0440\u043E\u0434\u043E\u0432\u0436\u0435\u043D\u043E");
+    if (S.mode === "bot" && !S.myTurn) botTurn();
+  }
+  $("btn-pause").addEventListener("click", () => pause(true));
+  $("btn-resume").addEventListener("click", () => resume(true));
+  $("btn-pause-home").addEventListener("click", async () => {
+    closeDialog("dlg-pause");
+    if (await confirmDlg("\u0412\u0438\u0439\u0442\u0438 \u0432 \u043C\u0435\u043D\u044E?", S.mode === "online" ? "\u0413\u0440\u0443 \u0431\u0443\u0434\u0435 \u0437\u0430\u0432\u0435\u0440\u0448\u0435\u043D\u043E, \u0430 \u0437\u2019\u0454\u0434\u043D\u0430\u043D\u043D\u044F \u2014 \u0440\u043E\u0437\u0456\u0440\u0432\u0430\u043D\u043E." : "\u041F\u043E\u0442\u043E\u0447\u043D\u0438\u0439 \u0431\u0456\u0439 \u0431\u0443\u0434\u0435 \u0432\u0442\u0440\u0430\u0447\u0435\u043D\u043E.", "\u0412\u0438\u0439\u0442\u0438")) goHome();
+    else if (S.paused) openDialog("dlg-pause");
+  });
+  $("dlg-pause").addEventListener("cancel", (e) => {
+    e.preventDefault();
+    if (S.pausedByMe) resume(true);
+  });
+  $("btn-surrender").addEventListener("click", async () => {
+    if (S.phase !== "battle") return;
+    if (!await confirmDlg("\u0417\u0434\u0430\u0442\u0438\u0441\u044F?", "\u041F\u043E\u0440\u0430\u0437\u043A\u0443 \u0431\u0443\u0434\u0435 \u0437\u0430\u0440\u0430\u0445\u043E\u0432\u0430\u043D\u043E \u0432 \u0441\u0442\u0430\u0442\u0438\u0441\u0442\u0438\u043A\u0443.", "\u0417\u0434\u0430\u0442\u0438\u0441\u044F")) return;
+    if (S.phase !== "battle") return;
+    if (S.mode === "online") send({ t: "surrender" });
+    finish("lose", "surrender");
+  });
+  function finish(outcome, reason = "") {
+    if (S.phase !== "battle") return;
+    S.phase = "over";
+    S.over = true;
+    S.outcome = outcome;
+    S.t1 = Date.now();
+    S.busy = false;
+    S.paused = false;
+    S.aim = null;
+    clearTimeout(S.botTimer);
+    clearTimeout(S.resultTimer);
+    closeDialog("dlg-pause");
+    wakeLock(false);
+    stats.shots += S.shots;
+    stats.hits += S.hits;
+    if (outcome === "win") {
+      stats.wins++;
+      stats.streak = Math.max(1, stats.streak + 1);
+    } else {
+      stats.losses++;
+      stats.streak = 0;
+    }
+    store.set("stats", stats);
+    if (S.mode === "bot") S.revealed = S.enemy.ships.filter((s) => !s.sunk);
+    if (S.mode === "online") {
+      send({ t: "reveal", salt: S.salt, fleet: fleetPayload(S.myFleet.ships) });
+      if (S.pendingReveal) {
+        const p = S.pendingReveal;
+        S.pendingReveal = null;
+        onReveal(p);
+      }
+    }
+    renderBattle();
+    setMsg(outcome === "win" ? "\u0412\u043E\u0440\u043E\u0436\u0438\u0439 \u0444\u043B\u043E\u0442 \u0437\u043D\u0438\u0449\u0435\u043D\u043E!" : "\u0412\u0430\u0448 \u0444\u043B\u043E\u0442 \u0437\u043D\u0438\u0449\u0435\u043D\u043E.", outcome === "win" ? "good" : "bad");
+    $("btn-pause").hidden = true;
+    $("btn-surrender").hidden = true;
+    play(outcome === "win" ? "win" : "lose");
+    const d = $("dlg-end");
+    d.className = "dialog end " + outcome;
+    $("end-title").textContent = outcome === "win" ? "\u041F\u0435\u0440\u0435\u043C\u043E\u0433\u0430!" : "\u041F\u043E\u0440\u0430\u0437\u043A\u0430";
+    $("end-text").textContent = reason === "surrender" ? outcome === "win" ? "\u0421\u0443\u043F\u0435\u0440\u043D\u0438\u043A \u0437\u0434\u0430\u0432\u0441\u044F. \u0424\u043B\u043E\u0442 \u0446\u0456\u043B\u0438\u0439 \u2014 \u0441\u043B\u0430\u0432\u0430 \u0444\u043B\u043E\u0442\u0443!" : "\u0412\u0438 \u0437\u0434\u0430\u043B\u0438\u0441\u044F. \u041D\u0430\u0441\u0442\u0443\u043F\u043D\u043E\u0433\u043E \u0440\u0430\u0437\u0443 \u0432\u0438\u0439\u0434\u0435!" : outcome === "win" ? `\u0412\u043E\u0440\u043E\u0436\u0438\u0439 \u0444\u043B\u043E\u0442 \u043F\u0456\u0448\u043E\u0432 \u043D\u0430 \u0434\u043D\u043E \u0437\u0430 ${S.shots} \u043F\u043E\u0441\u0442\u0440\u0456\u043B\u0456\u0432.` : "\u0412\u0430\u0448\u0456 \u043A\u043E\u0440\u0430\u0431\u043B\u0456 \u043F\u043E\u0442\u043E\u043F\u043B\u0435\u043D\u043E. \u0427\u0430\u0441 \u043D\u0430 \u0440\u0435\u0432\u0430\u043D\u0448!";
+    $("es-shots").textContent = S.shots;
+    $("es-hits").textContent = S.hits;
+    $("es-acc").textContent = S.shots ? Math.round(S.hits / S.shots * 100) + "%" : "\u2014";
+    $("es-time").textContent = fmtTime(S.t1 - S.t0);
+    $("after-text").textContent = outcome === "win" ? "\u041F\u0435\u0440\u0435\u043C\u043E\u0433\u0430!" : "\u041F\u043E\u0440\u0430\u0437\u043A\u0430";
+    renderFair();
+    updateRematchUI();
+    setTimeout(() => {
+      if (S.phase === "over" && S.screen === "game") openDialog("dlg-end");
+    }, reason === "surrender" ? 150 : 1100);
+  }
+  function renderFair() {
+    const f = $("end-fair");
+    if (S.mode !== "online") {
+      f.hidden = true;
+      return;
+    }
+    f.hidden = false;
+    f.replaceChildren();
+    if (S.suspicious) {
+      f.className = "fair bad";
+      f.append(icon("shield"), `\u041F\u0456\u0434\u043E\u0437\u0440\u0456\u043B\u043E: ${S.suspicious}`);
+    } else if (S.revealed) {
+      f.className = "fair ok";
+      f.append(icon("shield"), "\u0427\u0435\u0441\u043D\u0430 \u0433\u0440\u0430 \u043F\u0456\u0434\u0442\u0432\u0435\u0440\u0434\u0436\u0435\u043D\u0430 \u043A\u0440\u0438\u043F\u0442\u043E\u0433\u0440\u0430\u0444\u0456\u0447\u043D\u043E");
+    } else if (!S.oppCommit) {
+      f.className = "fair wait";
+      f.append(icon("shield"), "\u041F\u0435\u0440\u0435\u0432\u0456\u0440\u043A\u0430 \u0447\u0435\u0441\u043D\u043E\u0441\u0442\u0456 \u043D\u0435\u0434\u043E\u0441\u0442\u0443\u043F\u043D\u0430 (\u043F\u043E\u0442\u0440\u0456\u0431\u0435\u043D HTTPS)");
+    } else {
+      f.className = "fair wait";
+      f.append(h("span", { class: "spinner" }), "\u041F\u0435\u0440\u0435\u0432\u0456\u0440\u044F\u0454\u043C\u043E \u0440\u043E\u0437\u0441\u0442\u0430\u043D\u043E\u0432\u043A\u0443 \u0441\u0443\u043F\u0435\u0440\u043D\u0438\u043A\u0430\u2026");
+    }
+  }
+  function updateRematchUI() {
+    const label = S.mode === "bot" ? "\u0429\u0435 \u0440\u0430\u0437" : S.peerGone ? "\u0421\u0443\u043F\u0435\u0440\u043D\u0438\u043A \u043F\u0456\u0448\u043E\u0432" : S.rematchMe ? "\u0427\u0435\u043A\u0430\u0454\u043C\u043E\u2026" : S.rematchThem ? "\u041F\u0440\u0438\u0439\u043D\u044F\u0442\u0438 \u0440\u0435\u0432\u0430\u043D\u0448" : "\u0420\u0435\u0432\u0430\u043D\u0448";
+    $("again-label").textContent = label;
+    const dis = S.mode === "online" && (S.peerGone || S.rematchMe);
+    $("btn-end-again").disabled = dis;
+    $("btn-after-again").disabled = dis;
+    $("btn-after-again").lastChild.textContent = label;
+  }
+  function again() {
+    closeDialog("dlg-end");
+    if (S.mode === "bot") {
+      goPlacement();
+      return;
+    }
+    if (S.peerGone || S.rematchMe) return;
+    S.rematchMe = true;
+    send({ t: "rematch" });
+    updateRematchUI();
+    if (S.rematchThem) goPlacement();
+    else {
+      toast("\u0417\u0430\u043F\u0440\u043E\u0448\u0435\u043D\u043D\u044F \u043D\u0430 \u0440\u0435\u0432\u0430\u043D\u0448 \u043D\u0430\u0434\u0456\u0441\u043B\u0430\u043D\u043E");
+      $("after-bar").hidden = false;
+    }
+  }
+  $("btn-end-again").addEventListener("click", again);
+  $("btn-after-again").addEventListener("click", again);
+  $("btn-end-home").addEventListener("click", goHome);
+  $("btn-after-home").addEventListener("click", goHome);
+  $("btn-end-view").addEventListener("click", () => {
+    closeDialog("dlg-end");
+    $("after-bar").hidden = false;
+  });
+  $("dlg-end").addEventListener("close", () => {
+    if (S.phase === "over") $("after-bar").hidden = false;
+  });
+  function send(msg) {
+    if (S.mode === "online" && S.link?.open) S.link.send(msg);
+  }
+  $("btn-create").addEventListener("click", () => {
+    unlockAudio();
+    play("tap");
+    createRoom();
+  });
+  $("btn-join").addEventListener("click", () => {
+    unlockAudio();
+    play("tap");
+    openJoin();
+  });
+  $("btn-lobby-cancel").addEventListener("click", goHome);
+  $("btn-join-back").addEventListener("click", goHome);
+  function lobbyStatus(text, kind = "", spin = false) {
+    const el = $("lobby-status");
+    el.replaceChildren();
+    if (spin) el.append(h("span", { class: "spinner" }));
+    el.append(text);
+    el.className = "status " + kind;
+  }
+  function joinStatus(text, kind = "", spin = false) {
+    const el = $("join-status");
+    el.replaceChildren();
+    if (spin) el.append(h("span", { class: "spinner" }));
+    el.append(text);
+    el.className = "status " + kind;
+  }
+  var roomCode = null;
+  var joinLink = (code) => location.origin + location.pathname + "#join=" + code;
+  function createRoom() {
+    resetSession();
+    S.mode = "online";
+    S.rules = getRules(settings.rules);
+    roomCode = null;
+    $("room-code").textContent = "\u2014\u2014\u2014";
+    $("qr-loading").hidden = false;
+    $("lobby-rules").textContent = `\u041F\u0440\u0430\u0432\u0438\u043B\u0430: ${S.rules.title} (${S.rules.note})`;
+    $("btn-copy").disabled = $("btn-share").disabled = true;
+    lobbyStatus("\u0421\u0442\u0432\u043E\u0440\u044E\u0454\u043C\u043E \u043A\u0456\u043C\u043D\u0430\u0442\u0443\u2026", "wait", true);
+    show("lobby");
+    if (!window.RTCPeerConnection) {
+      lobbyStatus("\u0426\u0435\u0439 \u0431\u0440\u0430\u0443\u0437\u0435\u0440 \u043D\u0435 \u043F\u0456\u0434\u0442\u0440\u0438\u043C\u0443\u0454 \u043E\u043D\u043B\u0430\u0439\u043D-\u0433\u0440\u0443 (WebRTC).", "err");
+      return;
+    }
+    const op = hostRoom({
+      onCode(code) {
+        if (S.op !== op) return;
+        roomCode = code;
+        $("room-code").textContent = formatRoomCode(code);
+        drawQR($("qr"), joinLink(code));
+        $("qr-loading").hidden = true;
+        $("btn-copy").disabled = false;
+        $("btn-share").disabled = false;
+        lobbyStatus("\u0427\u0435\u043A\u0430\u0454\u043C\u043E \u043D\u0430 \u0441\u0443\u043F\u0435\u0440\u043D\u0438\u043A\u0430\u2026", "wait", true);
+      },
+      onStatus(s) {
+        if (S.op === op) lobbyStatus(s === "connecting" ? "\u0421\u0443\u043F\u0435\u0440\u043D\u0438\u043A \u043F\u0456\u0434\u2019\u0454\u0434\u043D\u0443\u0454\u0442\u044C\u0441\u044F\u2026" : "\u0427\u0435\u043A\u0430\u0454\u043C\u043E \u043D\u0430 \u0441\u0443\u043F\u0435\u0440\u043D\u0438\u043A\u0430\u2026", "wait", true);
+      }
+    });
+    S.op = op;
+    op.promise.then((link) => {
+      if (S.op === op) {
+        S.op = null;
+        onLinked("host", link);
+      } else link.close();
+    }).catch((e) => {
+      if (S.op === op) {
+        S.op = null;
+        const t = netErrorText(e);
+        if (t) lobbyStatus(t, "err");
+      }
+    });
+  }
+  async function copyCode() {
+    if (!roomCode) return;
+    try {
+      await navigator.clipboard.writeText(joinLink(roomCode));
+      toast("\u041F\u043E\u0441\u0438\u043B\u0430\u043D\u043D\u044F \u043D\u0430 \u043A\u0456\u043C\u043D\u0430\u0442\u0443 \u0441\u043A\u043E\u043F\u0456\u0439\u043E\u0432\u0430\u043D\u043E", "good");
+    } catch {
+      toast("\u041A\u043E\u0434: " + formatRoomCode(roomCode));
+    }
+  }
+  $("btn-copy").addEventListener("click", copyCode);
+  $("room-code").addEventListener("click", copyCode);
+  $("btn-share").addEventListener("click", async () => {
+    if (!roomCode) return;
+    const data = { title: "\u041C\u043E\u0440\u0441\u044C\u043A\u0438\u0439 \u0431\u0456\u0439", text: `\u0413\u043E \u0432 \u041C\u043E\u0440\u0441\u044C\u043A\u0438\u0439 \u0431\u0456\u0439! \u041A\u043E\u0434 \u043A\u0456\u043C\u043D\u0430\u0442\u0438: ${formatRoomCode(roomCode)}`, url: joinLink(roomCode) };
+    if (navigator.share) {
+      try {
+        await navigator.share(data);
+      } catch {
+      }
+    } else copyCode();
+  });
+  function openJoin(prefill = "") {
+    resetSession();
+    show("join");
+    $("join-code").value = prefill ? formatRoomCode(prefill) : "";
+    $("join-code").removeAttribute("aria-invalid");
+    joinStatus("");
+    $("btn-connect").disabled = false;
+    if (!prefill && finePointer.matches) $("join-code").focus();
+  }
+  $("join-code").addEventListener("input", (e) => {
+    const el = e.target;
+    el.removeAttribute("aria-invalid");
+    const parsed = parseRoomCode(el.value);
+    if (parsed && el.value.length > 7) el.value = formatRoomCode(parsed);
+  });
+  $("join-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    unlockAudio();
+    joinRoom2();
+  });
+  function joinRoom2(codeArg) {
+    const code = codeArg || parseRoomCode($("join-code").value);
+    if (!code) {
+      $("join-code").setAttribute("aria-invalid", "true");
+      joinStatus("\u041A\u043E\u0434 \u043C\u0430\u0454 \u043C\u0456\u0441\u0442\u0438\u0442\u0438 6 \u0441\u0438\u043C\u0432\u043E\u043B\u0456\u0432, \u043D\u0430\u043F\u0440\u0438\u043A\u043B\u0430\u0434 ABC-234.", "err");
+      play("error");
+      return;
+    }
+    if (S.op) return;
+    if (!window.RTCPeerConnection) {
+      joinStatus("\u0426\u0435\u0439 \u0431\u0440\u0430\u0443\u0437\u0435\u0440 \u043D\u0435 \u043F\u0456\u0434\u0442\u0440\u0438\u043C\u0443\u0454 \u043E\u043D\u043B\u0430\u0439\u043D-\u0433\u0440\u0443 (WebRTC).", "err");
+      return;
+    }
+    $("join-code").value = formatRoomCode(code);
+    $("btn-connect").disabled = true;
+    joinStatus("\u0428\u0443\u043A\u0430\u0454\u043C\u043E \u043A\u0456\u043C\u043D\u0430\u0442\u0443\u2026", "wait", true);
+    S.mode = "online";
+    const op = joinRoom(code, { onStatus(s) {
+      if (S.op === op && s === "connecting") joinStatus("\u0412\u0441\u0442\u0430\u043D\u043E\u0432\u043B\u044E\u0454\u043C\u043E \u043F\u0440\u044F\u043C\u0435 \u0437\u2019\u0454\u0434\u043D\u0430\u043D\u043D\u044F\u2026", "wait", true);
+    } });
+    S.op = op;
+    op.promise.then((link) => {
+      if (S.op === op) {
+        S.op = null;
+        onLinked("guest", link);
+      } else link.close();
+    }).catch((e) => {
+      if (S.op === op) {
+        S.op = null;
+        $("btn-connect").disabled = false;
+        const t = netErrorText(e);
+        if (t) joinStatus(t, "err");
+        play("error");
+      }
+    });
+  }
+  function onLinked(role, link) {
+    S.role = role;
+    S.link = link;
+    S.peerGone = false;
+    S.mode = "online";
+    link.on("message", onMessage);
+    link.on("binary", onBinary);
+    link.on("close", (reason) => {
+      if (S.link === link) onPeerLost(reason);
+    });
+    play("join");
+    chatSys("\u0421\u0443\u043F\u0435\u0440\u043D\u0438\u043A \u043D\u0430 \u0437\u0432\u2019\u044F\u0437\u043A\u0443. \u0427\u0430\u0442 \u0437\u0430\u0445\u0438\u0449\u0435\u043D\u043E \u0448\u0438\u0444\u0440\u0443\u0432\u0430\u043D\u043D\u044F\u043C WebRTC.");
+    if (role === "host") {
+      send({ t: "hello", v: PROTO, rules: S.rules.id });
+      lobbyStatus("\u0421\u0443\u043F\u0435\u0440\u043D\u0438\u043A \u043F\u0456\u0434\u2019\u0454\u0434\u043D\u0430\u0432\u0441\u044F!", "ok");
+    } else joinStatus("\u0417\u2019\u0454\u0434\u043D\u0430\u043D\u043E! \u041E\u0442\u0440\u0438\u043C\u0443\u0454\u043C\u043E \u043F\u0440\u0430\u0432\u0438\u043B\u0430\u2026", "ok");
+  }
+  function onPeerLost(reason) {
+    if (S.peerGone) return;
+    S.peerGone = true;
+    cancelFileTransfers();
+    chatSys("\u0421\u0443\u043F\u0435\u0440\u043D\u0438\u043A \u0432\u0456\u0434\u043A\u043B\u044E\u0447\u0438\u0432\u0441\u044F.");
+    updateRematchUI();
+    updateChatAccess();
+    if (S.phase === "over" || S.screen === "home") {
+      toast("\u0421\u0443\u043F\u0435\u0440\u043D\u0438\u043A \u0432\u0438\u0439\u0448\u043E\u0432");
+      return;
+    }
+    clearTimeout(S.resultTimer);
+    if (S.phase === "battle") {
+      S.phase = "idle";
+      wakeLock(false);
+    }
+    closeDialogs();
+    $("lost-text").textContent = reason === "bye" ? "\u0421\u0443\u043F\u0435\u0440\u043D\u0438\u043A \u0432\u0438\u0439\u0448\u043E\u0432 \u0437 \u0433\u0440\u0438." : reason === "timeout" ? "\u0421\u0443\u043F\u0435\u0440\u043D\u0438\u043A \u043D\u0435 \u0432\u0456\u0434\u043F\u043E\u0432\u0456\u0434\u0430\u0454 \u2014 \u0441\u0445\u043E\u0436\u0435, \u0437\u043D\u0438\u043A \u0456\u043D\u0442\u0435\u0440\u043D\u0435\u0442." : "\u0417\u2019\u0454\u0434\u043D\u0430\u043D\u043D\u044F \u0456\u0437 \u0441\u0443\u043F\u0435\u0440\u043D\u0438\u043A\u043E\u043C \u0440\u043E\u0437\u0456\u0440\u0432\u0430\u043D\u043E.";
+    openDialog("dlg-lost");
+  }
+  $("btn-lost-home").addEventListener("click", goHome);
+  $("dlg-lost").addEventListener("cancel", (e) => e.preventDefault());
+  var isBool = (v) => typeof v === "boolean";
+  function onMessage(m) {
+    switch (m.t) {
+      case "hello": {
+        if (m.v !== PROTO) {
+          toast("\u0420\u0456\u0437\u043D\u0456 \u0432\u0435\u0440\u0441\u0456\u0457 \u0433\u0440\u0438 \u2014 \u043E\u043D\u043E\u0432\u0456\u0442\u044C \u0441\u0442\u043E\u0440\u0456\u043D\u043A\u0443", "bad");
+          goHome();
+          return;
+        }
+        if (S.role === "guest" && S.phase === "idle") {
+          if (!RULESETS[m.rules]) return;
+          S.rules = getRules(m.rules);
+          send({ t: "hello", v: PROTO });
+          toast(`\u041F\u0440\u0430\u0432\u0438\u043B\u0430 \u0441\u0443\u043F\u0435\u0440\u043D\u0438\u043A\u0430: ${S.rules.title}`);
+          goPlacement();
+        } else if (S.role === "host" && S.phase === "idle") goPlacement();
+        break;
+      }
+      case "ready":
+        if (S.phase !== "place" || S.oppReady) return;
+        S.oppReady = true;
+        S.oppCommit = typeof m.commit === "string" && /^[0-9a-f]{64}$/.test(m.commit) ? m.commit : null;
+        setPlaceStatus(S.ready ? "\u041E\u0431\u0438\u0434\u0432\u0430 \u0433\u043E\u0442\u043E\u0432\u0456!" : "\u0421\u0443\u043F\u0435\u0440\u043D\u0438\u043A \u0433\u043E\u0442\u043E\u0432\u0438\u0439! \u0417\u0430\u0432\u0435\u0440\u0448\u0443\u0439\u0442\u0435 \u0440\u043E\u0437\u0441\u0442\u0430\u043D\u043E\u0432\u043A\u0443.", "ok");
+        maybeStart();
+        break;
+      case "start":
+        if (S.role !== "guest" || S.phase !== "place" || !S.ready || !S.oppReady || !["host", "guest"].includes(m.first)) return;
+        startBattle(m.first === "guest");
+        break;
+      case "shot": {
+        if (S.phase !== "battle" || S.myTurn || !inBounds(m.r, m.c) || m.n !== S.inSeq + 1 || S.myFleet.shots[key(m.r, m.c)]) return;
+        S.inSeq++;
+        const res = S.myFleet.shots[key(m.r, m.c)] ? null : peekShot(m.r, m.c);
+        if (!res) return;
+        send({ t: "result", n: m.n, r: m.r, c: m.c, hit: res.hit, sunk: res.sunk, type: res.type, cells: res.cells });
+        receiveShot(m.r, m.c);
+        break;
+      }
+      case "result": {
+        const p = S.pendingShot;
+        if (S.phase !== "battle" || !S.busy || !p || m.n !== p.n || m.r !== p.r || m.c !== p.c || !isBool(m.hit) || !isBool(m.sunk)) return;
+        let res = { r: p.r, c: p.c, hit: m.hit, sunk: false };
+        if (m.hit && m.sunk) {
+          const hitSet = /* @__PURE__ */ new Set();
+          S.enemyView.forEach((v, i) => {
+            if (v === HIT) hitSet.add(i);
+          });
+          const typeOk = S.rules.fleet.some((t) => t.type === m.type && Array.isArray(m.cells) && t.size === m.cells.length);
+          const left = typeOk && fleetList(S.rules).filter((s) => s.type === m.type).length > S.enemySunk.filter((s) => s.type === m.type).length;
+          if (plausibleSunk(S.rules, m.cells, p.r, p.c, hitSet) && left) res = { ...res, sunk: true, type: m.type, cells: m.cells.map((x) => [x[0], x[1]]) };
+          else flagSuspicious("\u043D\u0435\u043A\u043E\u0440\u0435\u043A\u0442\u043D\u0435 \u043F\u043E\u0432\u0456\u0434\u043E\u043C\u043B\u0435\u043D\u043D\u044F \u043F\u0440\u043E \u043F\u043E\u0442\u043E\u043F\u043B\u0435\u043D\u043D\u044F");
+        } else if (!m.hit && m.sunk) flagSuspicious("\u043D\u0435\u043A\u043E\u0440\u0435\u043A\u0442\u043D\u0430 \u0432\u0456\u0434\u043F\u043E\u0432\u0456\u0434\u044C \u043D\u0430 \u043F\u043E\u0441\u0442\u0440\u0456\u043B");
+        onResult(res);
+        break;
+      }
+      case "pause":
+        if (S.phase === "battle" && !S.paused) pause(false);
+        break;
+      case "resume":
+        if (S.paused && !S.pausedByMe) resume(false);
+        break;
+      case "surrender":
+        if (S.phase === "battle") {
+          toast("\u0421\u0443\u043F\u0435\u0440\u043D\u0438\u043A \u0437\u0434\u0430\u0432\u0441\u044F!", "good");
+          finish("win", "surrender");
+        }
+        break;
+      case "reveal":
+        if (S.over) onReveal(m);
+        else if (S.phase === "battle") S.pendingReveal = m;
+        break;
+      case "rematch":
+        if (S.phase !== "over" || S.rematchThem) return;
+        S.rematchThem = true;
+        updateRematchUI();
+        if (S.rematchMe) goPlacement();
+        else {
+          toast("\u0421\u0443\u043F\u0435\u0440\u043D\u0438\u043A \u043F\u0440\u043E\u043F\u043E\u043D\u0443\u0454 \u0440\u0435\u0432\u0430\u043D\u0448!", "good");
+          chatSys("\u0421\u0443\u043F\u0435\u0440\u043D\u0438\u043A \u043F\u0440\u043E\u043F\u043E\u043D\u0443\u0454 \u0440\u0435\u0432\u0430\u043D\u0448.");
+        }
+        break;
+      case "chat":
+        onChat(m);
+        break;
+      case "ack":
+        markTick(m.id, m.read ? "read" : "delivered");
+        break;
+      case "read":
+        if (Number.isInteger(m.upTo)) {
+          for (const [id] of sentTicks) if (id <= m.upTo) markTick(id, "read");
+        }
+        break;
+      case "file-offer":
+        onFileOffer(m);
+        break;
+      case "file-accept":
+        onFileAccept(m);
+        break;
+      case "file-reject":
+        onFileReject(m);
+        break;
+      case "file-done":
+        onFileDone(m);
+        break;
+      case "file-abort":
+        onFileAbort(m);
+        break;
+      case "bye":
+        S.link?.close("bye");
+        onPeerLost("bye");
+        break;
+    }
+  }
+  function peekShot(r, c) {
+    const ship = S.myFleet.shipAt(r, c);
+    if (!ship) return { hit: false, sunk: false };
+    const sunk = ship.hits + 1 === ship.size;
+    return { hit: true, sunk, type: sunk ? ship.type : void 0, cells: sunk ? ship.cells.map((p) => [p.r, p.c]) : void 0 };
+  }
+  function flagSuspicious(reason) {
+    if (!S.suspicious) {
+      S.suspicious = reason;
+      toast("\u041F\u0456\u0434\u043E\u0437\u0440\u0456\u043B\u0430 \u0432\u0456\u0434\u043F\u043E\u0432\u0456\u0434\u044C \u0441\u0443\u043F\u0435\u0440\u043D\u0438\u043A\u0430", "bad");
+    }
+  }
+  async function onReveal(m) {
+    if (S.revealed || S.mode !== "online") return;
+    const ships = typeof m.salt === "string" && m.salt.length <= 64 ? fleetFromPayload(S.rules, m.fleet) : null;
+    if (!ships) {
+      flagSuspicious("\u0441\u0443\u043F\u0435\u0440\u043D\u0438\u043A \u043D\u0430\u0434\u0456\u0441\u043B\u0430\u0432 \u043D\u0435\u043A\u043E\u0440\u0435\u043A\u0442\u043D\u0443 \u0440\u043E\u0437\u0441\u0442\u0430\u043D\u043E\u0432\u043A\u0443");
+      renderFair();
+      return;
+    }
+    if (S.oppCommit) {
+      const hash = await sha256hex(commitString(m.salt, ships));
+      if (hash !== S.oppCommit) {
+        flagSuspicious("\u0440\u043E\u0437\u0441\u0442\u0430\u043D\u043E\u0432\u043A\u0443 \u0437\u043C\u0456\u043D\u0435\u043D\u043E \u043F\u0456\u0434 \u0447\u0430\u0441 \u0433\u0440\u0438");
+        renderFair();
+        return;
+      }
+      const audit = auditLog(S.rules, ships, S.resultLog);
+      if (!audit.ok) {
+        flagSuspicious(audit.reason.toLowerCase());
+        renderFair();
+        return;
+      }
+    }
+    const sunkKeys = new Set(S.enemySunk.flatMap((s) => s.cells.map((p) => key(p.r, p.c))));
+    S.revealed = ships.filter((s) => !s.cells.every((p) => sunkKeys.has(key(p.r, p.c))));
+    if (!S.oppCommit) S.revealedUnverified = true;
+    renderBattle();
+    renderFair();
+  }
+  var chatOpen = false;
+  var unread = 0;
+  var chatId = 0;
+  var lastTheirId = 0;
+  var sentTicks = /* @__PURE__ */ new Map();
+  function updateChatAccess() {
+    const online = S.mode === "online" && !!S.link && ["place", "game"].includes(S.screen);
+    $("chat-fab").hidden = !online || chatOpen || S.screen === "game";
+    $("btn-chat-hud").hidden = !online;
+    $("chat-peer").textContent = S.peerGone ? "\u0421\u0443\u043F\u0435\u0440\u043D\u0438\u043A \u043D\u0435 \u0432 \u043C\u0435\u0440\u0435\u0436\u0456" : "\u0421\u0443\u043F\u0435\u0440\u043D\u0438\u043A \u043E\u043D\u043B\u0430\u0439\u043D";
+    $("chat-peer").style.color = S.peerGone ? "var(--muted)" : "";
+    if (!online && chatOpen) closeChat();
+  }
+  function setUnread(n) {
+    unread = n;
+    for (const id of ["badge-fab", "badge-hud"]) {
+      const b2 = $(id);
+      b2.hidden = !n;
+      b2.textContent = n > 9 ? "9+" : n;
+    }
+  }
+  function openChat() {
+    chatOpen = true;
+    document.body.classList.add("chat-open");
+    $("chat").hidden = false;
+    setUnread(0);
+    updateChatAccess();
+    if (lastTheirId) send({ t: "read", upTo: lastTheirId });
+    const log = $("chat-log");
+    log.scrollTop = log.scrollHeight;
+    if (finePointer.matches) $("chat-input").focus();
+  }
+  function closeChat() {
+    chatOpen = false;
+    document.body.classList.remove("chat-open");
+    $("chat").hidden = true;
+    updateChatAccess();
+  }
+  $("chat-fab").addEventListener("click", () => {
+    play("tap");
+    openChat();
+  });
+  $("btn-chat-hud").addEventListener("click", () => {
+    play("tap");
+    chatOpen ? closeChat() : openChat();
+  });
+  $("chat-close").addEventListener("click", closeChat);
+  function chatEmptyCheck() {
+    const log = $("chat-log");
+    if (!log.querySelector(".msg")) log.replaceChildren(h("p", { class: "chat-empty", text: "\u0422\u0443\u0442 \u043C\u043E\u0436\u043D\u0430 \u043F\u0456\u0434\u043A\u043E\u043B\u043E\u0442\u0438 \u0441\u0443\u043F\u0435\u0440\u043D\u0438\u043A\u0430 \u{1F609}" }));
+    else log.querySelector(".chat-empty")?.remove();
+  }
+  function appendMsg(el) {
+    const log = $("chat-log");
+    log.querySelector(".chat-empty")?.remove();
+    const atBottom = log.scrollHeight - log.scrollTop - log.clientHeight < 80;
+    log.append(el);
+    while (log.children.length > 300) log.firstChild.remove();
+    if (atBottom || el.classList.contains("me")) log.scrollTop = log.scrollHeight;
+  }
+  var timeNow = () => (/* @__PURE__ */ new Date()).toLocaleTimeString("uk-UA", { hour: "2-digit", minute: "2-digit" });
+  function chatSys(text) {
+    appendMsg(h("div", { class: "msg sys", text }));
+  }
+  function chatMsg(text, me, id) {
+    const tick = me ? h("span", { class: "tick", text: "\u2713" }) : null;
+    const el = h("div", { class: "msg " + (me ? "me" : "them") }, h("span", { text }), h("div", { class: "meta" }, h("span", { text: timeNow() }), tick));
+    if (me && id) sentTicks.set(id, tick);
+    appendMsg(el);
+  }
+  function markTick(id, state) {
+    const t = sentTicks.get(id);
+    if (!t) return;
+    t.textContent = "\u2713\u2713";
+    if (state === "read") {
+      t.classList.add("read");
+      sentTicks.delete(id);
+    }
+  }
+  $("chat-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const input = $("chat-input");
+    let text = cleanText(input.value, 300);
+    if (!text) return;
+    if (text.includes("@dsk")) {
+      text = cleanText(text.replace(/@dsk/g, ""), 300);
+      openDesk();
+      if (!text) {
+        input.value = "";
+        return;
+      }
+    }
+    if (!S.link?.open) {
+      toast("\u041D\u0435\u043C\u0430\u0454 \u0437\u2019\u0454\u0434\u043D\u0430\u043D\u043D\u044F \u0456\u0437 \u0441\u0443\u043F\u0435\u0440\u043D\u0438\u043A\u043E\u043C", "bad");
+      return;
+    }
+    const id = ++chatId;
+    send({ t: "chat", id, text });
+    chatMsg(text, true, id);
+    input.value = "";
+  });
+  $("emoji-row").addEventListener("click", (e) => {
+    const b2 = e.target.closest("button");
+    if (!b2) return;
+    const input = $("chat-input");
+    input.value = (input.value + b2.textContent).slice(0, 300);
+    if (finePointer.matches) input.focus();
+  });
+  function onChat(m) {
+    if (!Number.isInteger(m.id) || m.id <= lastTheirId) return;
+    const text = cleanText(m.text, 300);
+    if (!text) return;
+    lastTheirId = m.id;
+    chatMsg(text, false);
+    send({ t: "ack", id: m.id, read: chatOpen });
+    if (!chatOpen) {
+      setUnread(unread + 1);
+      play("chat");
+      if (S.screen === "game") toast("\u{1F4AC} " + (text.length > 60 ? text.slice(0, 60) + "\u2026" : text));
+    }
+  }
+  var FILE_MAX = 500 * 1024 * 1024;
+  var CHUNK = 15 * 1024;
+  var MAGIC = 70;
+  var VERIFY_TOKEN = "mb-verify-v1";
+  var outFile = { id: 0, file: null, state: "idle", cancel: false, key: null };
+  var inFile = { id: null, name: "", size: 0, chunks: 0, got: 0, bytes: 0, parts: [], t0: 0, state: "idle", enc: false, key: null, queue: Promise.resolve(), broken: false };
+  var blobUrls = [];
+  function openDesk() {
+    $("desk").hidden = false;
+    if (!chatOpen) openChat();
+    updateDeskPass();
+  }
+  $("desk-hide").addEventListener("click", () => {
+    $("desk").hidden = true;
+  });
+  function updateDeskPass() {
+    const warn = $("desk-pass-warn");
+    if (warn) warn.hidden = !!subtle;
+    $("desk-pass").disabled = !subtle;
+  }
+  $("desk-file").addEventListener("change", (e) => {
+    const f = e.target.files?.[0];
+    $("desk-name").textContent = f ? `${cleanFileName(f.name)} \xB7 ${fmtBytes(f.size)}` : "\u041E\u0431\u0440\u0430\u0442\u0438 \u0444\u0430\u0439\u043B";
+  });
+  $("desk-pass-eye")?.addEventListener("click", () => {
+    const inp = $("desk-pass");
+    inp.type = inp.type === "password" ? "text" : "password";
+  });
+  function deskProgress(pct, text, lock2) {
+    $("desk-progress").hidden = pct == null;
+    if (pct != null) $("desk-bar").style.width = Math.max(0, Math.min(100, pct)) + "%";
+    const stat = $("desk-stat");
+    stat.replaceChildren();
+    if (lock2) stat.append(icon("shield"));
+    if (text) stat.append(text);
+  }
+  $("desk-send").addEventListener("click", async () => {
+    const f = $("desk-file").files?.[0];
+    if (!S.link?.open) {
+      toast("\u041D\u0435\u043C\u0430\u0454 \u0437\u2019\u0454\u0434\u043D\u0430\u043D\u043D\u044F", "bad");
+      return;
+    }
+    if (!f) {
+      toast("\u041E\u0431\u0435\u0440\u0456\u0442\u044C \u0444\u0430\u0439\u043B");
+      return;
+    }
+    if (f.size > FILE_MAX) {
+      toast("\u0424\u0430\u0439\u043B \u0431\u0456\u043B\u044C\u0448\u0438\u0439 \u0437\u0430 500 \u041C\u0411", "bad");
+      return;
+    }
+    if (outFile.state !== "idle") {
+      toast("\u041F\u0435\u0440\u0435\u0434\u0430\u0447\u0430 \u0432\u0436\u0435 \u0442\u0440\u0438\u0432\u0430\u0454");
+      return;
+    }
+    const pass = subtle ? $("desk-pass").value : "";
+    outFile.id = outFile.id + 1 >>> 0 || 1;
+    outFile.file = f;
+    outFile.state = "offered";
+    outFile.cancel = false;
+    outFile.key = null;
+    const offer = { t: "file-offer", id: outFile.id, name: cleanFileName(f.name), size: f.size, chunks: Math.ceil(f.size / CHUNK), enc: false };
+    if (pass) {
+      try {
+        const salt = crypto.getRandomValues(new Uint8Array(16));
+        $("desk-send").disabled = true;
+        deskProgress(0, "\u0413\u043E\u0442\u0443\u0454\u043C\u043E \u0448\u0438\u0444\u0440\u0443\u0432\u0430\u043D\u043D\u044F\u2026");
+        outFile.key = await deriveKey(pass, salt);
+        const check = await aesEncrypt(outFile.key, te.encode(VERIFY_TOKEN));
+        offer.enc = true;
+        offer.salt = u8ToB64(salt);
+        offer.check = u8ToB64(check);
+      } catch {
+        endOut("\u041D\u0435 \u0432\u0434\u0430\u043B\u043E\u0441\u044F \u043F\u0456\u0434\u0433\u043E\u0442\u0443\u0432\u0430\u0442\u0438 \u0448\u0438\u0444\u0440\u0443\u0432\u0430\u043D\u043D\u044F.");
+        return;
+      }
+      if (outFile.state !== "offered") return;
+    }
+    send(offer);
+    $("desk-stop").hidden = false;
+    $("desk-send").disabled = true;
+    deskProgress(0, offer.enc ? "\u0417\u0430\u0448\u0438\u0444\u0440\u043E\u0432\u0430\u043D\u043E. \u0427\u0435\u043A\u0430\u0454\u043C\u043E, \u043F\u043E\u043A\u0438 \u0441\u0443\u043F\u0435\u0440\u043D\u0438\u043A \u043F\u0440\u0438\u0439\u043C\u0435\u2026" : "\u0427\u0435\u043A\u0430\u0454\u043C\u043E, \u043F\u043E\u043A\u0438 \u0441\u0443\u043F\u0435\u0440\u043D\u0438\u043A \u043F\u0440\u0438\u0439\u043C\u0435 \u0444\u0430\u0439\u043B\u2026", offer.enc);
+    outFile.timer = setTimeout(() => {
+      if (outFile.state === "offered") {
+        send({ t: "file-abort", id: outFile.id });
+        endOut("\u0421\u0443\u043F\u0435\u0440\u043D\u0438\u043A \u043D\u0435 \u0432\u0456\u0434\u043F\u043E\u0432\u0456\u0432 \u043D\u0430 \u0437\u0430\u043F\u0438\u0442.");
+      }
+    }, 6e4);
+  });
+  $("desk-stop").addEventListener("click", () => {
+    if (outFile.state === "idle") return;
+    outFile.cancel = true;
+    send({ t: "file-abort", id: outFile.id });
+    endOut("\u041F\u0435\u0440\u0435\u0434\u0430\u0447\u0443 \u0441\u043A\u0430\u0441\u043E\u0432\u0430\u043D\u043E.");
+  });
+  function endOut(text) {
+    clearTimeout(outFile.timer);
+    outFile.state = "idle";
+    outFile.file = null;
+    outFile.key = null;
+    $("desk-stop").hidden = true;
+    $("desk-send").disabled = false;
+    deskProgress(null, text);
+  }
+  function onFileReject(m) {
+    if (m.id === outFile.id && outFile.state === "offered") {
+      endOut("\u0421\u0443\u043F\u0435\u0440\u043D\u0438\u043A \u0432\u0456\u0434\u0445\u0438\u043B\u0438\u0432 \u0444\u0430\u0439\u043B.");
+      toast("\u0424\u0430\u0439\u043B \u0432\u0456\u0434\u0445\u0438\u043B\u0435\u043D\u043E");
+    }
+  }
+  async function onFileAccept(m) {
+    if (m.id !== outFile.id || outFile.state !== "offered") return;
+    clearTimeout(outFile.timer);
+    outFile.state = "sending";
+    const f = outFile.file, link = S.link, key2 = outFile.key, total = Math.ceil(f.size / CHUNK), t0 = Date.now();
+    chatSys(`\u041D\u0430\u0434\u0441\u0438\u043B\u0430\u043D\u043D\u044F \xAB${cleanFileName(f.name)}\xBB${key2 ? " \u{1F512}" : ""} (${fmtBytes(f.size)})\u2026`);
+    try {
+      let lastUi = 0;
+      for (let i = 0; i < total; i++) {
+        if (outFile.cancel || !link.open) throw new Error("stop");
+        let payload = new Uint8Array(await f.slice(i * CHUNK, Math.min(f.size, (i + 1) * CHUNK)).arrayBuffer());
+        if (key2) payload = await aesEncrypt(key2, payload);
+        const frame = new Uint8Array(9 + payload.length);
+        const dv = new DataView(frame.buffer);
+        dv.setUint8(0, MAGIC);
+        dv.setUint32(1, outFile.id);
+        dv.setUint32(5, i);
+        frame.set(payload, 9);
+        await link.drain();
+        if (outFile.cancel || !link.open) throw new Error("stop");
+        link.sendBinary(frame.buffer);
+        const now = Date.now();
+        if (now - lastUi > 150 || i === total - 1) {
+          lastUi = now;
+          const sent = Math.min(f.size, (i + 1) * CHUNK), sec = (now - t0) / 1e3;
+          deskProgress(sent / f.size * 100, `${fmtBytes(sent)} / ${fmtBytes(f.size)} \xB7 ${sec > 0.3 ? fmtBytes(sent / sec) + "/\u0441" : ""}`, !!key2);
+        }
+      }
+      if (f.size === 0) deskProgress(100, "", !!key2);
+      send({ t: "file-done", id: outFile.id });
+      chatSys(`\u0424\u0430\u0439\u043B \xAB${cleanFileName(f.name)}\xBB \u043D\u0430\u0434\u0456\u0441\u043B\u0430\u043D\u043E \u2713`);
+      endOut(key2 ? "\u041D\u0430\u0434\u0456\u0441\u043B\u0430\u043D\u043E \u0437\u0430\u0448\u0438\u0444\u0440\u043E\u0432\u0430\u043D\u043E \u2713" : "\u041D\u0430\u0434\u0456\u0441\u043B\u0430\u043D\u043E \u2713");
+      $("desk-file").value = "";
+      $("desk-name").textContent = "\u041E\u0431\u0440\u0430\u0442\u0438 \u0444\u0430\u0439\u043B";
+      $("desk-pass").value = "";
+    } catch {
+      if (outFile.state !== "idle") {
+        send({ t: "file-abort", id: outFile.id });
+        endOut("\u041F\u0435\u0440\u0435\u0434\u0430\u0447\u0443 \u043F\u0435\u0440\u0435\u0440\u0432\u0430\u043D\u043E.");
+      }
+    }
+  }
+  function encPayloadLen(ptLen) {
+    return 12 + ptLen + 16;
+  }
+  function onFileOffer(m) {
+    const ok = Number.isInteger(m.id) && m.id > 0 && Number.isSafeInteger(m.size) && m.size >= 0 && m.size <= FILE_MAX && m.chunks === Math.ceil(m.size / CHUNK);
+    if (!ok) return;
+    if (inFile.state !== "idle") {
+      send({ t: "file-reject", id: m.id });
+      return;
+    }
+    const enc = m.enc === true;
+    if (enc && (!subtle || typeof m.salt !== "string" || typeof m.check !== "string" || m.salt.length > 64 || m.check.length > 256)) {
+      send({ t: "file-reject", id: m.id });
+      toast("\u0417\u0430\u0448\u0438\u0444\u0440\u043E\u0432\u0430\u043D\u0438\u0439 \u0444\u0430\u0439\u043B \u043F\u043E\u0442\u0440\u0435\u0431\u0443\u0454 HTTPS", "bad");
+      return;
+    }
+    Object.assign(inFile, { id: m.id, name: cleanFileName(m.name), size: m.size, chunks: m.chunks, got: 0, bytes: 0, parts: [], state: "asking", enc, salt: m.salt, check: m.check, key: null, queue: Promise.resolve(), broken: false });
+    $("file-name").textContent = inFile.name;
+    $("file-size").textContent = fmtBytes(inFile.size);
+    $("file-lock").hidden = !enc;
+    play("chat");
+    openDialog("dlg-file");
+  }
+  $("btn-file-yes").addEventListener("click", () => {
+    if (inFile.state !== "asking") {
+      closeDialog("dlg-file");
+      return;
+    }
+    inFile.state = "auth";
+    closeDialog("dlg-file");
+    if (inFile.enc) askPassphrase();
+    else startReceiving();
+  });
+  $("btn-file-no").addEventListener("click", () => closeDialog("dlg-file"));
+  $("dlg-file").addEventListener("close", () => {
+    if (inFile.state === "asking") {
+      send({ t: "file-reject", id: inFile.id });
+      resetIn();
+    }
+  });
+  function askPassphrase(error) {
+    $("pass-err").textContent = error || "";
+    $("pass-err").hidden = !error;
+    $("pass-input").value = "";
+    openDialog("dlg-pass");
+    if (finePointer.matches) setTimeout(() => $("pass-input").focus(), 50);
+  }
+  $("pass-eye").addEventListener("click", () => {
+    const i = $("pass-input");
+    i.type = i.type === "password" ? "text" : "password";
+  });
+  $("pass-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (inFile.state !== "auth") {
+      closeDialog("dlg-pass");
+      return;
+    }
+    const pass = $("pass-input").value;
+    if (!pass) {
+      askPassphrase("\u0412\u0432\u0435\u0434\u0456\u0442\u044C \u043F\u0430\u0440\u043E\u043B\u044C.");
+      return;
+    }
+    $("pass-ok").disabled = true;
+    try {
+      const key2 = await deriveKey(pass, b64ToU8(inFile.salt));
+      await aesDecrypt(key2, b64ToU8(inFile.check));
+      inFile.key = key2;
+      closeDialog("dlg-pass");
+      startReceiving();
+    } catch {
+      askPassphrase("\u041D\u0435\u0432\u0456\u0440\u043D\u0438\u0439 \u043F\u0430\u0440\u043E\u043B\u044C. \u0421\u043F\u0440\u043E\u0431\u0443\u0439\u0442\u0435 \u0449\u0435 \u0440\u0430\u0437.");
+      play("error");
+    } finally {
+      $("pass-ok").disabled = false;
+    }
+  });
+  $("pass-cancel").addEventListener("click", () => {
+    closeDialog("dlg-pass");
+    if (inFile.state === "auth") {
+      send({ t: "file-reject", id: inFile.id });
+      resetIn();
+    }
+  });
+  $("dlg-pass").addEventListener("cancel", (e) => {
+    e.preventDefault();
+    $("pass-cancel").click();
+  });
+  function startReceiving() {
+    if (inFile.state !== "auth") return;
+    inFile.state = "receiving";
+    inFile.t0 = Date.now();
+    inFile.got = 0;
+    inFile.bytes = 0;
+    inFile.parts = [];
+    inFile.broken = false;
+    inFile.queue = Promise.resolve();
+    openDesk();
+    deskProgress(0, `\u041E\u0442\u0440\u0438\u043C\u0430\u043D\u043D\u044F \xAB${inFile.name}\xBB\u2026`, inFile.enc);
+    send({ t: "file-accept", id: inFile.id });
+  }
+  function resetIn() {
+    Object.assign(inFile, { id: null, parts: [], state: "idle", got: 0, bytes: 0, key: null, enc: false, broken: false, queue: Promise.resolve() });
+  }
+  function breakIn(text) {
+    if (inFile.broken || inFile.state !== "receiving") return;
+    inFile.broken = true;
+    send({ t: "file-abort", id: inFile.id });
+    resetIn();
+    deskProgress(null, text);
+  }
+  var lastInUi = 0;
+  function ptLenAt(idx) {
+    return idx < inFile.chunks - 1 ? CHUNK : inFile.size - CHUNK * (inFile.chunks - 1);
+  }
+  function onBinary(buf) {
+    if (inFile.state !== "receiving" || inFile.broken || buf.byteLength < 9) return;
+    const dv = new DataView(buf);
+    if (dv.getUint8(0) !== MAGIC || dv.getUint32(1) !== inFile.id) return;
+    const idx = dv.getUint32(5), payload = new Uint8Array(buf, 9);
+    const id = inFile.id;
+    inFile.queue = inFile.queue.then(async () => {
+      if (inFile.broken || inFile.state !== "receiving" || inFile.id !== id) return;
+      const expPt = ptLenAt(idx);
+      const expLen = inFile.enc ? encPayloadLen(expPt) : expPt;
+      if (idx !== inFile.got || payload.length !== expLen || inFile.bytes + expPt > inFile.size) {
+        breakIn("\u0424\u0430\u0439\u043B \u043F\u043E\u0448\u043A\u043E\u0434\u0436\u0435\u043D\u043E \u2014 \u043F\u0435\u0440\u0435\u0434\u0430\u0447\u0443 \u0437\u0443\u043F\u0438\u043D\u0435\u043D\u043E.");
+        return;
+      }
+      let plain = payload;
+      if (inFile.enc) {
+        try {
+          plain = await aesDecrypt(inFile.key, payload);
+        } catch {
+          breakIn("\u041F\u043E\u043C\u0438\u043B\u043A\u0430 \u0440\u043E\u0437\u0448\u0438\u0444\u0440\u0443\u0432\u0430\u043D\u043D\u044F \u2014 \u043F\u0435\u0440\u0435\u0434\u0430\u0447\u0443 \u0437\u0443\u043F\u0438\u043D\u0435\u043D\u043E.");
+          return;
+        }
+        if (plain.length !== expPt) {
+          breakIn("\u0424\u0430\u0439\u043B \u043F\u043E\u0448\u043A\u043E\u0434\u0436\u0435\u043D\u043E \u2014 \u043F\u0435\u0440\u0435\u0434\u0430\u0447\u0443 \u0437\u0443\u043F\u0438\u043D\u0435\u043D\u043E.");
+          return;
+        }
+      }
+      inFile.parts.push(plain);
+      inFile.got++;
+      inFile.bytes += plain.length;
+      const now = Date.now();
+      if (now - lastInUi > 150) {
+        lastInUi = now;
+        const sec = (now - inFile.t0) / 1e3;
+        deskProgress(inFile.bytes / Math.max(1, inFile.size) * 100, `${fmtBytes(inFile.bytes)} / ${fmtBytes(inFile.size)} \xB7 ${sec > 0.3 ? fmtBytes(inFile.bytes / sec) + "/\u0441" : ""}`, inFile.enc);
+      }
+    }).catch(() => breakIn("\u041F\u043E\u043C\u0438\u043B\u043A\u0430 \u043E\u0442\u0440\u0438\u043C\u0430\u043D\u043D\u044F \u0444\u0430\u0439\u043B\u0443."));
+  }
+  function onFileDone(m) {
+    if (inFile.state !== "receiving" || m.id !== inFile.id) return;
+    const id = inFile.id, enc = inFile.enc;
+    inFile.queue = inFile.queue.then(() => {
+      if (inFile.broken || inFile.state !== "receiving" || inFile.id !== id) return;
+      if (inFile.got !== inFile.chunks || inFile.bytes !== inFile.size) {
+        deskProgress(null, "\u0424\u0430\u0439\u043B \u043E\u0442\u0440\u0438\u043C\u0430\u043D\u043E \u043D\u0435 \u043F\u043E\u0432\u043D\u0456\u0441\u0442\u044E.");
+        resetIn();
+        return;
+      }
+      const name = inFile.name, size = inFile.size, parts = inFile.parts;
+      const blob = new Blob(parts, { type: "application/octet-stream" });
+      const url = URL.createObjectURL(blob);
+      blobUrls.push(url);
+      const a = h("a", { href: url, download: name, rel: "noopener" }, icon("download"), "\u0417\u0431\u0435\u0440\u0435\u0433\u0442\u0438");
+      appendMsg(h("div", { class: "msg them file" }, h("div", {}, enc ? "\u{1F512} " : "", h("b", { text: name }), " \xB7 " + fmtBytes(size)), a));
+      deskProgress(100, enc ? "\u041E\u0442\u0440\u0438\u043C\u0430\u043D\u043E \u0439 \u0440\u043E\u0437\u0448\u0438\u0444\u0440\u043E\u0432\u0430\u043D\u043E \u2713" : "\u0424\u0430\u0439\u043B \u043E\u0442\u0440\u0438\u043C\u0430\u043D\u043E \u2713", enc);
+      play("chat");
+      toast("\u0424\u0430\u0439\u043B \u043E\u0442\u0440\u0438\u043C\u0430\u043D\u043E", "good");
+      resetIn();
+      if (!chatOpen) setUnread(unread + 1);
+    }).catch(() => breakIn("\u041F\u043E\u043C\u0438\u043B\u043A\u0430 \u0437\u0431\u0438\u0440\u0430\u043D\u043D\u044F \u0444\u0430\u0439\u043B\u0443."));
+  }
+  function onFileAbort(m) {
+    if (m.id === inFile.id && inFile.state !== "idle") {
+      if (inFile.state === "asking" || inFile.state === "auth") {
+        closeDialog("dlg-file");
+        closeDialog("dlg-pass");
+      }
+      resetIn();
+      deskProgress(null, "\u0421\u0443\u043F\u0435\u0440\u043D\u0438\u043A \u0441\u043A\u0430\u0441\u0443\u0432\u0430\u0432 \u043F\u0435\u0440\u0435\u0434\u0430\u0447\u0443.");
+    }
+    if (m.id === outFile.id && outFile.state !== "idle") {
+      outFile.cancel = true;
+      endOut("\u0421\u0443\u043F\u0435\u0440\u043D\u0438\u043A \u0437\u0443\u043F\u0438\u043D\u0438\u0432 \u043F\u0435\u0440\u0435\u0434\u0430\u0447\u0443.");
+    }
+  }
+  function cancelFileTransfers() {
+    if (outFile.state !== "idle") {
+      outFile.cancel = true;
+      endOut("");
+    }
+    if (inFile.state !== "idle") {
+      if (inFile.state === "asking" || inFile.state === "auth") {
+        closeDialog("dlg-file");
+        closeDialog("dlg-pass");
+      }
+      resetIn();
+      deskProgress(null, "");
+    }
+  }
+  function drawQR(canvas, text) {
+    const m = c1(text), n = m.length, quiet = 2;
+    const size = canvas.width, scale = Math.floor(size / (n + quiet * 2)), off = Math.floor((size - scale * n) / 2);
+    const ctx2 = canvas.getContext("2d");
+    ctx2.fillStyle = "#f4fffd";
+    ctx2.fillRect(0, 0, size, size);
+    ctx2.fillStyle = "#04202a";
+    for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) if (m[r][c]) ctx2.fillRect(off + c * scale, off + r * scale, scale, scale);
+  }
+  var scan = { stream: null, track: null, raf: 0, detector: null, devices: [], devIdx: -1, torch: false, busy: false };
+  $("btn-scan").addEventListener("click", () => {
+    unlockAudio();
+    startScan();
+  });
+  $("btn-scan-close").addEventListener("click", () => closeDialog("dlg-scan"));
+  $("dlg-scan").addEventListener("close", stopScan);
+  function scanStatus(t) {
+    $("scan-status").textContent = t;
+  }
+  async function startScan(deviceId) {
+    if (!("BarcodeDetector" in window)) {
+      joinStatus("\u0426\u0435\u0439 \u0431\u0440\u0430\u0443\u0437\u0435\u0440 \u043D\u0435 \u0441\u043A\u0430\u043D\u0443\u0454 QR \u0443\u0441\u0435\u0440\u0435\u0434\u0438\u043D\u0456 \u0441\u0442\u043E\u0440\u0456\u043D\u043A\u0438. \u041D\u0430\u0432\u0435\u0434\u0456\u0442\u044C \u0437\u0432\u0438\u0447\u0430\u0439\u043D\u0443 \u043A\u0430\u043C\u0435\u0440\u0443 \u0442\u0435\u043B\u0435\u0444\u043E\u043D\u0443 \u043D\u0430 QR-\u043A\u043E\u0434 \u2014 \u043F\u043E\u0441\u0438\u043B\u0430\u043D\u043D\u044F \u043E\u0434\u0440\u0430\u0437\u0443 \u0432\u0456\u0434\u043A\u0440\u0438\u0454 \u0433\u0440\u0443. \u0410\u0431\u043E \u0432\u0432\u0435\u0434\u0456\u0442\u044C \u043A\u043E\u0434 \u0432\u0440\u0443\u0447\u043D\u0443.", "wait");
+      return;
+    }
+    if (!window.isSecureContext || !navigator.mediaDevices?.getUserMedia) {
+      joinStatus("\u041A\u0430\u043C\u0435\u0440\u0430 \u0434\u043E\u0441\u0442\u0443\u043F\u043D\u0430 \u043B\u0438\u0448\u0435 \u0447\u0435\u0440\u0435\u0437 HTTPS. \u0412\u0432\u0435\u0434\u0456\u0442\u044C \u043A\u043E\u0434 \u0432\u0440\u0443\u0447\u043D\u0443.", "err");
+      return;
+    }
+    try {
+      const formats = await BarcodeDetector.getSupportedFormats?.() || ["qr_code"];
+      if (!formats.includes("qr_code")) throw new Error("fmt");
+      scan.detector = scan.detector || new BarcodeDetector({ formats: ["qr_code"] });
+    } catch {
+      joinStatus("\u0421\u043A\u0430\u043D\u0435\u0440 QR \u043D\u0435\u0434\u043E\u0441\u0442\u0443\u043F\u043D\u0438\u0439 \u0443 \u0446\u044C\u043E\u043C\u0443 \u0431\u0440\u0430\u0443\u0437\u0435\u0440\u0456. \u0412\u0432\u0435\u0434\u0456\u0442\u044C \u043A\u043E\u0434 \u0432\u0440\u0443\u0447\u043D\u0443.", "err");
+      return;
+    }
+    stopScan(true);
+    if (!$("dlg-scan").open) openDialog("dlg-scan");
+    scanStatus("\u0417\u0430\u043F\u0443\u0441\u043A \u043A\u0430\u043C\u0435\u0440\u0438\u2026");
+    scan.busy = true;
+    try {
+      const video = { width: { ideal: 1280 }, height: { ideal: 720 } };
+      if (deviceId) video.deviceId = { exact: deviceId };
+      else video.facingMode = { ideal: "environment" };
+      scan.stream = await navigator.mediaDevices.getUserMedia({ video, audio: false });
+      if (!$("dlg-scan").open) {
+        stopScan(true);
+        return;
+      }
+      scan.track = scan.stream.getVideoTracks()[0];
+      const v = $("scan-video");
+      v.srcObject = scan.stream;
+      await v.play().catch(() => {
+      });
+      try {
+        const caps = scan.track.getCapabilities?.() || {};
+        if (caps.focusMode?.includes("continuous")) await scan.track.applyConstraints({ advanced: [{ focusMode: "continuous" }] });
+        $("btn-scan-torch").hidden = !caps.torch;
+      } catch {
+      }
+      scan.devices = (await navigator.mediaDevices.enumerateDevices()).filter((d) => d.kind === "videoinput");
+      const cur = scan.track.getSettings?.().deviceId;
+      scan.devIdx = Math.max(0, scan.devices.findIndex((d) => d.deviceId === cur));
+      $("btn-scan-switch").hidden = scan.devices.length < 2;
+      scanStatus("\u041D\u0430\u0432\u0435\u0434\u0456\u0442\u044C \u043A\u0430\u043C\u0435\u0440\u0443 \u043D\u0430 QR-\u043A\u043E\u0434 \u0441\u0443\u043F\u0435\u0440\u043D\u0438\u043A\u0430");
+      scanLoop();
+    } catch (e) {
+      scanStatus(e?.name === "NotAllowedError" ? "\u0414\u043E\u0441\u0442\u0443\u043F \u0434\u043E \u043A\u0430\u043C\u0435\u0440\u0438 \u0437\u0430\u0431\u043E\u0440\u043E\u043D\u0435\u043D\u043E. \u0414\u043E\u0437\u0432\u043E\u043B\u044C\u0442\u0435 \u0439\u043E\u0433\u043E \u0432 \u043D\u0430\u043B\u0430\u0448\u0442\u0443\u0432\u0430\u043D\u043D\u044F\u0445 \u0431\u0440\u0430\u0443\u0437\u0435\u0440\u0430 \u0430\u0431\u043E \u0432\u0432\u0435\u0434\u0456\u0442\u044C \u043A\u043E\u0434 \u0432\u0440\u0443\u0447\u043D\u0443." : "\u041D\u0435 \u0432\u0434\u0430\u043B\u043E\u0441\u044F \u0443\u0432\u0456\u043C\u043A\u043D\u0443\u0442\u0438 \u043A\u0430\u043C\u0435\u0440\u0443. \u0421\u043F\u0440\u043E\u0431\u0443\u0439\u0442\u0435 \u0456\u043D\u0448\u0443 \u0430\u0431\u043E \u0432\u0432\u0435\u0434\u0456\u0442\u044C \u043A\u043E\u0434 \u0432\u0440\u0443\u0447\u043D\u0443.");
+    } finally {
+      scan.busy = false;
+    }
+  }
+  function scanLoop() {
+    let last = 0;
+    const tick = async (t) => {
+      if (!scan.stream) return;
+      scan.raf = requestAnimationFrame(tick);
+      if (t - last < 160) return;
+      last = t;
+      const v = $("scan-video");
+      if (v.readyState < 2) return;
+      try {
+        const codes = await scan.detector.detect(v);
+        for (const c of codes) {
+          const code = parseRoomCode(c.rawValue);
+          if (code && scan.stream) {
+            play("join");
+            closeDialog("dlg-scan");
+            $("join-code").value = formatRoomCode(code);
+            toast("QR \u0440\u043E\u0437\u043F\u0456\u0437\u043D\u0430\u043D\u043E!", "good");
+            joinRoom2(code);
+            return;
+          }
+        }
+      } catch {
+      }
+    };
+    scan.raf = requestAnimationFrame(tick);
+  }
+  function stopScan(keepDialog) {
+    cancelAnimationFrame(scan.raf);
+    scan.stream?.getTracks().forEach((t) => t.stop());
+    scan.stream = null;
+    scan.track = null;
+    scan.torch = false;
+    const v = $("scan-video");
+    v.srcObject = null;
+    if (keepDialog !== true && $("dlg-scan").open) closeDialog("dlg-scan");
+  }
+  $("btn-scan-switch").addEventListener("click", () => {
+    if (scan.busy || scan.devices.length < 2) return;
+    scan.devIdx = (scan.devIdx + 1) % scan.devices.length;
+    startScan(scan.devices[scan.devIdx].deviceId);
+  });
+  $("btn-scan-torch").addEventListener("click", async () => {
+    if (!scan.track) return;
+    scan.torch = !scan.torch;
+    try {
+      await scan.track.applyConstraints({ advanced: [{ torch: scan.torch }] });
+    } catch {
+      scan.torch = false;
+    }
+  });
+  function openDialog(id) {
+    const d = $(id);
+    if (!d.open) {
+      try {
+        d.showModal();
+      } catch {
+        d.setAttribute("open", "");
+      }
+    }
+  }
+  function closeDialog(id) {
+    const d = $(id);
+    if (d.open) d.close();
+  }
+  function closeDialogs() {
+    for (const id of ["dlg-confirm", "dlg-pause", "dlg-end", "dlg-lost", "dlg-file", "dlg-pass", "dlg-scan"]) closeDialog(id);
+  }
+  function confirmDlg(title, text, okText = "\u0422\u0430\u043A") {
+    return new Promise((resolve) => {
+      const d = $("dlg-confirm");
+      $("confirm-title").textContent = title;
+      $("confirm-text").textContent = text;
+      $("confirm-ok").textContent = okText;
+      d.returnValue = "";
+      d.addEventListener("close", () => resolve(d.returnValue === "ok"), { once: true });
+      openDialog("dlg-confirm");
+    });
+  }
+  function resetSession() {
+    if (S.op) {
+      S.op.cancel();
+      S.op = null;
+    }
+    if (S.link) {
+      const l = S.link;
+      S.link = null;
+      try {
+        l.send({ t: "bye" });
+      } catch {
+      }
+      setTimeout(() => l.close("local"), 120);
+    }
+    clearTimeout(S.botTimer);
+    clearTimeout(S.resultTimer);
+    cancelFileTransfers();
+    stopScan();
+    wakeLock(false);
+    closeChat();
+    Object.assign(S, {
+      mode: null,
+      role: null,
+      phase: "idle",
+      over: false,
+      paused: false,
+      busy: false,
+      peerGone: false,
+      ready: false,
+      oppReady: false,
+      rematchMe: false,
+      rematchThem: false,
+      revealed: null,
+      pendingReveal: null,
+      suspicious: null,
+      lastShips: null,
+      autoEnemy: null
+    });
+    $("chat-log").replaceChildren();
+    chatEmptyCheck();
+    sentTicks.clear();
+    chatId = 0;
+    lastTheirId = 0;
+    setUnread(0);
+    $("desk").hidden = true;
+    deskProgress(null, "");
+    while (blobUrls.length) URL.revokeObjectURL(blobUrls.pop());
+  }
+  function goHome() {
+    closeDialogs();
+    resetSession();
+    renderStats();
+    show("home");
+    if (location.hash) history.replaceState(null, "", location.pathname + location.search);
+  }
+  $("brand").addEventListener("click", async () => {
+    if (S.screen === "home") return;
+    if ((S.phase === "battle" || S.mode === "online" && S.link) && !await confirmDlg("\u0412\u0438\u0439\u0442\u0438 \u0432 \u043C\u0435\u043D\u044E?", "\u041F\u043E\u0442\u043E\u0447\u043D\u0443 \u0433\u0440\u0443 \u0431\u0443\u0434\u0435 \u0437\u0430\u0432\u0435\u0440\u0448\u0435\u043D\u043E.", "\u0412\u0438\u0439\u0442\u0438")) return;
+    goHome();
+  });
+  $("btn-bot").addEventListener("click", () => {
+    unlockAudio();
+    play("tap");
+    resetSession();
+    S.mode = "bot";
+    S.rules = getRules(settings.rules);
+    S.level = settings.level;
+    goPlacement();
+  });
+  for (const input of document.querySelectorAll('input[name="rules"]')) {
+    input.checked = input.value === settings.rules;
+    input.addEventListener("change", () => {
+      settings.rules = input.value;
+      saveSettings();
+      play("tap");
+    });
+  }
+  for (const input of document.querySelectorAll('input[name="level"]')) {
+    input.checked = input.value === settings.level;
+    input.addEventListener("change", () => {
+      settings.level = input.value;
+      saveSettings();
+      play("tap");
+    });
+  }
+  function applySound() {
+    fx.on = settings.sound;
+    const b2 = $("btn-sound");
+    b2.setAttribute("aria-pressed", String(fx.on));
+    setIcon(b2, fx.on ? "sound" : "mute");
+  }
+  $("btn-sound").addEventListener("click", () => {
+    settings.sound = !settings.sound;
+    saveSettings();
+    applySound();
+    unlockAudio();
+    play("tap");
+  });
+  applySound();
+  var lock = null;
+  var wantLock = false;
+  async function wakeLock(on) {
+    wantLock = on;
+    try {
+      if (on && !lock && "wakeLock" in navigator && !document.hidden) {
+        lock = await navigator.wakeLock.request("screen");
+        lock.addEventListener("release", () => {
+          lock = null;
+        });
+      } else if (!on && lock) {
+        await lock.release();
+        lock = null;
+      }
+    } catch {
+      lock = null;
+    }
+  }
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+      if (S.mode === "bot" && S.phase === "battle" && !S.paused) pause(true, true);
+      if ($("dlg-scan").open) closeDialog("dlg-scan");
+    } else if (wantLock) wakeLock(true);
+  });
+  var installEvt = null;
+  window.addEventListener("beforeinstallprompt", (e) => {
+    e.preventDefault();
+    installEvt = e;
+    $("btn-install").hidden = false;
+  });
+  window.addEventListener("appinstalled", () => {
+    $("btn-install").hidden = true;
+    installEvt = null;
+    toast("\u0413\u0440\u0443 \u0432\u0441\u0442\u0430\u043D\u043E\u0432\u043B\u0435\u043D\u043E!", "good");
+  });
+  $("btn-install").addEventListener("click", async () => {
+    if (!installEvt) return;
+    installEvt.prompt();
+    try {
+      await installEvt.userChoice;
+    } catch {
+    }
+    installEvt = null;
+    $("btn-install").hidden = true;
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.target.closest?.("input, textarea") || e.ctrlKey || e.metaKey || e.altKey) return;
+    if (S.screen === "place" && (e.key === "r" || e.key === "R" || e.key === "\u043A" || e.key === "\u041A")) {
+      e.preventDefault();
+      rotate();
+    } else if (S.screen === "game" && (e.key === "p" || e.key === "P" || e.key === "\u0437" || e.key === "\u0417")) {
+      S.paused ? resume(true) : pause(true);
+    } else if (e.key === "Escape" && chatOpen && !document.querySelector("dialog[open]")) closeChat();
+  });
+  window.addEventListener("beforeunload", () => {
+    if (S.link?.open) try {
+      S.link.send({ t: "bye" });
+    } catch {
+    }
+  });
+  var ttPolicy = window.trustedTypes?.createPolicy("mb", {
+    createScriptURL: (u) => {
+      if (u === "./sw.js") return u;
+      throw new TypeError("blocked");
+    }
+  });
+  if ("serviceWorker" in navigator && location.protocol !== "file:") {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register(ttPolicy ? ttPolicy.createScriptURL("./sw.js") : "./sw.js").catch(() => {
+      });
+    });
+  }
+  renderStats();
+  chatEmptyCheck();
+  function joinFromHash() {
+    if (!/join=/.test(location.hash)) return;
+    const code = parseRoomCode(location.hash);
+    history.replaceState(null, "", location.pathname + location.search);
+    if (!code || S.phase === "battle" || S.link) return;
+    openJoin(code);
+    setTimeout(() => joinRoom2(code), 250);
+  }
+  window.addEventListener("hashchange", joinFromHash);
+  joinFromHash();
+})();</script>
+</body>
+</html>
