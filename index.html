@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; media-src 'self' blob: mediastream:; connect-src 'self' wss://0.peerjs.com https://battleship-ua.metered.live https://fonts.googleapis.com https://fonts.gstatic.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; require-trusted-types-for 'script'; trusted-types mb">
+  <meta name="referrer" content="no-referrer">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#061018">
+  <meta name="description" content="Морський бій: тактичний ШІ, гра з другом онлайн за кодом або QR, чат. Працює на телефоні й комп’ютері, навіть офлайн.">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Морський Бій">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
+  <link rel="apple-touch-icon" href="./apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400..800&family=Unbounded:wght@500..800&display=swap">
+  <link rel="stylesheet" href="./css/app.css">
+  <script type="module" src="./js/app.js"></script>
+  <title>Морський Бій</title>
+</head>
+<body>
+  <svg class="sprite" aria-hidden="true" focusable="false">
+    <symbol id="i-sound" viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></symbol>
+    <symbol id="i-mute" viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="m17 9 5 6m0-6-5 6"/></symbol>
+    <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 10h8M8 13h5"/></symbol>
+    <symbol id="i-pause" viewBox="0 0 24 24"><path d="M8 5v14M16 5v14"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 5v14l12-7z"/></symbol>
+    <symbol id="i-flag" viewBox="0 0 24 24"><path d="M5 21V4m0 0h11l-2 4 2 4H5"/></symbol>
+    <symbol id="i-rotate" viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.3-5.7L20 8.6"/><path d="M20 3v5.6h-5.6"/></symbol>
+    <symbol id="i-dice" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/><circle cx="9" cy="9" r=".6"/><circle cx="15" cy="15" r=".6"/><circle cx="15" cy="9" r=".6"/><circle cx="9" cy="15" r=".6"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3m-9 0 1 13h10l1-13"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/></symbol>
+    <symbol id="i-share" viewBox="0 0 24 24"><path d="M12 15V3m0 0L7.5 7.5M12 3l4.5 4.5"/><path d="M6 11H5v10h14V11h-1"/></symbol>
+    <symbol id="i-camera" viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></symbol>
+    <symbol id="i-back" viewBox="0 0 24 24"><path d="M19 12H5m0 0 6-6m-6 6 6 6"/></symbol>
+    <symbol id="i-bot" viewBox="0 0 24 24"><rect x="4" y="8" width="16" height="11" rx="3"/><path d="M12 4v4M9 13h.01M15 13h.01M2 13v2M22 13v2"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14a6.5 6.5 0 0 1 3.5 6"/></symbol>
+    <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></symbol>
+    <symbol id="i-send" viewBox="0 0 24 24"><path d="M4 12 20 4l-5 16-3-7z"/><path d="m12 13 8-9"/></symbol>
+    <symbol id="i-clip" viewBox="0 0 24 24"><path d="m20 11-8.5 8.5a5 5 0 0 1-7-7L13 4a3.3 3.3 0 0 1 4.7 4.7L9.2 17.2a1.7 1.7 0 0 1-2.4-2.4L14 7.6"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 20h14"/></symbol>
+    <symbol id="i-install" viewBox="0 0 24 24"><rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M12 7v7m0 0-3-3m3 3 3-3"/></symbol>
+    <symbol id="i-trophy" viewBox="0 0 24 24"><path d="M8 4h8v5a4 4 0 0 1-8 0zM8 6H4.5a3 3 0 0 0 3.5 4M16 6h3.5a3 3 0 0 1-3.5 4M12 13v4m-4 3h8l-1-3H9z"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M4 12a8 8 0 0 1 13.7-5.7L20 8.6M20 12a8 8 0 0 1-13.7 5.7L4 15.4"/><path d="M20 3.5v5.1h-5.1M4 20.5v-5.1h5.1"/></symbol>
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="m3.5 11 8.5-7 8.5 7M6 9.5V20h12V9.5"/></symbol>
+    <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 4.5 6v6c0 4.5 3.2 7.7 7.5 9 4.3-1.3 7.5-4.5 7.5-9V6z"/><path d="m8.5 12 2.5 2.5 4.5-5"/></symbol>
+    <symbol id="i-torch" viewBox="0 0 24 24"><path d="M8 3h8v4l-2 4v10h-4V11L8 7z"/><path d="M12 14v2"/></symbol>
+    <symbol id="i-switch" viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><path d="M9 13a3 3 0 0 1 5.2-2M15 13a3 3 0 0 1-5.2 2"/><path d="M14.5 9.5v1.7h-1.7M9.5 16.5v-1.7h1.7"/></symbol>
+    <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><path d="M12 1.5v4m0 13v4M1.5 12h4m13 0h4"/></symbol>
+    <symbol id="i-anchor" viewBox="0 0 24 24"><circle cx="12" cy="5" r="2.2"/><path d="M12 7.2V21m-5-10h10M4 13a8 8 0 0 0 16 0"/></symbol>
+  </svg>
+
+  <div class="ocean" aria-hidden="true"><div class="ocean-sweep"></div><div class="ocean-grid"></div></div>
+
+  <div id="app">
+    <header class="topbar">
+      <button class="brand" id="brand" type="button" aria-label="На головну">
+        <span class="brand-mark"><svg><use href="#i-anchor"/></svg></span>
+        <span class="brand-name">Морський бій</span>
+      </button>
+      <div class="topbar-actions">
+        <button class="icon-btn" id="btn-install" type="button" hidden aria-label="Встановити додаток" title="Встановити додаток"><svg><use href="#i-install"/></svg></button>
+        <button class="icon-btn" id="btn-sound" type="button" aria-pressed="true" aria-label="Звук і вібрація" title="Звук і вібрація"><svg><use href="#i-sound"/></svg></button>
+      </div>
+    </header>
+
+    <main>
+      <!-- ГОЛОВНА -->
+      <section class="screen is-active" id="screen-home" aria-labelledby="home-title">
+        <div class="home">
+          <div class="hero">
+            <p class="eyebrow">Тактична гра на двох</p>
+            <h1 id="home-title" class="hero-title">Морський<br><span>бій</span></h1>
+            <p class="hero-lead">Розстав флот, знайди ворога на радарі й потопи його першим. Грай із ШІ або з другом за кодом чи QR.</p>
+            <div class="sonar" aria-hidden="true">
+              <div class="sonar-sweep"></div>
+              <i class="blip b1"></i><i class="blip b2"></i><i class="blip b3"></i>
+            </div>
+          </div>
+
+          <div class="home-panel">
+            <fieldset class="field">
+              <legend>Правила</legend>
+              <div class="seg" role="radiogroup" id="rules-seg">
+                <label><input type="radio" name="rules" value="classic" checked><span><b>Класичні</b><small>10 кораблів · без дотику</small></span></label>
+                <label><input type="radio" name="rules" value="modern"><span><b>Сучасні</b><small>5 кораблів · дотик можна</small></span></label>
+              </div>
+            </fieldset>
+
+            <article class="mode-card">
+              <div class="mode-head"><span class="mode-icon"><svg><use href="#i-bot"/></svg></span><div><h2>Проти ШІ</h2><p>Офлайн, у будь-який момент</p></div></div>
+              <div class="seg seg-sm" role="radiogroup" aria-label="Складність ШІ" id="level-seg">
+                <label><input type="radio" name="level" value="easy"><span><b>Кадет</b></span></label>
+                <label><input type="radio" name="level" value="normal" checked><span><b>Капітан</b></span></label>
+                <label><input type="radio" name="level" value="hard"><span><b>Адмірал</b></span></label>
+              </div>
+              <button class="btn btn-primary btn-lg" id="btn-bot" type="button"><svg><use href="#i-target"/></svg>Почати бій</button>
+            </article>
+
+            <article class="mode-card">
+              <div class="mode-head"><span class="mode-icon"><svg><use href="#i-users"/></svg></span><div><h2>З другом онлайн</h2><p>Пряме з’єднання, чат, перевірка чесності</p></div></div>
+              <div class="btn-row">
+                <button class="btn btn-secondary" id="btn-create" type="button"><svg><use href="#i-link"/></svg>Створити кімнату</button>
+                <button class="btn btn-secondary" id="btn-join" type="button"><svg><use href="#i-camera"/></svg>Приєднатися</button>
+              </div>
+            </article>
+
+            <dl class="stats" id="stats" aria-label="Ваша статистика">
+              <div><dt>Перемоги</dt><dd id="st-wins">0</dd></div>
+              <div><dt>Поразки</dt><dd id="st-losses">0</dd></div>
+              <div><dt>Точність</dt><dd id="st-acc">—</dd></div>
+              <div><dt>Серія</dt><dd id="st-streak">0</dd></div>
+            </dl>
+          </div>
+        </div>
+      </section>
+
+      <!-- СТВОРЕННЯ КІМНАТИ -->
+      <section class="screen" id="screen-lobby" aria-labelledby="lobby-title">
+        <div class="panel lobby">
+          <p class="eyebrow">Онлайн-гра</p>
+          <h2 id="lobby-title">Кімната готова</h2>
+          <p class="muted">Покажіть другу QR-код або надішліть код. Сканування звичайною камерою телефону одразу відкриє гру.</p>
+          <div class="qr-box"><canvas id="qr" width="232" height="232" aria-label="QR-код для приєднання"></canvas><div class="qr-loading" id="qr-loading"><span class="spinner"></span></div></div>
+          <button class="room-code" id="room-code" type="button" aria-label="Скопіювати код кімнати">———</button>
+          <p class="rules-chip" id="lobby-rules"></p>
+          <div class="btn-row">
+            <button class="btn btn-secondary" id="btn-copy" type="button"><svg><use href="#i-copy"/></svg>Копіювати</button>
+            <button class="btn btn-secondary" id="btn-share" type="button"><svg><use href="#i-share"/></svg>Поділитися</button>
+          </div>
+          <p class="status" id="lobby-status" role="status"><span class="spinner"></span>Створення кімнати…</p>
+          <button class="btn btn-ghost" id="btn-lobby-cancel" type="button"><svg><use href="#i-back"/></svg>Скасувати</button>
+        </div>
+      </section>
+
+      <!-- ПРИЄДНАННЯ -->
+      <section class="screen" id="screen-join" aria-labelledby="join-title">
+        <div class="panel lobby">
+          <p class="eyebrow">Онлайн-гра</p>
+          <h2 id="join-title">Приєднатися</h2>
+          <p class="muted">Введіть 6-символьний код кімнати друга або відскануйте його QR-код.</p>
+          <form id="join-form" class="join-form" autocomplete="off" novalidate>
+            <label class="sr-only" for="join-code">Код кімнати</label>
+            <input id="join-code" class="code-input" type="text" inputmode="text" autocapitalize="characters" spellcheck="false" maxlength="40" placeholder="ABC-123" enterkeyhint="go">
+            <button class="btn btn-primary btn-lg" id="btn-connect" type="submit"><svg><use href="#i-link"/></svg>Під’єднатися</button>
+          </form>
+          <button class="btn btn-secondary" id="btn-scan" type="button"><svg><use href="#i-camera"/></svg>Сканувати QR</button>
+          <p class="status" id="join-status" role="status"></p>
+          <button class="btn btn-ghost" id="btn-join-back" type="button"><svg><use href="#i-back"/></svg>Назад</button>
+        </div>
+      </section>
+
+      <!-- РОЗСТАНОВКА -->
+      <section class="screen" id="screen-place" aria-labelledby="place-title">
+        <div class="place">
+          <div class="board-zone">
+            <div class="board" id="place-board" role="group" aria-label="Ваше поле для розстановки"></div>
+          </div>
+          <div class="place-side">
+            <div class="place-head">
+              <p class="eyebrow" id="place-mode">Розстановка</p>
+              <h2 id="place-title">Розстав свій флот</h2>
+              <p class="hint" id="place-hint" aria-live="polite">Обери корабель і торкнися поля.</p>
+            </div>
+            <div class="dock" id="dock" role="radiogroup" aria-label="Кораблі"></div>
+            <div class="tool-row">
+              <button class="btn btn-secondary" id="btn-rotate" type="button" title="Повернути (R)"><svg><use href="#i-rotate"/></svg><span id="orient-label">Горизонтально</span></button>
+              <button class="btn btn-secondary btn-icon" id="btn-random" type="button" title="Випадково" aria-label="Розставити випадково"><svg><use href="#i-dice"/></svg></button>
+              <button class="btn btn-secondary btn-icon" id="btn-clear" type="button" title="Очистити" aria-label="Очистити поле"><svg><use href="#i-trash"/></svg></button>
+            </div>
+            <div class="confirm-bar" id="confirm-bar" hidden>
+              <button class="btn btn-primary" id="btn-place-ok" type="button"><svg><use href="#i-check"/></svg>Поставити</button>
+              <button class="btn btn-secondary" id="btn-place-cancel" type="button"><svg><use href="#i-close"/></svg>Скасувати</button>
+            </div>
+            <button class="btn btn-primary btn-lg" id="btn-ready" type="button" disabled><svg><use href="#i-check"/></svg>До бою</button>
+            <p class="status" id="place-status" role="status"></p>
+            <button class="btn btn-ghost" id="btn-place-back" type="button"><svg><use href="#i-back"/></svg>Меню</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- БІЙ -->
+      <section class="screen" id="screen-game" aria-label="Бій">
+        <div class="hud">
+          <div class="hud-side me"><span class="hud-label">Ви <b class="hud-n" id="hud-me-n"></b></span><div class="fleet-pips" id="pips-me"></div></div>
+          <div class="turn" id="turn" role="status" aria-live="polite"><span class="turn-dot"></span><span id="turn-text">Ваш хід</span></div>
+          <div class="hud-side enemy"><span class="hud-label"><span id="enemy-label">Суперник</span> <b class="hud-n" id="hud-enemy-n"></b></span><div class="fleet-pips" id="pips-enemy"></div></div>
+        </div>
+        <div class="battle">
+          <div class="board-card enemy-card" id="enemy-card">
+            <div class="board-cap"><span>Поле суперника</span><span class="cap-count" id="enemy-count"></span></div>
+            <div class="board" id="enemy-board" role="group" aria-label="Поле суперника: оберіть клітинку для пострілу"></div>
+          </div>
+          <div class="board-card me-card" id="me-card">
+            <div class="board-cap"><span>Ваш флот</span><span class="cap-count" id="me-count"></span></div>
+            <div class="board" id="my-board" role="group" aria-label="Ваше поле"></div>
+          </div>
+        </div>
+        <div class="game-bar">
+          <p class="game-msg" id="game-msg" aria-live="polite"></p>
+          <div class="game-actions">
+            <button class="icon-btn" id="btn-chat-hud" type="button" hidden aria-label="Чат" title="Чат"><svg><use href="#i-chat"/></svg><span class="badge" id="badge-hud" hidden></span></button>
+            <button class="icon-btn" id="btn-pause" type="button" aria-label="Пауза" title="Пауза (P)"><svg><use href="#i-pause"/></svg></button>
+            <button class="icon-btn danger" id="btn-surrender" type="button" aria-label="Здатися" title="Здатися"><svg><use href="#i-flag"/></svg></button>
+          </div>
+        </div>
+        <div class="after-bar" id="after-bar" hidden>
+          <span id="after-text">Бій завершено</span>
+          <button class="btn btn-primary" id="btn-after-again" type="button"><svg><use href="#i-refresh"/></svg>Ще раз</button>
+          <button class="btn btn-secondary" id="btn-after-home" type="button"><svg><use href="#i-home"/></svg>Меню</button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ЧАТ -->
+  <button class="chat-fab" id="chat-fab" type="button" hidden aria-label="Відкрити чат"><svg><use href="#i-chat"/></svg><span class="badge" id="badge-fab" hidden></span></button>
+  <aside class="chat" id="chat" aria-label="Чат" hidden>
+    <header class="chat-head">
+      <div><b>Чат</b><small id="chat-peer">Суперник онлайн</small></div>
+      <button class="icon-btn sm" id="chat-close" type="button" aria-label="Закрити чат"><svg><use href="#i-close"/></svg></button>
+    </header>
+    <div class="chat-log" id="chat-log" role="log" aria-live="polite"></div>
+    <div class="desk" id="desk" hidden>
+      <div class="desk-top"><span>Вкладення · до 500 МБ</span><button class="link-btn" id="desk-hide" type="button">Сховати</button></div>
+      <div class="desk-row">
+        <label class="btn btn-secondary file-pick"><svg><use href="#i-clip"/></svg><span id="desk-name">Обрати файл</span><input type="file" id="desk-file" class="sr-only"></label>
+        <button class="btn btn-primary" id="desk-send" type="button">Надіслати</button>
+        <button class="btn btn-danger" id="desk-stop" type="button" hidden>Стоп</button>
+      </div>
+      <div class="progress" id="desk-progress" hidden><div class="progress-bar" id="desk-bar"></div></div>
+      <p class="desk-stat" id="desk-stat"></p>
+    </div>
+    <div class="emoji-row" id="emoji-row">
+      <button type="button">👍</button><button type="button">🔥</button><button type="button">💥</button><button type="button">🎯</button><button type="button">😎</button><button type="button">😅</button><button type="button">🌊</button><button type="button">⚓</button><button type="button">🫡</button><button type="button">🏆</button>
+    </div>
+    <form class="chat-form" id="chat-form" autocomplete="off">
+      <label class="sr-only" for="chat-input">Повідомлення</label>
+      <input id="chat-input" type="text" maxlength="300" placeholder="Повідомлення…" enterkeyhint="send">
+      <button class="icon-btn accent" type="submit" aria-label="Надіслати"><svg><use href="#i-send"/></svg></button>
+    </form>
+  </aside>
+
+  <!-- ДІАЛОГИ -->
+  <dialog class="dialog" id="dlg-confirm" aria-labelledby="confirm-title">
+    <form method="dialog">
+      <h3 id="confirm-title">Ви впевнені?</h3>
+      <p id="confirm-text" class="muted"></p>
+      <div class="dialog-actions">
+        <button class="btn btn-secondary" value="cancel" type="submit">Ні</button>
+        <button class="btn btn-danger" value="ok" type="submit" id="confirm-ok">Так</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog class="dialog" id="dlg-pause" aria-labelledby="pause-title">
+    <h3 id="pause-title"><svg><use href="#i-pause"/></svg>Пауза</h3>
+    <p id="pause-text" class="muted">Гру призупинено</p>
+    <div class="dialog-actions">
+      <button class="btn btn-ghost" id="btn-pause-home" type="button"><svg><use href="#i-home"/></svg>Меню</button>
+      <button class="btn btn-primary" id="btn-resume" type="button"><svg><use href="#i-play"/></svg>Продовжити</button>
+    </div>
+  </dialog>
+
+  <dialog class="dialog" id="dlg-lost" aria-labelledby="lost-title">
+    <h3 id="lost-title">З’єднання втрачено</h3>
+    <p id="lost-text" class="muted">Суперник відключився.</p>
+    <div class="dialog-actions">
+      <button class="btn btn-primary" id="btn-lost-home" type="button"><svg><use href="#i-home"/></svg>У меню</button>
+    </div>
+  </dialog>
+
+  <dialog class="dialog end" id="dlg-end" aria-labelledby="end-title">
+    <div class="end-burst" aria-hidden="true"></div>
+    <p class="eyebrow" id="end-eyebrow">Бій завершено</p>
+    <h3 id="end-title" class="end-title">Перемога!</h3>
+    <p id="end-text" class="muted"></p>
+    <dl class="end-stats">
+      <div><dt>Постріли</dt><dd id="es-shots">0</dd></div>
+      <div><dt>Влучання</dt><dd id="es-hits">0</dd></div>
+      <div><dt>Точність</dt><dd id="es-acc">0%</dd></div>
+      <div><dt>Час</dt><dd id="es-time">0:00</dd></div>
+    </dl>
+    <p class="fair" id="end-fair" hidden></p>
+    <div class="dialog-actions">
+      <button class="btn btn-ghost" id="btn-end-view" type="button"><svg><use href="#i-eye"/></svg>Поле</button>
+      <button class="btn btn-secondary" id="btn-end-home" type="button"><svg><use href="#i-home"/></svg>Меню</button>
+      <button class="btn btn-primary" id="btn-end-again" type="button"><svg><use href="#i-refresh"/></svg><span id="again-label">Ще раз</span></button>
+    </div>
+  </dialog>
+
+  <dialog class="dialog" id="dlg-file" aria-labelledby="file-title">
+    <h3 id="file-title"><svg><use href="#i-download"/></svg>Вхідний файл</h3>
+    <p class="muted">Суперник хоче надіслати файл:</p>
+    <p class="file-card"><b id="file-name"></b><span id="file-size"></span></p>
+    <p class="muted small">Приймайте файли лише від людей, яким довіряєте. Не відкривайте невідомі програми.</p>
+    <div class="dialog-actions">
+      <button class="btn btn-secondary" id="btn-file-no" type="button">Відхилити</button>
+      <button class="btn btn-primary" id="btn-file-yes" type="button">Прийняти</button>
+    </div>
+  </dialog>
+
+  <dialog class="dialog scan" id="dlg-scan" aria-labelledby="scan-title">
+    <div class="scan-head">
+      <h3 id="scan-title">Сканування QR</h3>
+      <button class="icon-btn sm" id="btn-scan-close" type="button" aria-label="Закрити"><svg><use href="#i-close"/></svg></button>
+    </div>
+    <div class="viewfinder">
+      <video id="scan-video" playsinline muted></video>
+      <div class="vf-frame" aria-hidden="true"><i></i><i></i><i></i><i></i><span class="vf-line"></span></div>
+    </div>
+    <p class="muted small" id="scan-status" role="status">Запуск камери…</p>
+    <div class="dialog-actions">
+      <button class="btn btn-secondary" id="btn-scan-switch" type="button" hidden><svg><use href="#i-switch"/></svg>Камера</button>
+      <button class="btn btn-secondary" id="btn-scan-torch" type="button" hidden><svg><use href="#i-torch"/></svg>Ліхтарик</button>
+    </div>
+  </dialog>
+
+  <div class="toasts" id="toasts" role="status" aria-live="polite"></div>
+</body>
+</html>
